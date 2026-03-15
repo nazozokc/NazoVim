@@ -38,6 +38,9 @@
             runtimeInputs = [
               pkgs.neovim
               pkgs.git # lazy.nvim の自己 bootstrap に必要
+              pkgs.clang-tools # clangd
+              pkgs.jdt-language-server # jdtls
+              pkgs.ruby
             ];
             text = ''
               APPNAME="nvim-nazozokc"
