@@ -1,0 +1,99 @@
+name: Neovim Startup Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  nvim-startup:
+    name: Check nvim starts without errors
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      # nix develop のキャッシュ（2回目以降を高速化）
+      - name: Cache Nix store
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/nix
+            /nix/store
+          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-keys: |
+            nix-${{ runner.os }}-
+
+      # lazy.nvim プラグインのキャッシュ
+      - name: Cache lazy.nvim plugins
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/nvim-nazozokc/lazy
+          key: lazy-${{ runner.os }}-${{ hashFiles('lazy-lock.json') }}
+          restore-keys: |
+            lazy-${{ runner.os }}-
+
+      - name: Set up Neovim config
+        run: |
+          export NVIM_APPNAME="nvim-nazozokc"
+          CONFIG_DIR="$HOME/.config/$NVIM_APPNAME"
+          mkdir -p "$CONFIG_DIR"
+          cp -r . "$CONFIG_DIR/"
+          chmod -R u+w "$CONFIG_DIR"
+          echo "NVIM_APPNAME=$NVIM_APPNAME" >> "$GITHUB_ENV"
+          echo "CONFIG_DIR=$CONFIG_DIR" >> "$GITHUB_ENV"
+
+      - name: Install lazy.nvim plugins
+        timeout-minutes: 10
+        run: |
+          nix develop --command sh -c '
+            export NVIM_APPNAME="nvim-nazozokc"
+            nvim --headless "+Lazy! sync" +q 2>&1 | tee /tmp/lazy-sync.log
+            echo "--- lazy sync log ---"
+            cat /tmp/lazy-sync.log
+          '
+
+      - name: Check Neovim startup (no errors)
+        run: |
+          nix develop --command sh -c '
+            export NVIM_APPNAME="nvim-nazozokc"
+
+            # --startuptime でタイム計測しつつ headless 起動
+            nvim --headless \
+              --startuptime /tmp/startuptime.log \
+              -c "lua vim.defer_fn(function() vim.cmd(\"qall!\") end, 500)" \
+              2>/tmp/nvim-stderr.log || true
+
+            echo "=== stderr ==="
+            cat /tmp/nvim-stderr.log
+
+            echo "=== startuptime (tail) ==="
+            tail -5 /tmp/startuptime.log 2>/dev/null || echo "(no startuptime log)"
+
+            # E で始まる Vim エラー、または "Error" を含む行を検出して fail
+            if grep -qE "(^E[0-9]+:|Error detected|Error in lua)" /tmp/nvim-stderr.log 2>/dev/null; then
+              echo ""
+              echo "::error::Neovim startup errors detected!"
+              grep -E "(^E[0-9]+:|Error detected|Error in lua)" /tmp/nvim-stderr.log
+              exit 1
+            fi
+
+            echo ""
+            echo "✓ Neovim started without errors."
+          '
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvim-startup-logs
+          path: |
+            /tmp/nvim-stderr.log
+            /tmp/lazy-sync.log
+            /tmp/startuptime.log
