@@ -77,6 +77,8 @@
             packages = with pkgs; [
               neovim
               git
+              claude-code
+              opencode
 
               # LSP
               lua-language-server
