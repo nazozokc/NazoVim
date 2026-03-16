@@ -30,7 +30,7 @@
 
 ## 🖼️ Screenshots
 
-> _TODO: screenshots go here_
+> _Coming soon_
 
 ---
 
@@ -86,7 +86,13 @@ nix develop github:nazozokc/nazozokc.nvim.config
 nvim  # NVIM_APPNAME=nvim-nazozokc で自動起動
 ```
 
-### 方法3: Clone（Nix不要）
+### 方法 3: Clone（Nix 不要）
+
+> **注意**: 既存の Neovim 設定を上書きします。バックアップを推奨します。
+>
+> ```bash
+> mv ~/.config/nvim ~/.config/nvim.backup  # バックアップ（任意）
+> ```
 
 ```bash
 git clone https://github.com/nazozokc/nazozokc.nvim.config.git ~/.config/nvim
@@ -231,6 +237,14 @@ nvim
 | neotest-jest / vitest / playwright | テストアダプタ |
 | nvim-coverage | カバレッジ表示 |
 
+**キーマップ:**
+| キー | 動作 |
+|------|------|
+| `<leader>tr` | 最寄りのテスト実行 |
+| `<leader>tR` | 全テスト実行 |
+| `<leader>tf` | ファイルのテスト実行 |
+| `<leader>to` | テスト出力 toggle |
+
 </details>
 
 ---
@@ -325,6 +339,25 @@ nvim
 | `<C-q>` | バッファを閉じる |
 
 </details>
+
+---
+
+## 🛠️ Maintenance
+
+### プラグイン更新
+
+```vim
+:Lazy sync   " 全プラグインを更新
+:Lazy clean  " 未使用プラグインを削除
+:Lazy snapshot " 現在のバージョンをロック
+```
+
+### 設定リロード
+
+```vim
+:Lazy reload   " 設定を再読み込み
+:source %      " 現在のバッファを sourced
+```
 
 ---
 
