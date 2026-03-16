@@ -40,11 +40,12 @@
 - **🔧 Full LSP** — TypeScript / Lua / Ruby / Nix / C / Java / Zig など多言語対応。mason + 手動 (nixd) の両刀
 - **🎨 kanagawa** — `kanagawa-dragon` テーマ + 透明背景でターミナルと溶け込む
 - **🧠 AI統合** — Claude Code (`claudecode.nvim`) と opencode (`opencode.nvim`) を両方サポート
-- **🌊 snacks.nvim** — Dashboard・Picker・Zen mode をまとめて snacks に統一
+- **🌊 snacks.nvim** — Dashboard・Picker・Zen mode・セッション管理をまとめて統一
 - **🐛 DAP** — JavaScript / TypeScript のデバッグ環境を最小構成で内包
 - **📦 Nix対応** — `nix run` で隔離起動 / `nix develop` でLSP完備のdevShell
 - **🧪 テスト** — neotest + Jest / Vitest / Playwright アダプタ
 - **🔍 Fuzzy finding** — snacks.nvim Picker (ivy layout) をメイン、Telescope をサブとして併用
+- **📝 Treesitter textobjects** — 関数・クラス・引数単位の高精度テキストオブジェクト
 
 ---
 
@@ -144,6 +145,7 @@ nvim
 | none-ls.nvim | rubocop等の追加診断 |
 | fidget.nvim | LSPプログレス表示 |
 | tiny-inline-diagnostic.nvim | インライン診断 |
+| lazydev.nvim | Lua/Neovim API の補完・型チェック強化 |
 
 </details>
 
@@ -152,7 +154,7 @@ nvim
 
 | プラグイン | 用途 |
 |------------|------|
-| snacks.nvim | Picker / Dashboard / Zen / Words |
+| snacks.nvim | Picker / Dashboard / Zen / Words / Session |
 | telescope.nvim | ファジーファインダー（サブ） |
 | oil.nvim | バッファベースのファイルエクスプローラー |
 | neo-tree.nvim | ツリー形式ファイルエクスプローラー |
@@ -203,6 +205,7 @@ nvim
 | プラグイン | 用途 |
 |------------|------|
 | nvim-treesitter | シンタックスハイライト / インデント |
+| nvim-treesitter-textobjects | 関数・クラス・引数単位のテキストオブジェクト |
 | nvim-autopairs | 括弧自動補完 |
 | mini.ai / surround / comment | テキストオブジェクト・Surround・コメント |
 | nvim-spider | CamelCase/snake_case対応 w/e/b |
@@ -211,6 +214,7 @@ nvim
 | which-key.nvim | キーマップヘルプ |
 | toggleterm.nvim | フローティングターミナル |
 | kulala.nvim | REST client (.http ファイル) |
+| persistence.nvim | セッション管理 |
 
 </details>
 
@@ -236,14 +240,6 @@ nvim
 | neotest | テストランナー |
 | neotest-jest / vitest / playwright | テストアダプタ |
 | nvim-coverage | カバレッジ表示 |
-
-**キーマップ:**
-| キー | 動作 |
-|------|------|
-| `<leader>tr` | 最寄りのテスト実行 |
-| `<leader>tR` | 全テスト実行 |
-| `<leader>tf` | ファイルのテスト実行 |
-| `<leader>to` | テスト出力 toggle |
 
 </details>
 
@@ -288,6 +284,25 @@ nvim
 </details>
 
 <details>
+<summary><b>Treesitter Textobjects</b></summary>
+
+| キー | 動作 |
+|------|------|
+| `af` / `if` | outer / inner 関数 |
+| `ac` / `ic` | outer / inner クラス |
+| `aa` / `ia` | outer / inner 引数 |
+| `ai` / `ii` | outer / inner 条件分岐 |
+| `al` / `il` | outer / inner ループ |
+| `ab` / `ib` | outer / inner ブロック |
+| `]f` / `[f` | 次/前の関数へジャンプ |
+| `]c` / `[c` | 次/前のクラスへジャンプ |
+| `]a` / `[a` | 次/前の引数へジャンプ |
+| `<Leader>sn` | 次の引数と swap |
+| `<Leader>sp` | 前の引数と swap |
+
+</details>
+
+<details>
 <summary><b>Git</b></summary>
 
 | キー | 動作 |
@@ -298,6 +313,18 @@ nvim
 | `<Leader>gc` | Diffview Close |
 | `<Leader>gp` | Hunkプレビュー |
 | `<Leader>gt` | Blame toggle |
+
+</details>
+
+<details>
+<summary><b>セッション</b></summary>
+
+| キー | 動作 |
+|------|------|
+| `<Leader>qs` | セッション復元 |
+| `<Leader>qS` | セッション選択 |
+| `<Leader>ql` | 最後のセッションを復元 |
+| `<Leader>qd` | セッション保存を停止 |
 
 </details>
 
@@ -325,6 +352,18 @@ nvim
 | `<F12>` | ステップアウト |
 | `<Leader>db` | ブレークポイント切替 |
 | `<Leader>du` | DAP UI toggle |
+
+</details>
+
+<details>
+<summary><b>テスト</b></summary>
+
+| キー | 動作 |
+|------|------|
+| `<leader>tr` | 最寄りのテスト実行 |
+| `<leader>tR` | 全テスト実行 |
+| `<leader>tf` | ファイルのテスト実行 |
+| `<leader>to` | テスト出力 toggle |
 
 </details>
 
