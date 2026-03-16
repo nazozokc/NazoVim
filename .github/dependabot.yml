@@ -3,8 +3,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "hourly"
-      hours: "*/3"
+      interval: "daily"
     labels:
       - "dependencies"
     commit-message:
