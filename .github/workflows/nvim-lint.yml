@@ -2,13 +2,11 @@ name: "CI: Lint (Lua)"
 on:
   pull_request:
     paths:
-      - "lua/*.lua"
-      - "init.lua"
+      - "**/*.lua"
       - ".github/workflows/nvim-lint.yml"
   push:
     paths:
-      - "*/*.lua"
-      - "init.lua"
+      - "**/*.lua"
       - ".github/workflows/nvim-lint.yml"
 
 concurrency:
@@ -23,20 +21,34 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+
       - uses: DeterminateSystems/nix-installer-action@v21
+
       - name: StyLua auto-fix
         run: |
-          nix shell nixpkgs#stylua --command stylua nvim/
-      - name: Create PR if StyLua made changes
+          nix shell nixpkgs#stylua --command stylua lua/ init.lua
+
+      - name: Check for StyLua diff (PR)
+        if: github.event_name == 'pull_request'
+        run: |
+          if ! git diff --quiet; then
+            echo "::error::StyLua formatting violations detected. Run stylua locally."
+            git diff
+            exit 1
+          fi
+
+      - name: Create PR if StyLua made changes (push)
         if: github.event_name == 'push'
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@v7
         with:
           commit-message: "style: auto-fix StyLua formatting"
           title: "style: auto-fix StyLua formatting"
           body: "StyLua によるフォーマット自動修正"
           branch: "fix/stylua-auto-format"
           base: main
+
       - name: luacheck
         run: |
-          nix shell nixpkgs#lua54Packages.luacheck --command luacheck nvim/ --globals vim; code=$?; [ $code -lt 2 ]
+          nix shell nixpkgs#lua54Packages.luacheck --command \
+            luacheck lua/ init.lua --globals vim; code=$?; [ $code -lt 2 ]
