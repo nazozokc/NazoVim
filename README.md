@@ -87,7 +87,7 @@ nix develop github:nazozokc/nazozokc.nvim.config
 nvim  # NVIM_APPNAME=nvim-nazozokc で自動起動
 ```
 
-### 方法 3: Clone（Nix 不要）
+### 方法3: Clone（Nix 不要）
 
 > **注意**: 既存の Neovim 設定を上書きします。バックアップを推奨します。
 >
@@ -337,6 +337,7 @@ nvim
 | `<Leader>af` | Claude Code focus |
 | `<Leader>ab` | 現在バッファを追加 |
 | `<C-a>` | opencode ask |
+| `<C-x>` | opencode select action |
 | `<C-.>` | opencode toggle |
 
 </details>
