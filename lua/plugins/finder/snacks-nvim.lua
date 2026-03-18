@@ -9,20 +9,20 @@ return {
 		dashboard = {
 			sections = {
 				{ section = "header" },
-				{ icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
-				{ icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
-				{ icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
+				{ icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
+				{ icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
+				{ icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
 				{ section = "startup" },
 			},
 			autokeys = "asdfghjklqwertyuiop",
 			preset = {
 				keys = {
-					{ icon = "", desc = "New file", key = "e", action = ":enew" },
+					{ icon = "", desc = "New file", key = "e", action = ":enew" },
 					{ icon = "󰒲", desc = "Lazy", key = "z", action = ":Lazy" },
 					{ icon = "󰈙", desc = "Oil", key = ".", action = ":Oil" },
-					{ icon = "", desc = "Dotfiles", key = "d", action = ":Config" },
+					{ icon = "", desc = "Dotfiles", key = "d", action = ":Config" },
 					{ icon = "󰈙", desc = "Files", key = "f", action = ":Telescope find_files" },
-					{ icon = "", desc = "Restore Session", key = "s", section = "session" },
+					{ icon = "", desc = "Restore Session", key = "s", section = "session" },
 					{ icon = "󰅚", desc = "Quit", key = "q", action = ":qa" },
 				},
 				header = [[
