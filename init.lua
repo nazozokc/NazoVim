@@ -16,6 +16,9 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
+-- Add treesitter parser install dir to runtimepath
+vim.opt.rtp:append(vim.fn.stdpath("data") .. "/site")
+
 -- =========================================================
 -- Basic UI options
 -- =========================================================
@@ -40,7 +43,11 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 -- Load configs
 -- =========================================================
 require("vim-options")
-require("lazy").setup("plugins")
+require("lazy").setup("plugins", {
+	rocks = {
+		enabled = false,
+	},
+})
 
 -- =========================================================
 -- Keymaps

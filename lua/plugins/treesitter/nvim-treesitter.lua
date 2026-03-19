@@ -4,6 +4,7 @@ return {
 		build = ":TSUpdate",
 		event = { "BufReadPost", "BufNewFile" },
 		opts = {
+			parser_install_dir = vim.fn.stdpath("data") .. "/site",
 			ensure_installed = {
 				"javascript",
 				"typescript",
@@ -16,6 +17,8 @@ return {
 				"lua",
 				"vim",
 				"vimdoc",
+				"regex",
+				"bash",
 			},
 
 			highlight = {
