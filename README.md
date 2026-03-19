@@ -10,7 +10,7 @@
 █   █ █   █ █████  ███    █   ███ █   █
 ```
 
-**A personal Neovim distribution by [nazozokc](https://github.com/nazozokc)**
+**A personal Neovim distribution by [nazozokc:NazoVim-org](https://github.com/nazozokc)**
 
 [![CI](https://github.com/nazozokc/nazozokc.nvim.config/actions/workflows/nvim.yml/badge.svg)](https://github.com/nazozokc/nazozokc.nvim.config/actions/workflows/nvim.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
