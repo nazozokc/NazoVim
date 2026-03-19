@@ -21,6 +21,7 @@ return {
 					return {
 						sources.path,
 						sources.treesitter,
+						sources.lsp,
 					}
 				end,
 			},

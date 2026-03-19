@@ -49,7 +49,9 @@
               export NVIM_APPNAME="$APPNAME"
               # 毎回 config を削除して再作成
               echo "[nazozokc.nvim] Refreshing config at $CONFIG_DIR ..."
-              rm -rf "$CONFIG_DIR"
+              if [ -d "$CONFIG_DIR" ]; then
+                rm -rf "$CONFIG_DIR"
+              fi
               mkdir -p "$CONFIG_DIR"
               cp -r ${nvimConfig}/. "$CONFIG_DIR/"
               chmod -R u+w "$CONFIG_DIR"

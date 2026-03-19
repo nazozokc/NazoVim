@@ -1,17 +1,6 @@
+-- none-ls.nvim sources are all commented out and the plugin is not useful
+-- Consider removing this plugin or uncommenting desired sources
 return {
 	"nvimtools/none-ls.nvim",
-	event = "LspAttach",
-	config = function()
-		local null_ls = require("null-ls")
-		null_ls.setup({
-			sources = {
-				-- disabled: requires ruby/rubocop/erb_lint
-				-- null_ls.builtins.diagnostics.erb_lint,
-				-- null_ls.builtins.diagnostics.rubocop,
-				-- null_ls.builtins.formatting.rubocop,
-			},
-		})
-
-		vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, { desc = "Format buffer" })
-	end,
+	enabled = false,
 }

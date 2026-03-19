@@ -105,20 +105,20 @@ a neovim distribution]],
 		zen = {
 			enabled = true,
 			on_open = function()
-				local safe_cmd = function(cmd)
-					pcall(vim.cmd, cmd)
-				end
 				vim.diagnostic.enable(false)
 				vim.opt.signcolumn = "no"
-				safe_cmd("IblDisable")
+				local ok, ibl = pcall(require, "ibl")
+				if ok and ibl then
+					pcall(ibl.disable, 0)
+				end
 			end,
 			on_close = function()
-				local safe_cmd = function(cmd)
-					pcall(vim.cmd, cmd)
-				end
 				vim.diagnostic.enable(true)
 				vim.opt.signcolumn = "yes"
-				safe_cmd("IblEnable")
+				local ok, ibl = pcall(require, "ibl")
+				if ok and ibl then
+					pcall(ibl.enable, 0)
+				end
 			end,
 		},
 	},

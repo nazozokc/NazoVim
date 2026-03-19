@@ -60,7 +60,9 @@ local map = vim.keymap.set
 map("n", "<leader>t", ":ToggleTerm<CR>", { desc = "Toggle terminal" })
 map("n", "<leader>c", ":Oil $HOME/dotfiles<CR>", { desc = "Open dotfiles in Oil" })
 map("n", "<leader>so", ":AerialToggle!<CR>")
-map("n", "<F2>", ":echo 'Twilight plugin not installed'<CR>", { desc = "Toggle Twilight (not installed)" })
+map("n", "<F2>", function()
+	require("snacks").zen.toggle()
+end, { desc = "Toggle Zen Mode" })
 map("n", "<leader>e", ":TroubleToggle<CR>")
 
 -- ---------------------------------------------------------
