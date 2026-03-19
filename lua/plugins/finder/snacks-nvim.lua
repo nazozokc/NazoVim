@@ -3,6 +3,9 @@ return {
 	priority = 1000,
 	lazy = false,
 	opts = {
+		notifier = {
+			enabled = false,
+		},
 		-- =========================
 		-- Dashboard
 		-- =========================
