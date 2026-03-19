@@ -5,9 +5,10 @@ return {
 		local null_ls = require("null-ls")
 		null_ls.setup({
 			sources = {
-				null_ls.builtins.diagnostics.erb_lint,
-				null_ls.builtins.diagnostics.rubocop,
-				null_ls.builtins.formatting.rubocop,
+				-- disabled: requires ruby/rubocop/erb_lint
+				-- null_ls.builtins.diagnostics.erb_lint,
+				-- null_ls.builtins.diagnostics.rubocop,
+				-- null_ls.builtins.formatting.rubocop,
 			},
 		})
 
