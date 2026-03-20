@@ -1,11 +1,11 @@
 return {
 	{
 		"nvim-telescope/telescope-ui-select.nvim",
-		event = "VeryLazy",
+		lazy = true,
 	},
 	{
 		"nvim-telescope/telescope.nvim",
-		event = "VeryLazy",
+		cmd = { "Telescope" },
 		tag = "0.1.5",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function()
