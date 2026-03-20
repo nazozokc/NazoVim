@@ -5,7 +5,7 @@ return {
 		event = { "BufReadPost", "BufNewFile" },
 		config = function(_, opts)
 			vim.opt.rtp:prepend(vim.fn.stdpath("data") .. "/site")
-			require("nvim-treesitter.configs").setup(opts)
+			require("nvim-treesitter").setup(opts)
 		end,
 		opts = {
 			parser_install_dir = vim.fn.stdpath("data") .. "/site",
