@@ -17,6 +17,10 @@
 ![Neovim](https://img.shields.io/badge/Neovim-0.10%2B-blueviolet?logo=neovim)
 ![Nix](https://img.shields.io/badge/Nix-flake-blue?logo=nixos)
 
+> **注意:** CIはNix環境で実行されるため、Nixなしのcloneインストールは
+> 自動テストされていません。Nixを使わない場合は `nvim --headless +q` で
+> 手動確認することを推奨します。
+
 </div>
 
 ---
@@ -96,14 +100,13 @@ nvim
 初回起動時に lazy.nvim がすべてのプラグインを自動インストールします。
 
 ### 方法2でクローン後に削除しても良いファイル
-- flake.nix
 - document/
-- .github/
 - LICENSE
 - SECURITY.md
 - CONTRIBUTING.md
 
-※不安な場合は削除しなくても動作には一切影響がありません。
+> `flake.nix` と `.github/` は CI に必要です。
+> PRを送る予定がない場合は `.github/` のみ削除しても構いません。
 
 ---
 
@@ -258,7 +261,7 @@ nvim
 | キー | 動作 |
 |------|------|
 | `<Leader><Leader>` | ファイル検索 (snacks Picker) |
-| `<Leader>g` | Live Grep |
+| `<Leader>/` | Live Grep |
 | `<Leader>b` | バッファ一覧 |
 | `<Leader>r` | 最近使ったファイル |
 | `<Leader>h` | 検索ハイライト解除 |
