@@ -21,7 +21,7 @@
           # このリポジトリの設定ファイルを Nix store にコピー
           nvimConfig = pkgs.stdenv.mkDerivation {
             pname = "nazovim";
-            version = "0.1.0";
+            version = "1.0.0";
             src = ./.;
             # .git は不要なので除外
             installPhase = ''
