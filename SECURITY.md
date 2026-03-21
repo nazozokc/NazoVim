@@ -2,13 +2,21 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+Only the latest commit on `main` is actively maintained.
+Older versions are not supported.
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you find a security issue in this Neovim configuration (e.g. a plugin executing
+arbitrary code, a compromised dependency, or an unsafe default), please open a
+**private** GitHub Security Advisory instead of a public issue.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Go to: **Security → Advisories → New draft security advisory**
+
+Please include:
+- A description of the issue
+- Steps to reproduce
+- Affected plugin(s) or component(s)
+- Suggested fix if you have one
+
+You can expect an initial response within a few days.
