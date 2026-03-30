@@ -19,10 +19,10 @@ lazy.nvim をプラグインマネージャーとして使用しています。
 
 ## ディレクトリ構成
 
-```
+```text
 nvim/
 ├── init.lua              # エントリーポイント・キーマップ
-├── lazy-lock.json        # プラグインバージョンロック
+├── lazy-lock.json        # プラグンバージョンロック
 ├── lua/
 │   ├── plugins.lua       # プラグイン定義（空、plugins/ 以下を自動読み込み）
 │   ├── vim-options.lua   # 基本設定
@@ -42,7 +42,7 @@ nvim/
 ### LSP / 補完
 
 | プラグイン | 用途 |
-|------------|------|
+| ---------- | ---- |
 | nvim-lspconfig + mason | LSP管理 |
 | typescript-tools.nvim | TypeScript専用LSP（高速化・semantic tokens無効化済み） |
 | nvim-cmp | 補完エンジン |
@@ -58,7 +58,7 @@ nvim/
 ### Fuzzy Finder / ナビゲーション
 
 | プラグイン | 用途 |
-|------------|------|
+| ---------- | ---- |
 | snacks.nvim | Picker / Dashboard / Zen / Words / Session |
 | telescope.nvim | ファジーファインダー（サブ） |
 | oil.nvim | バッファベースのファイルエクスプローラー |
@@ -71,7 +71,7 @@ nvim/
 ### UI / 見た目
 
 | プラグイン | 用途 |
-|------------|------|
+| ---------- | ---- |
 | kanagawa.nvim | カラースキーム（dragon + 透明背景） |
 | lualine.nvim | ステータスライン |
 | barbar.nvim | タブバー |
@@ -88,7 +88,7 @@ nvim/
 ### Git
 
 | プラグイン | 用途 |
-|------------|------|
+| ---------- | ---- |
 | gitsigns.nvim | Git差分サインカラム |
 | diffview.nvim | 差分ビュー / ファイル履歴 |
 | lazygit.nvim | LazyGit統合 |
@@ -98,7 +98,7 @@ nvim/
 ### エディタ機能
 
 | プラグイン | 用途 |
-|------------|------|
+| ---------- | ---- |
 | nvim-treesitter | シンタックスハイライト / インデント |
 | nvim-treesitter-textobjects | 関数・クラス・引数単位のテキストオブジェクト |
 | nvim-autopairs | 括弧自動補完 |
@@ -114,7 +114,7 @@ nvim/
 ### AI統合
 
 | プラグイン | 用途 |
-|------------|------|
+| ---------- | ---- |
 | claudecode.nvim | Claude Code統合 |
 | opencode.nvim | opencode統合 |
 | CopilotChat.nvim | GitHub Copilot Chat |
@@ -123,7 +123,7 @@ nvim/
 ### デバッグ / テスト
 
 | プラグイン | 用途 |
-|------------|------|
+| ---------- | ---- |
 | nvim-dap + nvim-dap-ui | デバッガー |
 | nvim-dap-vscode-js | JS/TS デバッグアダプタ |
 | neotest | テストランナー |
@@ -141,7 +141,7 @@ nvim/
 ### 基本
 
 | キー | 動作 |
-|------|------|
+| ---- | ---- |
 | `<Leader><Leader>` | ファイル検索 (snacks Picker) |
 | `<Leader>/` | Live Grep |
 | `<Leader>b` | バッファ一覧 |
@@ -156,7 +156,7 @@ nvim/
 ### LSP
 
 | キー | 動作 |
-|------|------|
+| ---- | ---- |
 | `K` | ホバー |
 | `gd` | 定義へ移動 (Lspsaga) |
 | `ga` | コードアクション (Lspsaga) |
@@ -169,7 +169,7 @@ nvim/
 ### Treesitter Textobjects
 
 | キー | 動作 |
-|------|------|
+| ---- | ---- |
 | `af` / `if` | outer / inner 関数 |
 | `ac` / `ic` | outer / inner クラス |
 | `aa` / `ia` | outer / inner 引数 |
@@ -182,10 +182,10 @@ nvim/
 | `<Leader>sn` | 次の引数と swap |
 | `<Leader>sp` | 前の引数と swap |
 
-### Git
+### Git (キーマップ)
 
 | キー | 動作 |
-|------|------|
+| ---- | ---- |
 | `<Leader>gd` | DiffviewOpen |
 | `<Leader>gh` | ファイル履歴 |
 | `<Leader>gH` | ブランチ履歴 |
@@ -196,7 +196,7 @@ nvim/
 ### セッション
 
 | キー | 動作 |
-|------|------|
+| ---- | ---- |
 | `<Leader>qs` | セッション復元 |
 | `<Leader>qS` | セッション選択 |
 | `<Leader>ql` | 最後のセッションを復元 |
@@ -205,7 +205,7 @@ nvim/
 ### Trouble（診断一覧）
 
 | キー | 動作 |
-|------|------|
+| ---- | ---- |
 | `<Leader>xx` | 診断一覧 toggle |
 | `<Leader>xX` | バッファの診断一覧 |
 | `<Leader>cs` | シンボル一覧 |
@@ -214,7 +214,7 @@ nvim/
 ### DAP
 
 | キー | 動作 |
-|------|------|
+| ---- | ---- |
 | `<F5>` | 実行 / 継続 |
 | `<F10>` | ステップオーバー |
 | `<F11>` | ステップイン |
@@ -225,7 +225,7 @@ nvim/
 ### テスト
 
 | キー | 動作 |
-|------|------|
+| ---- | ---- |
 | `<leader>tr` | 最寄りのテスト実行 |
 | `<leader>tR` | 全テスト実行 |
 | `<leader>tf` | ファイルのテスト実行 |
@@ -234,7 +234,7 @@ nvim/
 ### ウィンドウ移動
 
 | キー | 動作 |
-|------|------|
+| ---- | ---- |
 | `<C-h>` | 左へ移動 (tmux対応) |
 | `<C-j>` | 下へ移動 (tmux対応) |
 | `<C-k>` | 上へ移動 (tmux対応) |
@@ -243,7 +243,7 @@ nvim/
 ### バッファ
 
 | キー | 動作 |
-|------|------|
+| ---- | ---- |
 | `<C-PageDown>` | 次のバッファ |
 | `<C-PageUp>` | 前のバッファ |
 | `<C-t>` | 新規バッファ |

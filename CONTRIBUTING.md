@@ -10,12 +10,14 @@ nazovim は個人設定ベースのディストリビューションですが、
 バグ報告・機能提案・プラグイン追加提案は、それぞれ専用のテンプレートを使ってください。
 
 | テンプレート | 用途 |
-|---|---|
+| ----------- | ---- |
 | 🐛 Bug Report | クラッシュ・動作不良などの不具合 |
 | ✨ Feature Request | キーマップ追加・設定の改善提案 |
 | 🔌 Plugin Proposal | 新プラグインの追加提案 |
 
-質問・雑談は [GitHub Discussions](https://github.com/nazozokc/nazozokc.nvim.config/discussions) へどうぞ。
+質問・雑談は
+[GitHub Discussions](https://github.com/nazozokc/nazozokc.nvim.config/discussions)
+へどうぞ。
 
 ---
 
@@ -63,7 +65,7 @@ nix shell nixpkgs#stylua --command stylua lua/ init.lua
 - lazy.nvim の仕様に従い、できる限り **遅延ロード** (`event`, `ft`, `cmd`, `keys`) を指定してください
 - 既存プラグインと重複・競合がないか確認してください（特に LSP 系・フォーマッター系）
 
-```
+```text
 lua/plugins/
 ├── ai/          # AI 統合
 ├── completion/  # 補完
@@ -87,7 +89,7 @@ lua/plugins/
 PR を出すと以下の CI が自動実行されます。
 
 | ワークフロー | 内容 |
-|---|---|
+| ------------ | ---- |
 | `nvim.yml` | Neovim のヘッドレス起動チェック（エラーが出ないか確認） |
 | `nvim-lint.yml` | StyLua フォーマットチェック + luacheck |
 
