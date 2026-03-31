@@ -1,6 +1,6 @@
 return {
 	"vinnymeller/swagger-preview.nvim",
-	event = "InsertEnter",
+	cmd = { "SwaggerPreview" },
 	build = "npm install -g swagger-ui-watcher",
 	config = true,
 }

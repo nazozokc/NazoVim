@@ -29,21 +29,7 @@ return {
 		},
 		integrations = {
 			grep_in_directory = function(directory)
-				local ok = pcall(require, "telescope")
-				if ok then
-					local telescope = require("telescope")
-					telescope.extensions.live_grep.live_grep({
-						cwd = directory,
-					})
-				end
-			end,
-			replace_in_directory = function(directory)
-				local ok = pcall(require, "grug-far")
-				if ok then
-					require("grug-far").open({
-						cwd = directory,
-					})
-				end
+				require("telescope.builtin").live_grep({ cwd = directory })
 			end,
 		},
 	},
