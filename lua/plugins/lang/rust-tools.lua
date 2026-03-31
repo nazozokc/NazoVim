@@ -28,22 +28,16 @@ return {
 				on_attach = function(_, bufnr)
 					local wk = require("which-key")
 
-					wk.register({
-						["K"] = { vim.lsp.buf.hover, "Hover docs" },
-						["gd"] = { vim.lsp.buf.definition, "Go to definition" },
-						["gr"] = { vim.lsp.buf.references, "References" },
-						["gi"] = { vim.lsp.buf.implementation, "Implementation" },
-						["<leader>ca"] = { vim.lsp.buf.code_action, "Code Action" },
-						["<leader>rn"] = { vim.lsp.buf.rename, "Rename" },
-						["<leader>rr"] = {
-							rt.runnables.runnables,
-							"Rust Runnables",
-						},
-						["<leader>rd"] = {
-							rt.debuggables.debuggables,
-							"Rust Debuggables",
-						},
-					}, { buffer = bufnr })
+					wk.add({
+						{ "K", vim.lsp.buf.hover, buffer = bufnr, desc = "Hover docs" },
+						{ "gd", vim.lsp.buf.definition, buffer = bufnr, desc = "Go to definition" },
+						{ "gr", vim.lsp.buf.references, buffer = bufnr, desc = "References" },
+						{ "gi", vim.lsp.buf.implementation, buffer = bufnr, desc = "Implementation" },
+						{ "<leader>ca", vim.lsp.buf.code_action, buffer = bufnr, desc = "Code Action" },
+						{ "<leader>rn", vim.lsp.buf.rename, buffer = bufnr, desc = "Rename" },
+						{ "<leader>rr", rt.runnables.runnables, buffer = bufnr, desc = "Rust Runnables" },
+						{ "<leader>rd", rt.debuggables.debuggables, buffer = bufnr, desc = "Rust Debuggables" },
+					})
 
 					-- Toggle Inlay Hints
 					vim.keymap.set(

@@ -15,7 +15,6 @@ if not vim.uv.fs_stat(lazypath) then
 end
 
 vim.opt.rtp:prepend(lazypath)
-vim.opt.rtp:prepend(vim.fn.stdpath("data") .. "/site")
 
 -- =========================================================
 -- Basic UI options
@@ -80,7 +79,7 @@ map("n", "<leader>so", ":AerialToggle!<CR>", { desc = "Toggle Aerial" })
 map("n", "<F2>", function()
 	require("snacks").zen.toggle()
 end, { desc = "Toggle Zen Mode" })
-map("n", "<leader>e", ":TroubleToggle<CR>", { desc = "Toggle Trouble" })
+map("n", "<leader>e", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Toggle Trouble" })
 
 -- ---------------------------------------------------------
 -- LSP (Lspsaga / Actions)

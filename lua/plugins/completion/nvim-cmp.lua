@@ -116,22 +116,20 @@ return {
 		vim.api.nvim_create_autocmd("CompleteChanged", {
 			callback = function()
 				local ok, err = pcall(function()
-					local completed = vim.fn.complete_info()
+					local info = vim.fn.complete_info()
 
-					-- ポップアップが表示されていない場合はクリア
-					if not completed.pum_visible then
+					if not info.pum_visible then
 						vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
 						return
 					end
 
-					-- 未選択の場合はクリア
-					local selected = completed.selected
+					local selected = info.selected
 					if selected < 0 then
 						vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
 						return
 					end
 
-					local item = vim.fn.complete_info(selected)
+					local item = info.items and info.items[selected + 1]
 					if not item or not item.abbr or item.abbr == "" then
 						vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
 						return
