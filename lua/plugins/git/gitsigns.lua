@@ -6,7 +6,7 @@ return {
 			signs = {
 				add = { text = "▎" },
 				change = { text = "▎" },
-				delete = { text = "▎" }, -- ← VSCodeは全部同じバー
+				delete = { text = "▎" },
 				topdelete = { text = "▎" },
 				changedelete = { text = "▎" },
 			},
@@ -19,7 +19,7 @@ return {
 				follow_files = true,
 			},
 
-			current_line_blame = false, -- ← VSCodeはデフォOFF
+			current_line_blame = false,
 			word_diff = false,
 			update_debounce = 100,
 
@@ -28,7 +28,7 @@ return {
 			},
 		})
 
-		-- VSCode風キーマップ
+		-- VSCode-style keymaps
 		vim.keymap.set("n", "]c", function()
 			require("gitsigns").next_hunk()
 		end)

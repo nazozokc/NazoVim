@@ -1,19 +1,19 @@
 return {
-	-- 1. mini.ai（テキストオブジェクト、編集系なのでほぼすぐロード）
+	-- 1. mini.ai (text objects, loaded early for editing)
 	{
 		"echasnovski/mini.ai",
 		version = false,
-		event = "VeryLazy", -- 起動直後でなく、Lazyロード
+		event = "VeryLazy",
 		config = function()
 			require("mini.ai").setup({ mappings = { around = "a", inside = "i" } })
 		end,
 	},
 
-	-- 2. mini.surround（aiに依存するのでaiと同じタイミング）
+	-- 2. mini.surround (depends on ai, same timing)
 	{
 		"echasnovski/mini.surround",
 		version = false,
-		-- VeryLazy → keys に変更。実際に使うキーを押すまでロードしない
+		-- Changed to keys: loads only when key is pressed
 		keys = {
 			{ "sa", desc = "Add surrounding" },
 			{ "sd", desc = "Delete surrounding" },
@@ -32,21 +32,21 @@ return {
 		end,
 	},
 
-	-- 3. mini.comment（コメント系は編集時にロード）
+	-- 3. mini.comment (loaded when editing)
 	{
 		"echasnovski/mini.comment",
 		version = false,
-		event = "BufReadPre", -- バッファを開く直前に読み込む
+		event = "BufReadPre",
 		config = function()
 			require("mini.comment").setup({ options = { ignore_blank_line = true, start_of_line = false } })
 		end,
 	},
 
-	-- 4. mini.indentscope（見た目系、表示時に読み込み）
+	-- 4. mini.indentscope (visual, loaded when displayed)
 	{
 		"echasnovski/mini.indentscope",
 		version = false,
-		event = "BufReadPost", -- バッファ読み込み後に描画
+		event = "BufReadPost",
 		config = function()
 			require("mini.indentscope").setup({
 				draw = {
@@ -59,11 +59,11 @@ return {
 		end,
 	},
 
-	-- 5. mini.jump（移動系、ノーマルモード入ったらロード）
+	-- 5. mini.jump (movement, loaded on first cursor move)
 	{
 		"echasnovski/mini.jump",
 		version = false,
-		event = "CursorMoved", -- 最初のカーソル移動でロード
+		event = "CursorMoved",
 		config = function()
 			require("mini.jump").setup({ mappings = { repeat_forward = ";", repeat_backward = "," } })
 		end,

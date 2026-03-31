@@ -3,20 +3,20 @@ return {
 		"nvim-java/nvim-java",
 		dependencies = {
 			"neovim/nvim-lspconfig",
-			"mfussenegger/nvim-dap", -- Debug プラグイン
-			"MunifTanjim/nui.nvim", -- UI 補助
+			"mfussenegger/nvim-dap",
+			"MunifTanjim/nui.nvim",
 		},
 		ft = { "java" },
 		config = function()
 			require("java").setup({
-				jdtls = { version = "latest" }, -- jdtls のバージョン
-				lombok = { enable = true }, -- Lombok 対応
-				java_test = { enable = true }, -- テスト
-				java_debug_adapter = { enable = true }, -- デバッグ
-				spring_boot_tools = { enable = true }, -- Spring Boot
+				jdtls = { version = "latest" },
+				lombok = { enable = true },
+				java_test = { enable = true },
+				java_debug_adapter = { enable = true },
+				spring_boot_tools = { enable = true },
 				jdk = { auto_install = true, version = "17" },
 			})
-			-- LSP を有効化
+			-- Enable LSP
 			require("lspconfig").jdtls.setup({})
 		end,
 	},

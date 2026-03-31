@@ -32,7 +32,7 @@ return {
 			end)(),
 		})
 
-		-- キーマップ
+		-- Keymaps
 		local map = vim.keymap.set
 		map("n", "<leader>ns", require("package-info").show, { desc = "Show package versions", silent = true })
 		map("n", "<leader>nc", require("package-info").hide, { desc = "Hide package versions", silent = true })

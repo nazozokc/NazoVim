@@ -12,10 +12,10 @@ return {
 			enable_incsearch = true,
 		})
 
-		-- 検索時に hlslens を自動で発動させるマッピング
+		-- Auto activate hlslens on search
 		local opts = { noremap = true, silent = true }
 
-		-- n/N で移動したあとカウント表示
+		-- Show count after n/N movement
 		vim.api.nvim_set_keymap(
 			"n",
 			"n",
@@ -29,11 +29,11 @@ return {
 			opts
 		)
 
-		-- * と # でも同様に
+		-- Same for * and #
 		vim.api.nvim_set_keymap("n", "*", [[*<Cmd>lua require('hlslens').start()<CR>]], opts)
 		vim.api.nvim_set_keymap("n", "#", [[#<Cmd>lua require('hlslens').start()<CR>]], opts)
 
-		-- <Leader>l で現在結果の詳細 toggle
+		-- Toggle details with <Leader>l
 		vim.api.nvim_set_keymap("n", "<Leader>l", "<Cmd>lua require('hlslens').toggle_virtual_text()<CR>", opts)
 	end,
 }

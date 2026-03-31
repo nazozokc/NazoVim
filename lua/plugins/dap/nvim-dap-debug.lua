@@ -1,16 +1,14 @@
 -- =========================
--- Debug (JS / TS) 軽量最適化
+-- Debug (JS / TS) lightweight config
 -- =========================
 return {
 
-	-- DAP 本体（常駐させない）
+	-- DAP core (load on demand)
 	{
 		"mfussenegger/nvim-dap",
 		event = "VeryLazy",
 		config = function()
 			local dap = require("dap")
-
-			-- 無駄なログを出さない
 			dap.set_log_level("ERROR")
 		end,
 		keys = {
@@ -59,7 +57,7 @@ return {
 		},
 	},
 
-	-- DAP UI（自動で開かせない）
+	-- DAP UI (not auto-open)
 	{
 		"rcarriga/nvim-dap-ui",
 		dependencies = { "mfussenegger/nvim-dap" },
@@ -86,19 +84,19 @@ return {
 						position = "right",
 					},
 				},
-				controls = { enabled = false }, -- ← 地味に重い
+				controls = { enabled = false },
 			})
 		end,
 	},
 
-	-- vscode-js-debug（build しない＝超重要）
+	-- vscode-js-debug (skip build)
 	{
 		"microsoft/vscode-js-debug",
 		lazy = true,
-		build = "echo 'skip build'", -- ← これがないと地獄
+		build = "echo 'skip build'",
 	},
 
-	-- JS / TS 用 DAP
+	-- JS / TS DAP
 	{
 		"mxsdev/nvim-dap-vscode-js",
 		ft = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
@@ -108,7 +106,6 @@ return {
 		},
 		config = function()
 			require("dap-vscode-js").setup({
-				-- node デバッグだけで十分（Chromeは必要時だけ）
 				adapters = { "pwa-node" },
 			})
 
@@ -130,16 +127,16 @@ return {
 		end,
 	},
 
-	-- Virtual Text（最小構成）
+	-- Virtual Text (minimal config)
 	{
 		"theHamsta/nvim-dap-virtual-text",
 		event = "VeryLazy",
 		opts = {
 			enabled = true,
-			enabled_commands = false, -- ← いらん
+			enabled_commands = false,
 			highlight_changed_variables = false,
 			show_stop_reason = true,
-			commented = true, -- コード邪魔しない
+			commented = true,
 		},
 	},
 }

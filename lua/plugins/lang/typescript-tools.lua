@@ -26,19 +26,19 @@ return {
 			end,
 
 			settings = {
-				-- ===== 超重要 =====
+				-- Important: disable separate diagnostic server
 				separate_diagnostic_server = false,
-				publish_diagnostic_on = "save", -- insert_leave より軽い
+				publish_diagnostic_on = "save",
 
-				-- 補完を最小限に
+				-- Minimal completions
 				complete_function_calls = false,
 				include_completions_with_insert_text = false,
 
-				-- 表示系 全部オフ
+				-- Disable display features
 				code_lens = "off",
 				disable_member_code_lens = true,
 
-				-- inlay hints 全無効
+				-- Disable inlay hints
 				tsserver_file_preferences = {
 					includeInlayParameterNameHints = "none",
 					includeInlayParameterNameHintsWhenArgumentMatchesName = false,
@@ -49,7 +49,7 @@ return {
 					includeInlayEnumMemberValueHints = false,
 				},
 
-				-- ファイル監視を軽量化（CPU暴走防止）
+				-- Lightweight file watching
 				tsserver_watch_options = {
 					watchFile = "useFsEvents",
 					watchDirectory = "useFsEvents",

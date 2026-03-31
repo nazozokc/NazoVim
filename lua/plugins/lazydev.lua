@@ -3,9 +3,9 @@ return {
 	ft = "lua",
 	opts = {
 		library = {
-			-- snacks.nvim の型定義も読み込む
+			-- Load snacks.nvim types
 			{ path = "snacks.nvim", words = { "Snacks" } },
-			-- lazy.nvim の型定義
+			-- Load lazy.nvim types
 			{ path = "lazy.nvim", words = { "LazySpec", "LazyConfig" } },
 		},
 	},

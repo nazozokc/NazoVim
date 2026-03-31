@@ -1,6 +1,6 @@
 return {
 	"simrat39/rust-tools.nvim",
-	ft = { "rust" }, -- Rust開いたときだけロード
+	ft = { "rust" },
 	dependencies = {
 		"neovim/nvim-lspconfig",
 		"nvim-lua/plenary.nvim",
@@ -11,8 +11,8 @@ return {
 
 		rt.setup({
 			tools = {
-				autoSetHints = true, -- Inlay Hints 自動表示
-				hover_with_actions = true, -- Hover + Action
+				autoSetHints = true,
+				hover_with_actions = true,
 			},
 			server = {
 				settings = {
@@ -21,7 +21,7 @@ return {
 							allFeatures = true,
 						},
 						checkOnSave = {
-							command = "clippy", -- 保存時 clippy
+							command = "clippy",
 						},
 					},
 				},
@@ -45,7 +45,7 @@ return {
 						},
 					}, { buffer = bufnr })
 
-					-- Inlay Hints トグル
+					-- Toggle Inlay Hints
 					vim.keymap.set(
 						"n",
 						"<leader>th",

@@ -1,4 +1,3 @@
--- init.lua か plugins/noice.lua に
 return {
 	{
 		"folke/noice.nvim",
@@ -9,7 +8,7 @@ return {
 		opts = {
 			cmdline = {
 				enabled = true,
-				view = "cmdline_popup", -- 中央に出るやつ
+				view = "cmdline_popup",
 				format = {
 					cmdline = { icon = ">>>", lang = "vim" },
 					search_down = { icon = "🔍⌄", lang = "regex" },
@@ -19,14 +18,14 @@ return {
 			},
 			messages = {
 				enabled = true,
-				view_search = "virtualtext", -- 検索カウントを画面上に
+				view_search = "virtualtext",
 			},
 			popupmenu = {
 				enabled = true,
-				backend = "nui", -- cmp の補完でも動く
+				backend = "nui",
 			},
 			notify = {
-				enabled = true, -- vim.notify を有効
+				enabled = true,
 			},
 			lsp = {
 				override = {
@@ -40,15 +39,15 @@ return {
 				message = { enabled = true },
 			},
 			presets = {
-				bottom_search = true, -- /検索は下に表示
-				command_palette = true, -- cmdline と補完をいい感じに
-				long_message_to_split = true, -- 長い出力は split に
+				bottom_search = true,
+				command_palette = true,
+				long_message_to_split = true,
 			},
 		},
 		config = function(_, opts)
 			require("noice").setup(opts)
 
-			-- presets の外で autocmd を登録
+			-- Register autocmd outside of presets
 			vim.api.nvim_create_autocmd("ColorScheme", {
 				callback = function()
 					vim.cmd([[

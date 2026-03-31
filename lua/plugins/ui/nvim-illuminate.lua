@@ -6,7 +6,6 @@ return {
 			providers = {
 				"lsp",
 				"treesitter",
-				-- "regex", -- ← 切る。マジでいらん
 			},
 
 			delay = 120,
@@ -26,13 +25,13 @@ return {
 
 			large_file_cutoff = 5000,
 			large_file_overrides = {
-				providers = { "lsp" }, -- 重いファイルでは treesitter 切る
+				providers = { "lsp" },
 			},
 
 			disable_keymaps = false,
 		})
 
-		-- Kanagawa向け：主張しすぎない色
+		-- Subtle highlight for Kanagawa
 		vim.api.nvim_set_hl(0, "IlluminatedWordText", { underline = true })
 		vim.api.nvim_set_hl(0, "IlluminatedWordRead", { underline = true })
 		vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { underline = true })
