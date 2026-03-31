@@ -15,8 +15,6 @@ return {
 				"solargraph",
 				"efm",
 				"clangd",
-				"black",
-				"prettier",
 			},
 			automatic_enable = true,
 		},

@@ -29,11 +29,11 @@ return {
 		})
 
 		-- キーマップ
-		vim.keymap.set("n", "]c", function()
+		vim.keymap.set("n", "]h", function()
 			require("gitsigns").next_hunk()
 		end)
 
-		vim.keymap.set("n", "[c", function()
+		vim.keymap.set("n", "[h", function()
 			require("gitsigns").prev_hunk()
 		end)
 

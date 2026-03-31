@@ -10,6 +10,7 @@ return {
 		-- Dashboard
 		-- =========================
 		dashboard = {
+			enabled = true,
 			sections = {
 				{ section = "header" },
 				{ icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
@@ -25,20 +26,23 @@ return {
 					{ icon = "󰈙", desc = "Oil", key = ".", action = ":Oil" },
 					{ icon = "", desc = "Dotfiles", key = "d", action = ":Config" },
 					{ icon = "󰈙", desc = "Files", key = "f", action = ":Telescope find_files" },
-					{ icon = "", desc = "Restore Session", key = "s", section = "session" },
 					{ icon = "󰅚", desc = "Quit", key = "q", action = ":qa" },
 				},
 				header = [[
-█   █  ███  █████  ███  █   █ ███ █   █
-██  █ █   █     █ █   █ █   █  █  ██ ██
-█ █ █ █   █    █  █   █ █   █  █  █ █ █
-█  ██ █████   █   █   █ █   █  █  █   █
-█   █ █   █  █    █   █  █ █   █  █   █
-█   █ █   █ █     █   █  █ █   █  █   █
-█   █ █   █ █████  ███    █   ███ █   █
+ █   █  ███  █████  ███  █   █ ███ █   █
+ ██  █ █   █     █ █   █ █   █  █  ██ ██
+ █ █ █ █   █    █  █   █ █   █  █  █ █ █
+ █  ██ █████   █   █   █ █   █  █  █   █
+ █   █ █   █  █    █   █  █ █   █  █   █
+ █   █ █   █ █     █   █  █ █   █  █   █
+ █   █ █   █ █████  ███    █   ███ █   █
 
 a neovim distribution]],
 			},
+		},
+		-- Session は persistence.nvim で管理
+		session = {
+			enabled = false,
 		},
 		-- =========================
 		-- Picker

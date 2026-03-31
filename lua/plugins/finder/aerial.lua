@@ -8,7 +8,4 @@ return {
 		},
 		show_guides = true,
 	},
-	keys = {
-		{ "<leader>a", "<cmd>AerialToggle!<CR>", desc = "Aerial Toggle" },
-	},
 }
