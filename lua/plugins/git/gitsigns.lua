@@ -23,9 +23,33 @@ return {
 		},
 	},
 	keys = {
-		{ "]h", function() require("gitsigns").next_hunk() end, desc = "Next hunk" },
-		{ "[h", function() require("gitsigns").prev_hunk() end, desc = "Prev hunk" },
-		{ "<leader>gp", function() require("gitsigns").preview_hunk() end, desc = "Preview hunk" },
-		{ "<leader>gt", function() require("gitsigns").toggle_current_line_blame() end, desc = "Toggle blame" },
+		{
+			"]h",
+			function()
+				require("gitsigns").next_hunk()
+			end,
+			desc = "Next hunk",
+		},
+		{
+			"[h",
+			function()
+				require("gitsigns").prev_hunk()
+			end,
+			desc = "Prev hunk",
+		},
+		{
+			"<leader>gp",
+			function()
+				require("gitsigns").preview_hunk()
+			end,
+			desc = "Preview hunk",
+		},
+		{
+			"<leader>gt",
+			function()
+				require("gitsigns").toggle_current_line_blame()
+			end,
+			desc = "Toggle blame",
+		},
 	},
 }
