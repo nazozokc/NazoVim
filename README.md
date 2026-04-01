@@ -1,5 +1,3 @@
-# NazoVim
-
 ```text
 █   █  ███  █████  ███  █   █ ███ █   █
 ██  █ █   █     █ █   █ █   █  █  ██ ██
@@ -32,12 +30,6 @@
 <!-- markdownlint-enable MD013 -->
 
 > Nixのflakeとして配布しているため、`nix run` 一発で隔離された状態から即起動できます。
-
----
-
-## 🖼️ Screenshots
-
-> _Coming soon_
 
 ---
 
