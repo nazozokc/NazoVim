@@ -40,7 +40,8 @@
     "luacheck",
     "keymap",
     "Keymap",
-    "Keymaps"
+    "Keymaps",
+    "healthcheck"
   ],
   "flagWords": []
 }

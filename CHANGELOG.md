@@ -13,7 +13,7 @@
 
 - Fix code review issues and improve overall configuration ([#53](https://github.com/NazoVim-org/NazoVim/pull/53))
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v1.0.6...v1.0.7
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v1.0.6...v1.0.7>
 
 ---
 
@@ -30,7 +30,7 @@
 - Resolve CI action version issues and keymap conflicts ([#47](https://github.com/NazoVim-org/NazoVim/pull/47))
 - Update deprecated plugin APIs and fix critical bugs ([#51](https://github.com/NazoVim-org/NazoVim/pull/51))
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v1.0.5...v1.0.6
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v1.0.5...v1.0.6>
 
 ---
 
@@ -40,7 +40,7 @@
 
 - Add CI workflows for Nix, Markdown, and JSON validation ([#42](https://github.com/NazoVim-org/NazoVim/pull/42))
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v1.0.2...v1.0.5
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v1.0.2...v1.0.5>
 
 ---
 
@@ -50,7 +50,7 @@
 
 - Fix keymap conflicts and remove unused plugin ([#40](https://github.com/NazoVim-org/NazoVim/pull/40))
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v1.0.1...v1.0.2
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v1.0.1...v1.0.2>
 
 ---
 
@@ -58,7 +58,7 @@
 
 CI dependency updates only (actions/checkout, actions/upload-artifact, actions/cache).
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v1.0.0...v1.0.1
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v1.0.0...v1.0.1>
 
 ---
 
@@ -87,7 +87,7 @@ nix run github:NazoVim-org/NazoVim
 git clone https://github.com/NazoVim-org/NazoVim.git ~/.config/nvim && nvim
 ```
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/commits/v1.0.0
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/commits/v1.0.0>
 
 ---
 
@@ -95,7 +95,7 @@ git clone https://github.com/NazoVim-org/NazoVim.git ~/.config/nvim && nvim
 
 No notable changes.
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v0.2.7...v0.2.8
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v0.2.7...v0.2.8>
 
 ---
 
@@ -105,7 +105,7 @@ No notable changes.
 
 - Resolve 7 issues with clone-based distribution ([#35](https://github.com/NazoVim-org/NazoVim/pull/35))
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v0.2.6...v0.2.7
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v0.2.6...v0.2.7>
 
 ---
 
@@ -115,7 +115,7 @@ No notable changes.
 
 - Resolve 13 issues covering security, performance, maintainability, and consistency ([#34](https://github.com/NazoVim-org/NazoVim/pull/34))
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v0.2.5...v0.2.6
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v0.2.5...v0.2.6>
 
 ---
 
@@ -129,7 +129,7 @@ No notable changes.
 
 - Update and reorganize plugin configuration ([#20](https://github.com/NazoVim-org/NazoVim/pull/20))
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v0.2.4...v0.2.5
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v0.2.4...v0.2.5>
 
 ---
 
@@ -137,7 +137,7 @@ No notable changes.
 
 No notable changes.
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v0.2.3...v0.2.4
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v0.2.3...v0.2.4>
 
 ---
 
@@ -145,7 +145,7 @@ No notable changes.
 
 No notable changes.
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/v0.2.0...v0.2.3
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/compare/v0.2.0...v0.2.3>
 
 ---
 
@@ -164,7 +164,7 @@ No notable changes.
 
 - Reorganize plugins into category subdirectories ([#8](https://github.com/NazoVim-org/NazoVim/pull/8))
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/commits/V0.2.0
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/commits/V0.2.0>
 
 ---
 
@@ -178,4 +178,4 @@ No notable changes.
 
 - Fix template directory names and remove invalid variables option ([#11](https://github.com/NazoVim-org/NazoVim/pull/11))
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/commits/v0.1.0
+**Full Changelog**: <https://github.com/NazoVim-org/NazoVim/commits/v0.1.0>
