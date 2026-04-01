@@ -4,7 +4,6 @@ return {
 	ft = { "json" },
 	config = function()
 		local function detect_package_manager()
-			
 			local root =
 				vim.fs.root(0, { "pnpm-lock.yaml", "yarn.lock", "package-lock.json", "bun.lockb", "package.json" })
 			if not root then
@@ -45,6 +44,11 @@ return {
 		map("n", "<leader>nu", require("package-info").update, { desc = "Update package", silent = true })
 		map("n", "<leader>nd", require("package-info").delete, { desc = "Delete package", silent = true })
 		map("n", "<leader>ni", require("package-info").install, { desc = "Install new package", silent = true })
-		map("n", "<leader>np", require("package-info").change_version, { desc = "Change package version", silent = true })
+		map(
+			"n",
+			"<leader>np",
+			require("package-info").change_version,
+			{ desc = "Change package version", silent = true }
+		)
 	end,
 }
