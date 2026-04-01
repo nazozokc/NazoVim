@@ -1,7 +1,6 @@
--- lua/plugins/hlslens.lua
 return {
 	"kevinhwang91/nvim-hlslens",
-	event = { "BufReadPost", "BufNewFile" }, -- 必要に応じて
+	event = { "BufReadPost", "BufNewFile" },
 	config = function()
 		local hlslens = require("hlslens")
 
@@ -12,8 +11,7 @@ return {
 			enable_incsearch = true,
 		})
 
-		-- Auto activate hlslens on search
-		local opts = { noremap = true, silent = true }
+		local map = vim.keymap.set
 
 		map(
 			"n",

@@ -16,8 +16,6 @@ return {
 				spring_boot_tools = { enable = true },
 				jdk = { auto_install = true, version = "17" },
 			})
-			-- Enable LSP
-			require("lspconfig").jdtls.setup({})
 		end,
 	},
 }

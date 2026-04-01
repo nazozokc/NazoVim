@@ -16,7 +16,6 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
--- Add Treesitter parser install directory to runtime path
 vim.opt.rtp:prepend(vim.fn.stdpath("data") .. "/site")
 
 -- =========================================================

@@ -34,21 +34,9 @@ return {
 			autostart = true,
 			hide_up_to_date = true,
 			hide_unstable_versions = false,
-			package_manager = (function()
-				local root = vim.fn.getcwd()
-				if vim.fn.filereadable(root .. "/pnpm-lock.yaml") == 1 then
-					return "pnpm"
-				elseif vim.fn.filereadable(root .. "/yarn.lock") == 1 then
-					return "yarn"
-				elseif vim.fn.filereadable(root .. "/bun.lockb") == 1 then
-					return "bun"
-				else
-					return "npm"
-				end
-			end)(),
+			package_manager = detect_package_manager(),
 		})
 
-		-- Keymaps
 		local map = vim.keymap.set
 		map("n", "<leader>ns", require("package-info").show, { desc = "Show package versions", silent = true })
 		map("n", "<leader>nc", require("package-info").hide, { desc = "Hide package versions", silent = true })
