@@ -3,7 +3,7 @@
   extends: ["config:recommended"],
   automerge: true,
   automergeType: "pr",
-  schedule: ["every 3 hours"],
+  schedule: ["every weekend"],
   packageRules: [
     {
       matchUpdateTypes: ["patch", "minor"],
