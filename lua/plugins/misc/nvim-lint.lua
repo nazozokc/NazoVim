@@ -1,6 +1,6 @@
 return {
 	"mfussenegger/nvim-lint",
-	event = { "BufReadPost", "BufWritePost", "BufNewFile" },
+	event = { "BufWritePost", "BufNewFile" },
 	config = function()
 		local lint = require("lint")
 		lint.linters_by_ft = {
@@ -14,7 +14,7 @@ return {
 			markdown = { "markdownlint" },
 		}
 
-		vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
+		vim.api.nvim_create_autocmd({ "BufWritePost" }, {
 			callback = function()
 				lint.try_lint()
 			end,
