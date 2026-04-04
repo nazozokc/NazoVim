@@ -1,6 +1,7 @@
 return {
 	"hrsh7th/nvim-cmp",
 	event = "InsertEnter",
+
 	dependencies = {
 		-- Completion sources
 		"hrsh7th/cmp-nvim-lsp",
@@ -23,6 +24,7 @@ return {
 	config = function()
 		local cmp = require("cmp")
 		local luasnip = require("luasnip")
+		local tailwindcss_colorizer = require("tailwindcss-colorizer-cmp")
 
 		require("luasnip.loaders.from_vscode").lazy_load()
 
@@ -72,6 +74,8 @@ return {
 						path = "[PATH]",
 					})[entry.source.name]
 
+					tailwindcss_colorizer.format(entry, item)
+
 					return item
 				end,
 			},
@@ -102,6 +106,7 @@ return {
 			sources = {
 				{ name = "luasnip", priority = 1000 },
 				{ name = "nvim_lsp", priority = 900 },
+				{ name = "denippet", priority = 800 },
 				{ name = "path", priority = 500 },
 				{ name = "buffer", priority = 250 },
 			},

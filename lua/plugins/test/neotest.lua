@@ -7,6 +7,7 @@ return {
 		"thenbe/neotest-playwright",
 	},
 	keys = {
+
 		{
 			"<leader>tr",
 			function()

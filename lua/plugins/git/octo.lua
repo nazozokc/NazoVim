@@ -9,7 +9,7 @@ return {
 	},
 	keys = {
 		{
-			"<leader>oi",
+			"<leader>gi",
 			"<CMD>Octo issue list<CR>",
 			desc = "List GitHub Issues",
 		},

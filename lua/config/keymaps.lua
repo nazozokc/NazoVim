@@ -11,7 +11,6 @@ map("n", "<leader>e", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Toggle Tr
 
 -- LSP (Lspsaga / Actions)
 map("n", "ga", "<cmd>Lspsaga code_action<CR>", { desc = "Code Action" })
-map("n", "gd", "<cmd>Lspsaga goto_definition<CR>", { desc = "Go to Definition" })
 
 map("n", "<leader>ca", function()
 	require("actions-preview").code_actions()
