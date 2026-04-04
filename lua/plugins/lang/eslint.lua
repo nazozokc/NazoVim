@@ -1,5 +1,4 @@
 return {
 	"MunifTanjim/eslint.nvim",
-	event = "LspAttach",
-	ft = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+	enabled = false, -- nvim-lint で管理するため無効化
 }
