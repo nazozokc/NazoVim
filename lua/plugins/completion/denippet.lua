@@ -15,7 +15,7 @@ return {
 	{
 		"uga-rosa/cmp-denippet",
 		dependencies = { "uga-rosa/denippet.vim" },
-		lazy = true,
+		event = "InsertEnter",
 	},
 
 	-- VSCode snippets auto import
