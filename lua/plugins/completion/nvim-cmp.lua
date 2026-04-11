@@ -98,17 +98,18 @@ return {
 					else
 						fallback()
 					end
-end,
-		}),
-		sources = {
-			{ name = "copilot", priority = 1050 },
-			{ name = "luasnip", priority = 1000 },
-			{ name = "nvim_lsp", priority = 900 },
-			{ name = "path", priority = 500 },
-			{ name = "buffer", priority = 250 },
-		},
+				end,
+			}),
 
-		experimental = {
+			sources = {
+				{ name = "copilot", priority = 1050 },
+				{ name = "luasnip", priority = 1000 },
+				{ name = "nvim_lsp", priority = 900 },
+				{ name = "path", priority = 500 },
+				{ name = "buffer", priority = 250 },
+			},
+
+			experimental = {
 				ghost_text = {
 					hl_group = "CmpGhostSnippet",
 				},
