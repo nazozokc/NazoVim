@@ -98,9 +98,8 @@ return {
 					else
 						fallback()
 					end
-				end,
-			}),
-
+end,
+		}),
 		sources = {
 			{ name = "copilot", priority = 1050 },
 			{ name = "luasnip", priority = 1000 },
@@ -109,7 +108,7 @@ return {
 			{ name = "buffer", priority = 250 },
 		},
 
-			experimental = {
+		experimental = {
 				ghost_text = {
 					hl_group = "CmpGhostSnippet",
 				},
