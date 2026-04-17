@@ -139,7 +139,7 @@ return {
 		local ns = vim.api.nvim_create_namespace("cmp_snippet_preview")
 
 		vim.api.nvim_create_autocmd("CompleteChanged", {
-			callback = function()
+			callback = vim.schedule_wrap(function()
 				local ok, err = pcall(function()
 					local info = vim.fn.complete_info()
 
@@ -179,7 +179,7 @@ return {
 				if not ok then
 					vim.notify("[cmp] snippet preview error: " .. tostring(err), vim.log.levels.WARN)
 				end
-			end,
+			end),
 		})
 	end,
 }
