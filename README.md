@@ -396,7 +396,7 @@ return {
 # 隔離起動（設定を汚さない）
 nix run github:NazoVim-org/NazoVim
 
-# LSP/formatter 完备の開発シェル
+# LSP/formatter 完備の開発シェル
 nix develop github:NazoVim-org/NazoVim
 
 # 設定ファイルだけビルド
