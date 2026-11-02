@@ -24,6 +24,7 @@ function M.run(tasks, opts)
 	local active = {}
 	local stop = opts.stop_on_error == true
 	local any_failed = false
+	local cancelled = false
 
 	local function count_active()
 		local n = 0
@@ -66,7 +67,13 @@ function M.run(tasks, opts)
 			if opts.on_start then
 				pcall(opts.on_start, idx)
 			end
-			local success, r1, r2, r3 = coroutine.resume(co)
+			local ctx = {
+				index = idx,
+				cancelled = function()
+					return cancelled
+				end,
+			}
+			local success, r1, r2, r3 = coroutine.resume(co, ctx)
 			if coroutine.status(co) == "dead" then
 				active[co] = nil
 				A.detach(co)
@@ -102,7 +109,12 @@ function M.run(tasks, opts)
 			return n_done >= #tasks
 		end, 25)
 		if not done then
+			cancelled = true
+			local list = {}
 			for co in pairs(active) do
+				list[#list + 1] = co
+			end
+			for _, co in ipairs(list) do
 				A.abort(co)
 			end
 			vim.wait(2000, function()

@@ -37,12 +37,11 @@ function M.enabled(input, opts)
 end
 
 local function module_file(source)
-	local root = U.join(vim.fn.stdpath("config"), "lua")
 	local relative = source:gsub("%.", "/")
-	local base = U.join(root, relative)
-	for _, candidate in ipairs({ base .. ".lua", U.join(base, "init.lua") }) do
-		if U.is_file(candidate) then
-			return candidate
+	for _, candidate in ipairs({ "lua/" .. relative .. ".lua", "lua/" .. relative .. "/init.lua" }) do
+		local found = vim.api.nvim_get_runtime_file(candidate, false)
+		if #found > 0 then
+			return vim.fn.fnamemodify(found[1], ":p")
 		end
 	end
 	return nil
@@ -217,9 +216,6 @@ local function entry_code(spec)
 	if type(source) ~= "string" or source == "" then
 		return nil, "spec has no source"
 	end
-	if type(spec.build) == "function" then
-		return nil, "function build is not cacheable"
-	end
 
 	local fields = {}
 	local function add(name, value)
@@ -259,6 +255,7 @@ local function entry_code(spec)
 	local has_config = type(spec.config) == "function"
 	local needs_config = has_config
 	local keys_ok = spec.keys == nil or cacheable(spec.keys)
+	local build_ok = spec.build == nil or (type(spec.build) ~= "function" and cacheable(spec.build))
 	if spec.keys ~= nil and keys_ok then
 		local ok, err = add("keys", spec.keys)
 		if not ok then
@@ -277,6 +274,7 @@ local function entry_code(spec)
 		end
 	end
 	local needs_hydrate = (spec.keys ~= nil and not keys_ok)
+		or (spec.build ~= nil and not build_ok)
 		or type(spec.init) == "function"
 		or type(spec.enabled) == "function"
 		or type(spec.cond) == "function"
@@ -292,7 +290,7 @@ local function entry_code(spec)
 			return nil, err
 		end
 	end
-	if spec.build ~= nil then
+	if spec.build ~= nil and build_ok then
 		local ok, err = add("build", spec.build)
 		if not ok then
 			return nil, err
