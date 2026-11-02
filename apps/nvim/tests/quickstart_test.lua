@@ -1,5 +1,5 @@
 vim.opt.rtp:prepend("apps/nvim")
-local quickstart = require("config.quickstart")
+local quickstart = require("nazovim.quickstart")
 local original_list_uis = vim.api.nvim_list_uis
 vim.api.nvim_list_uis = function()
 	return { {} }

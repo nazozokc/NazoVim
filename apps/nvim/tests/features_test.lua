@@ -1,5 +1,5 @@
 vim.opt.rtp:prepend("apps/nvim")
-require("nazovim.features").setup()
+require("nazovim").setup()
 assert(vim.fn.exists(":ToggleTerm") == 2)
 assert(vim.fn.maparg("<Plug>(jumpcursor-jump)", "n") ~= "")
 

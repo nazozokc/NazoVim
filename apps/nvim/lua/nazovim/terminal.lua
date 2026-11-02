@@ -1,5 +1,6 @@
 local M = {}
 local terminals = {}
+local resize_installed = false
 
 local function geometry()
 	local width = math.max(1, math.floor(vim.o.columns * 0.8))
@@ -15,7 +16,26 @@ local function geometry()
 	}
 end
 
+---Install the resize handler only once the terminal module is actually used.
+local function install_resize_handler()
+	if resize_installed then
+		return
+	end
+	resize_installed = true
+	vim.api.nvim_create_autocmd("VimResized", {
+		group = vim.api.nvim_create_augroup("NazoTerminal", { clear = true }),
+		callback = function()
+			for _, term in pairs(terminals) do
+				if term.win and vim.api.nvim_win_is_valid(term.win) then
+					vim.api.nvim_win_set_config(term.win, geometry())
+				end
+			end
+		end,
+	})
+end
+
 function M.toggle(id)
+	install_resize_handler()
 	local term = terminals[id] or {}
 	terminals[id] = term
 	if term.win and vim.api.nvim_win_is_valid(term.win) then
@@ -49,15 +69,5 @@ function M.toggle(id)
 	end
 	vim.cmd("startinsert")
 end
-
-vim.api.nvim_create_autocmd("VimResized", {
-	callback = function()
-		for _, term in pairs(terminals) do
-			if term.win and vim.api.nvim_win_is_valid(term.win) then
-				vim.api.nvim_win_set_config(term.win, geometry())
-			end
-		end
-	end,
-})
 
 return M
