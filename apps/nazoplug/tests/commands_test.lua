@@ -122,6 +122,30 @@ test("commands clean ignores lock names outside the pack directory", function()
 	eq(U.exists(U.join(outside, "keep.txt")), true)
 end)
 
+test("install crash closes the progress window", function()
+	local pack_dir = U.join(tmp, "crash-pack")
+	local specs, by_name = S.collect({ { name = "crash.nvim", url = origin } }, { pack_dir = pack_dir })
+	C.setup({
+		specs = specs,
+		by_name = by_name,
+		lock = {},
+		lock_path = U.join(tmp, "crash-lock.json"),
+		pack_dir = pack_dir,
+	})
+	local I = require("nazoplug.install")
+	local original = I.install
+	I.install = function()
+		error("boom")
+	end
+	local wins_before = #vim.api.nvim_list_wins()
+	local ok, result, err = pcall(C.dispatch, { "install" })
+	I.install = original
+	truthy(ok, "dispatch must not raise: " .. tostring(result))
+	eq(result, false)
+	eq(#vim.api.nvim_list_wins(), wins_before, "progress window must be closed")
+	eq(err, nil)
+end)
+
 test("lock rejects names that could escape the pack directory", function()
 	local L = require("nazoplug.lock")
 	for _, name in ipairs({ "", ".", "..", "a/b", "a\\b", "-rf" }) do
