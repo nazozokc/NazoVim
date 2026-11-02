@@ -15,7 +15,6 @@ vim.fn.mkdir(temp, "p")
 -- Template selection, filenames containing spaces, literal substitutions, and overwrite safety.
 local template = require("nazovim.template")
 vim.g.nazovim_template_dir = vim.fn.getcwd() .. "/template"
-template.setup()
 vim.cmd.edit(vim.fn.fnameescape(temp .. "/my file.lua"))
 template.insert("lua/module.lua")
 assert(api.nvim_buf_get_lines(0, 0, 1, false)[1] == "-- my file.lua")

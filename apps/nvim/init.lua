@@ -9,7 +9,7 @@ vim.loader.enable()
 require("config.options")
 require("config.keymaps")
 require("config.autocmds")
-require("nazovim.features").setup()
+require("nazovim").setup()
 
 local disabled_plugins = {
 	"gzip",
@@ -55,4 +55,4 @@ if not initialized then
 	error("nazoplug setup failed")
 end
 
-require("config.quickstart").setup(nazoplug)
+require("nazovim.quickstart").setup(nazoplug)

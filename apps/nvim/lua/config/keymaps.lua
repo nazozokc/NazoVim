@@ -19,7 +19,7 @@ map("n", "<leader><leader>", function()
 	if ok then
 		picker.files()
 	else
-		require("config.quickstart").open_file()
+		require("nazovim.quickstart").open_file()
 	end
 end, { desc = "Files" })
 
