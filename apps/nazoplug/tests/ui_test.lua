@@ -94,6 +94,54 @@ test("browse window lists plugins with enrichment", function()
 	truthy(browse.win == nil or not vim.api.nvim_win_is_valid(browse.win), "browse window closed")
 end)
 
+test("progress degrades to a no-op without a drawable window", function()
+	local original = vim.api.nvim_open_win
+	vim.api.nvim_open_win = function()
+		error("no ui")
+	end
+	local ok, err = pcall(function()
+		local progress = UI.start_progress("No UI")
+		eq(progress.win, nil)
+		progress.push("alpha.nvim", "start")
+		progress.finish(1, 0)
+		progress.close()
+	end)
+	vim.api.nvim_open_win = original
+	if not ok then
+		error(err)
+	end
+end)
+
+test("progress window fits a small editor", function()
+	local columns, lines = vim.o.columns, vim.o.lines
+	vim.o.columns = 30
+	vim.o.lines = 10
+	local ok, err = pcall(function()
+		local progress = UI.start_progress("Small")
+		truthy(progress.win, "window handle")
+		local config = vim.api.nvim_win_get_config(progress.win)
+		eq(config.width <= 28, true, "width clamped: " .. tostring(config.width))
+		eq(config.height <= 8, true, "height clamped: " .. tostring(config.height))
+		progress.close()
+	end)
+	vim.o.columns = columns
+	vim.o.lines = lines
+	if not ok then
+		error(err)
+	end
+end)
+
+test("browse reports instead of throwing when the window cannot open", function()
+	local original = vim.api.nvim_open_win
+	vim.api.nvim_open_win = function()
+		error("no ui")
+	end
+	local ok, result = pcall(UI.browse, { specs = {}, by_name = {}, lock = {} })
+	vim.api.nvim_open_win = original
+	truthy(ok, "browse must not raise")
+	eq(result, nil)
+end)
+
 io.write(string.format("\nui: %d passed, %d failed\n", passed, failed))
 if failed > 0 then
 	os.exit(1)

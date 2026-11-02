@@ -105,6 +105,60 @@ test("commands clean removes orphan directories", function()
 	eq(U.exists(orphan), false)
 end)
 
+test("commands clean ignores lock names outside the pack directory", function()
+	local pack_dir = U.join(tmp, "clean-escape-pack")
+	local outside = U.join(tmp, "clean-escape-outside")
+	truthy(U.mkdir(pack_dir))
+	truthy(U.mkdir(outside))
+	truthy(U.write_file(U.join(outside, "keep.txt"), "keep\n"))
+	C.setup({
+		specs = {},
+		by_name = {},
+		lock = { ["../clean-escape-outside"] = { commit = string.rep("a", 40) } },
+		lock_path = U.join(tmp, "clean-escape-lock.json"),
+		pack_dir = pack_dir,
+	})
+	C.dispatch({ "clean", "--yes" })
+	eq(U.exists(U.join(outside, "keep.txt")), true)
+end)
+
+test("install crash closes the progress window", function()
+	local pack_dir = U.join(tmp, "crash-pack")
+	local specs, by_name = S.collect({ { name = "crash.nvim", url = origin } }, { pack_dir = pack_dir })
+	C.setup({
+		specs = specs,
+		by_name = by_name,
+		lock = {},
+		lock_path = U.join(tmp, "crash-lock.json"),
+		pack_dir = pack_dir,
+	})
+	local I = require("nazoplug.install")
+	local original = I.install
+	I.install = function()
+		error("boom")
+	end
+	local wins_before = #vim.api.nvim_list_wins()
+	local ok, result, err = pcall(C.dispatch, { "install" })
+	I.install = original
+	truthy(ok, "dispatch must not raise: " .. tostring(result))
+	eq(result, false)
+	eq(#vim.api.nvim_list_wins(), wins_before, "progress window must be closed")
+	eq(err, nil)
+end)
+
+test("lock rejects names that could escape the pack directory", function()
+	local L = require("nazoplug.lock")
+	for _, name in ipairs({ "", ".", "..", "a/b", "a\\b", "-rf" }) do
+		eq(L.valid_name(name), nil, "name " .. vim.inspect(name))
+	end
+	truthy(L.valid_name("plugin.nvim"))
+	local path = U.join(tmp, "traversal-lock.json")
+	truthy(U.write_file(path, '{"../evil":{"commit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}'))
+	local lock, err = L.load(path)
+	eq(lock, nil)
+	truthy(err and err:find("invalid lock name", 1, true))
+end)
+
 test("commands migrate refreshes the in-memory lock", function()
 	local lock_path = U.join(tmp, "migrate-state-lock.json")
 	local commit = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"

@@ -126,6 +126,30 @@ test("pinned plugin keeps its locked commit on update", function()
 	eq(third ~= entry.commit, true)
 end)
 
+test("install_missing keeps a pinned parent instead of repinning HEAD", function()
+	local pack = U.join(tmp, "pin-pack")
+	local head = truthy(G.head(origin))
+	local _, by_name = S.collect({
+		{
+			name = "pin-parent.nvim",
+			url = origin,
+			dependencies = { { name = "pin-child.nvim", url = origin } },
+		},
+	}, { pack_dir = pack })
+	local parent, child = by_name["pin-parent.nvim"], by_name["pin-child.nvim"]
+	local lock = {}
+	local ok, results = I.install({ parent }, lock, { update = false, by_name = by_name })
+	truthy(ok, vim.inspect(results))
+	eq(lock[parent.name].commit, head)
+	-- Move the working tree off the pin, then force the parent into the install
+	-- set by deleting a dependency.
+	truthy(G.checkout(parent.dir, first))
+	eq(G.head(parent.dir), first)
+	vim.fn.delete(child.dir, "rf")
+	truthy(I.install_missing({ parent }, lock, { by_name = by_name }))
+	eq(lock[parent.name].commit, head, "lock pin must not follow HEAD")
+end)
+
 test("sync does not fetch when the locked commit is already checked out", function()
 	local s = spec({ name = "offline-sync.nvim" })
 	local entry = truthy(I.ensure(s, {}))

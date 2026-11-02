@@ -107,6 +107,17 @@ function M.ensure(spec, opts)
 		if not entry then
 			return nil, string.format("failed to read HEAD for %s: %s", spec.name, entry_err)
 		end
+		-- An installed plugin never repins itself to whatever HEAD happens to
+		-- be: the lock entry stays authoritative unless the caller asked for an
+		-- update. Otherwise the startup install path silently rewrote the lock.
+		local locked_entry = opts.lock and opts.lock[spec.name]
+		if locked_entry and locked_entry.commit and locked_entry.commit ~= entry.commit then
+			local kept = { commit = locked_entry.commit }
+			if locked_entry.branch then
+				kept.branch = locked_entry.branch
+			end
+			entry = kept
+		end
 		local built, build_err = M.build(spec, opts)
 		if not built then
 			return entry, build_err
@@ -227,6 +238,26 @@ function M.prefetch(specs, opts)
 	local done = false
 	local aborted = false
 	local errors = {}
+	local processes = {}
+
+	local function stop_processes(signal)
+		local list = {}
+		for process in pairs(processes) do
+			list[#list + 1] = process
+		end
+		for _, process in ipairs(list) do
+			pcall(function()
+				process:kill(signal)
+			end)
+		end
+	end
+
+	local function wait_for_processes(ms)
+		return vim.wait(ms, function()
+			return next(processes) == nil
+		end, 25)
+	end
+
 	local function pump()
 		while active < concurrency and index < #missing do
 			index = index + 1
@@ -235,7 +266,11 @@ function M.prefetch(specs, opts)
 			if spec.branch and spec.version == nil and spec.commit == nil and spec.tag == nil then
 				clone_branch = spec.branch
 			end
+			local handle = {}
 			local function finish(result)
+				if handle.process then
+					processes[handle.process] = nil
+				end
 				vim.schedule(function()
 					active = active - 1
 					if aborted then
@@ -256,6 +291,8 @@ function M.prefetch(specs, opts)
 				timeout = timeout,
 			}, finish)
 			if ok then
+				handle.process = process
+				processes[process] = true
 				active = active + 1
 			else
 				errors[#errors + 1] = string.format("%s: %s", spec.name, tostring(process))
@@ -273,6 +310,13 @@ function M.prefetch(specs, opts)
 		if not finished then
 			aborted = true
 			errors[#errors + 1] = "clone prefetch timed out"
+			-- Never let a clone outlive the prefetch: the installer would race
+			-- against it and could clone into the same directory.
+			stop_processes("term")
+			if not wait_for_processes(5000) then
+				stop_processes("kill")
+				wait_for_processes(1000)
+			end
 		end
 	end
 	return #errors == 0, errors
@@ -327,7 +371,6 @@ end
 function M.install(specs, lock, opts)
 	opts = opts or {}
 	lock = lock or {}
-	M.prefetch(specs, opts)
 	local by_name = {}
 	if opts.by_name then
 		for name, spec in pairs(opts.by_name) do
@@ -344,6 +387,8 @@ function M.install(specs, lock, opts)
 	if cycle_err then
 		return false, results, failed, cycle_err
 	end
+
+	M.prefetch(specs, opts)
 
 	-- Per-plugin state for cross-worker dependency coordination.
 	local states = {} -- name -> "running" | "done" | "failed"
@@ -380,8 +425,18 @@ function M.install(specs, lock, opts)
 	-- coroutine; parks (yields) while dependencies are being installed by
 	-- other workers and at every subprocess boundary. Returns (ok, err, kind):
 	-- kind == "skip" means the row is already recorded.
-	local function ensure_tree(spec)
+	local function stop_worker(spec, err)
+		states[spec.name] = "failed"
+		record(spec, false, err)
+		wake_waiters()
+		return false, err, "skip"
+	end
+
+	local function ensure_tree(spec, ctx)
 		while true do
+			if ctx and ctx.cancelled() then
+				return stop_worker(spec, "cancelled")
+			end
 			local state = states[spec.name]
 			if state == "done" then
 				return true, nil, "skip"
@@ -401,13 +456,16 @@ function M.install(specs, lock, opts)
 		for _, dependency_name in ipairs(spec.dependencies or {}) do
 			local dependency = by_name[dependency_name]
 			if dependency then
-				ensure_tree(dependency)
+				ensure_tree(dependency, ctx)
 				if states[dependency.name] == "failed" then
 					return false, "dependency failed: " .. dependency.name, "skip"
 				end
 			end
 		end
 
+		if ctx and ctx.cancelled() then
+			return stop_worker(spec, "cancelled")
+		end
 		if opts.on_progress then
 			opts.on_progress(spec, "start")
 		end
@@ -443,8 +501,8 @@ function M.install(specs, lock, opts)
 	local pool = require("nazoplug.pool")
 	local tasks = {}
 	for _, spec in ipairs(specs) do
-		tasks[#tasks + 1] = function()
-			return ensure_tree(spec)
+		tasks[#tasks + 1] = function(ctx)
+			return ensure_tree(spec, ctx)
 		end
 	end
 	pool.run(tasks, {

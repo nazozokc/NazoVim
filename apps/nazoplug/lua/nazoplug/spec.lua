@@ -35,6 +35,7 @@ local function validate_name(name)
 end
 
 local collect_any
+local merge_specs
 
 local function import_module(import, ctx)
 	if type(import) == "function" then
@@ -207,21 +208,35 @@ local function normalize(raw, ctx, is_dep, source)
 		explicit_enabled = raw.enabled ~= nil,
 	}
 
-	local dependency_names = {}
-	for _, dependency in ipairs(as_list(spec.dependencies)) do
+	local declared = as_list(spec.dependencies)
+	spec.dependencies = {}
+
+	-- Register before collecting dependencies: a dependency that points back to
+	-- this spec must resolve to it instead of recursing forever. Cycles are
+	-- reported later by the installer.
+	local target = ctx.by_name[spec.name]
+	if not target then
+		target = spec
+		ctx.by_name[spec.name] = spec
+		ctx.list[#ctx.list + 1] = spec
+	end
+	for _, dependency in ipairs(declared) do
 		local dependency_specs = collect_any(dependency, ctx, true, source)
 		for _, dependency_spec in ipairs(dependency_specs) do
-			U.extend_unique(dependency_names, { dependency_spec.name })
+			U.extend_unique(spec.dependencies, { dependency_spec.name })
 		end
 	end
-	spec.dependencies = dependency_names
+	if target ~= spec then
+		merge_specs(target, spec)
+		return target
+	end
 
 	spec._.modules = nil
 	spec._.main = spec.main
 	return spec
 end
 
-local function merge_specs(existing, incoming)
+merge_specs = function(existing, incoming)
 	existing._.dep = existing._.dep and incoming._.dep
 	existing._.top = existing._.top or incoming._.top
 	existing._.source = existing._.source or incoming._.source
@@ -298,7 +313,9 @@ end
 local function register_spec(spec, ctx)
 	local existing = ctx.by_name[spec.name]
 	if existing then
-		merge_specs(existing, spec)
+		if existing ~= spec then
+			merge_specs(existing, spec)
+		end
 		return existing
 	end
 	ctx.by_name[spec.name] = spec

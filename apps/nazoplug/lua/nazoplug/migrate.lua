@@ -66,10 +66,14 @@ function M.migrate(specs, opts)
 		if not U.exists(spec.dir) and old_pack_dir then
 			local old_dir = U.join(old_pack_dir, spec.name)
 			if G.is_repo(old_dir) then
-				vim.fn.mkdir(U.dirname(spec.dir), "p")
-				local ok, err = pcall(vim.uv.fs_symlink, old_dir, spec.dir)
-				if not ok then
-					return nil, string.format("symlink failed for %s: %s", spec.name, err)
+				local made, mkdir_err = U.mkdir(U.dirname(spec.dir))
+				if not made then
+					return nil, string.format("failed to create %s: %s", U.dirname(spec.dir), tostring(mkdir_err))
+				end
+				local ok, created, link_err = pcall(vim.uv.fs_symlink, old_dir, spec.dir)
+				if not ok or not created then
+					local message = ok and link_err or created
+					return nil, string.format("symlink failed for %s: %s", spec.name, tostring(message))
 				end
 				migrated[#migrated + 1] = spec.name
 			end

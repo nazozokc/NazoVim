@@ -71,11 +71,47 @@ test("spec cache stores plain keys without needing hydration", function()
 	U.write_file(source, [[return { { "owner/example.nvim", keys = { "<leader>ex" } } } ]])
 	local specs = S.collect({ import = "plugins.example" }, { source = source, pack_dir = pack_dir })
 	assert(C.save(specs))
-	assert(U.is_file(C.bytecode_path()), "bytecode cache should be written")
+	assert(U.is_file(C.path()), "json cache should be written")
 	local cached, cached_by_name = C.load()
 	eq(#cached, 1)
 	eq(cached_by_name["example.nvim"].keys, { "<leader>ex" })
 	eq(cached_by_name["example.nvim"]._.needs_hydrate, false)
+end)
+
+test("spec cache is private and drops executable legacy caches", function()
+	package.loaded["plugins.example"] = nil
+	U.write_file(source, [[return { { "owner/example.nvim" } }]])
+	local specs = S.collect({ import = "plugins.example" }, { source = source, pack_dir = pack_dir })
+	local legacy = U.join(vim.fn.stdpath("cache"), "nazoplug", "spec-cache.lua")
+	assert(U.write_file(legacy, [[error("legacy cache executed")]]))
+	assert(C.save(specs))
+	eq(U.is_file(legacy), false)
+	assert(U.is_file(C.path()), "json cache should be written")
+	eq(vim.fn.getfperm(C.path()), "rw-------")
+end)
+
+test("spec cache never executes a legacy cache file", function()
+	local marker = U.join(tmp, "legacy-executed.txt")
+	vim.fn.delete(C.path())
+	local legacy = U.join(vim.fn.stdpath("cache"), "nazoplug", "spec-cache.lua")
+	U.write_file(
+		legacy,
+		string.format(
+			[[local f = io.open(%q, "w"); f:write("x"); f:close(); return {version=3,specs={},sources={},directories={}}]],
+			marker
+		)
+	)
+	eq(C.load(), nil)
+	eq(U.exists(marker), false)
+	vim.fn.delete(legacy)
+end)
+
+test("spec cache ignores a forged json cache", function()
+	U.write_file(
+		C.path(),
+		'{"version":3,"fingerprint":"x","sources":[],"directories":[],"specs":[{"name":"evil.nvim"}]}'
+	)
+	eq(C.load(), nil)
 end)
 
 test("spec cache marks function keys for hydration", function()
