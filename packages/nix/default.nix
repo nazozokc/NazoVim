@@ -4,7 +4,7 @@
 # merged in), and wrapped as a fully isolated NVIM_APPNAME launcher.
 #
 # The root flake.nix wires these into `packages.default`, `packages.config`
-# and `apps.default` for `nix run github:NazoVim-org/NazoVim`.
+# and `apps.default` for `nix run github:nazozokc/NazoVim`.
 
 {
   pkgs,

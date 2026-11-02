@@ -56,5 +56,5 @@ The `version` field in `flake.nix` is updated automatically by
 ## Notes
 
 - Systems: `x86_64-linux`, `aarch64-linux`, `aarch64-darwin`
-- `nix run github:NazoVim-org/NazoVim` launches isolated Neovim
+- `nix run github:nazozokc/NazoVim` launches isolated Neovim
 - `nix develop` sets `NVIM_APPNAME=nvim-nazozokc` automatically

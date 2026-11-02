@@ -1,6 +1,6 @@
 # Neovim Configuration
 
-このディレクトリは NazoVim-org/NazoVim リポジトリの Neovim 設定です。  
+このディレクトリは nazozokc/NazoVim リポジトリの Neovim 設定です。  
 自作プラグインマネージャー `nazoplug`（`apps/nazoplug/`）を使用しています。
 `init.lua` は `NAZOVIM_PLUGIN_MANAGER=lazy` のときだけ lazy.nvim にフォールバックします。
 
@@ -369,7 +369,7 @@ done
 
 ```bash
 git clone --depth 1 --filter=blob:none --sparse \
-  https://github.com/NazoVim-org/NazoVim.git ~/.config/nvim
+  https://github.com/nazozokc/NazoVim.git ~/.config/nvim
 cd ~/.config/nvim
 git sparse-checkout set apps/nvim
 mv apps/nvim/* . && rm -rf apps
