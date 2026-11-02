@@ -106,6 +106,20 @@ function M.mkdir(path)
 	return true
 end
 
+-- True when path resolves to root or one of its descendants. Normalizing both
+-- sides first means ".." segments cannot point outside root.
+function M.is_inside(root, path)
+	if type(root) ~= "string" or root == "" or type(path) ~= "string" or path == "" then
+		return false
+	end
+	local base = vim.fs.normalize(root)
+	local target = vim.fs.normalize(path)
+	if target == base then
+		return true
+	end
+	return target:sub(1, #base + 1) == base .. "/"
+end
+
 function M.read_file(path)
 	local file, err = io.open(path, "rb")
 	if not file then
@@ -130,12 +144,22 @@ function M.write_file(path, data)
 	return true
 end
 
-function M.write_atomic(path, data)
+-- Replace path with data through a temporary file. opts.mode (octal) restricts
+-- permissions before the rename so the file is never world-readable.
+function M.write_atomic(path, data, opts)
+	opts = opts or {}
 	M.mkdir(M.dirname(path))
 	local tmp = string.format("%s.tmp.%d.%d", path, uv.os_getpid(), math.random(1, 1000000))
 	local ok, err = M.write_file(tmp, data)
 	if not ok then
 		return nil, err
+	end
+	if opts.mode then
+		local chmodded, chmod_err = uv.fs_chmod(tmp, opts.mode)
+		if not chmodded then
+			uv.fs_unlink(tmp)
+			return nil, chmod_err
+		end
 	end
 	local renamed, rename_err = uv.fs_rename(tmp, path)
 	if not renamed then

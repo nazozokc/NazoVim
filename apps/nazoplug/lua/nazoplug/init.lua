@@ -33,13 +33,18 @@ function M.setup(opts)
 
 	if opts.install and opts.install.missing then
 		vim.schedule(function()
-			local install_ok, err = require("nazoplug.install").install_missing(M.specs, M.lock, {
-				lock_path = M.lock_path,
-				save = true,
-				by_name = M.by_name,
-			})
-			if not install_ok and err then
-				require("nazoplug.util").error("failed to install missing plugins: " .. tostring(err))
+			local util = require("nazoplug.util")
+			local called, install_ok, _, _, err = pcall(function()
+				return require("nazoplug.install").install_missing(M.specs, M.lock, {
+					lock_path = M.lock_path,
+					save = true,
+					by_name = M.by_name,
+				})
+			end)
+			if not called then
+				util.error("failed to install missing plugins: " .. tostring(install_ok))
+			elseif not install_ok and err then
+				util.error("failed to install missing plugins: " .. tostring(err))
 			end
 		end)
 	end

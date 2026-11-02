@@ -61,9 +61,11 @@ local function report(results, failed)
 end
 
 local function run_install(specs, opts)
+	opts = opts or {}
 	local lock = state.lock
 	local progress = require("nazoplug.ui").start_progress(opts.ui_title or "NazoPlug sync")
-	local ok, results, failed, err = I.install(
+	local called, ok, results, failed, err = pcall(
+		I.install,
 		specs,
 		lock,
 		vim.tbl_extend("force", {
@@ -74,8 +76,14 @@ local function run_install(specs, opts)
 			on_progress = function(spec, phase, perr)
 				progress.push(spec.name, phase, perr)
 			end,
-		}, opts or {})
+		}, opts)
 	)
+	if not called then
+		-- Never leave the progress window and its timer behind on a crash.
+		progress.close()
+		notify("install crashed: " .. tostring(ok), vim.log.levels.ERROR)
+		return false
+	end
 	progress.finish(#(results or {}) - #(failed or {}), #(failed or {}))
 	if not ok and err then
 		notify(err, vim.log.levels.ERROR)
@@ -291,15 +299,19 @@ local function cmd_clean(args)
 	if state.pack_dir then
 		for _, name in ipairs(stale) do
 			local dir = U.join(state.pack_dir, name)
-			if U.exists(dir) then
+			-- Names come from the (repo-controlled) lock file: never let one
+			-- resolve outside the pack directory.
+			if U.is_inside(state.pack_dir, dir) and U.exists(dir) then
 				targets[name] = dir
 			end
 		end
 		if U.is_dir(state.pack_dir) then
 			for _, name in ipairs(vim.fn.readdir(state.pack_dir)) do
-				local dir = U.join(state.pack_dir, name)
-				if not present[name] and not lock[name] and U.is_dir(dir) then
-					targets[name] = dir
+				if not name:find("/", 1, true) then
+					local dir = U.join(state.pack_dir, name)
+					if not present[name] and not lock[name] and U.is_dir(dir) then
+						targets[name] = dir
+					end
 				end
 			end
 		end

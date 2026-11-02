@@ -2,15 +2,28 @@ local U = require("nazoplug.util")
 
 local M = {}
 
-local VERSION = 2
+-- Bump when the on-disk schema changes. Version 3 stores plain JSON: earlier
+-- versions stored Lua source and executed it while loading, so anything able to
+-- write the cache file could run code inside Neovim.
+local VERSION = 3
 local uv = vim.uv or vim.loop
 
+local function cache_dir()
+	return U.join(vim.fn.stdpath("cache"), "nazoplug")
+end
+
 local function cache_path()
-	return U.join(vim.fn.stdpath("cache"), "nazoplug", "spec-cache.lua")
+	return U.join(cache_dir(), "spec-cache.json")
 end
 
 local function bytecode_path()
-	return U.join(vim.fn.stdpath("cache"), "nazoplug", "spec-cache.luac")
+	return U.join(cache_dir(), "spec-cache.luac")
+end
+
+-- Cache files written by older versions are executable Lua chunks. They are
+-- deleted instead of loaded, and re-created as JSON on the next save.
+local function legacy_paths()
+	return { U.join(cache_dir(), "spec-cache.lua"), bytecode_path() }
 end
 
 function M.path()
@@ -19,14 +32,6 @@ end
 
 function M.bytecode_path()
 	return bytecode_path()
-end
-
-local function dump_bytecode(chunk)
-	local ok, bytecode = pcall(string.dump, chunk)
-	if ok then
-		return bytecode
-	end
-	return nil
 end
 
 function M.enabled(input, opts)
@@ -114,85 +119,8 @@ function M.fingerprint(specs)
 	return manifest(specs)
 end
 
-local function encode(value, seen, depth)
-	depth = depth or 0
-	seen = seen or {}
-	if depth > 40 then
-		return nil, "table is too deep"
-	end
-	local kind = type(value)
-	if kind == "nil" then
-		return "nil"
-	end
-	if kind == "boolean" then
-		return tostring(value)
-	end
-	if kind == "number" then
-		if value ~= value or value == math.huge or value == -math.huge then
-			return nil, "unsupported number"
-		end
-		return tostring(value)
-	end
-	if kind == "string" then
-		return string.format("%q", value)
-	end
-	if kind == "function" then
-		local upvalue = debug.getupvalue(value, 1)
-		if upvalue ~= nil then
-			return nil, "function has upvalues"
-		end
-		local ok, dumped = pcall(string.dump, value)
-		if not ok then
-			return nil, dumped
-		end
-		return "loadstring(" .. string.format("%q", dumped) .. ")"
-	end
-	if kind ~= "table" then
-		return nil, "unsupported type: " .. kind
-	end
-	if seen[value] then
-		return nil, "cyclic table"
-	end
-	seen[value] = true
-	local keys = {}
-	for key in pairs(value) do
-		keys[#keys + 1] = key
-	end
-	table.sort(keys, function(left, right)
-		local left_kind, right_kind = type(left), type(right)
-		if left_kind == right_kind and (left_kind == "number" or left_kind == "string") then
-			return left < right
-		end
-		return tostring(left) < tostring(right)
-	end)
-	local parts = {}
-	for _, key in ipairs(keys) do
-		local key_kind = type(key)
-		if key_kind ~= "string" and key_kind ~= "number" then
-			seen[value] = nil
-			return nil, "unsupported table key"
-		end
-		local encoded_key = key_kind == "string" and string.format("%q", key) or tostring(key)
-		local encoded_value, err = encode(value[key], seen, depth + 1)
-		if not encoded_value then
-			seen[value] = nil
-			return nil, err
-		end
-		parts[#parts + 1] = "[" .. encoded_key .. "]=" .. encoded_value
-	end
-	seen[value] = nil
-	return "{" .. table.concat(parts, ",") .. "}"
-end
-
-local function field(fields, name, value)
-	local encoded, err = encode(value)
-	if not encoded then
-		return nil, name .. ": " .. tostring(err)
-	end
-	fields[#fields + 1] = string.format("[%q]=%s", name, encoded)
-	return true
-end
-
+-- JSON only carries nil/boolean/number/string leaves, so anything else has to
+-- be skipped and restored later by hydrating the original spec.
 local function cacheable(value, seen)
 	local kind = type(value)
 	if kind ~= "table" then
@@ -205,50 +133,51 @@ local function cacheable(value, seen)
 	seen[value] = true
 	for _, item in pairs(value) do
 		if not cacheable(item, seen) then
+			seen[value] = nil
 			return false
 		end
 	end
+	seen[value] = nil
 	return true
 end
 
-local function entry_code(spec)
+local CACHED_FIELDS = {
+	"name",
+	"url",
+	"dir",
+	"branch",
+	"submodules",
+	"lazy",
+	"priority",
+	"cmd",
+	"ft",
+	"event",
+	"dependencies",
+	"main",
+	"version",
+	"commit",
+	"tag",
+	"pin",
+}
+
+local function entry_of(spec)
 	local source = spec._ and spec._.source
 	if type(source) ~= "string" or source == "" then
 		return nil, "spec has no source"
 	end
 
-	local fields = {}
+	local entry = { source = source }
 	local function add(name, value)
-		local ok, err = field(fields, name, value)
-		if not ok then
-			return nil, err
+		if not cacheable(value) then
+			return false
 		end
+		entry[name] = value
 		return true
 	end
 
-	for _, name in ipairs({
-		"name",
-		"url",
-		"dir",
-		"branch",
-		"submodules",
-		"lazy",
-		"priority",
-		"cmd",
-		"ft",
-		"event",
-		"dependencies",
-		"main",
-		"version",
-		"commit",
-		"tag",
-		"pin",
-	}) do
-		if spec[name] ~= nil then
-			local ok, err = add(name, spec[name])
-			if not ok then
-				return nil, err
-			end
+	for _, name in ipairs(CACHED_FIELDS) do
+		if spec[name] ~= nil and not add(name, spec[name]) then
+			return nil, name .. ": value is not cacheable"
 		end
 	end
 
@@ -256,20 +185,15 @@ local function entry_code(spec)
 	local needs_config = has_config
 	local keys_ok = spec.keys == nil or cacheable(spec.keys)
 	local build_ok = spec.build == nil or (type(spec.build) ~= "function" and cacheable(spec.build))
-	if spec.keys ~= nil and keys_ok then
-		local ok, err = add("keys", spec.keys)
-		if not ok then
-			return nil, err
-		end
+	if spec.keys ~= nil and keys_ok and not add("keys", spec.keys) then
+		return nil, "keys: value is not cacheable"
 	end
 	if spec.config == false then
-		local ok, err = add("config", false)
-		if not ok then
-			return nil, err
+		if not add("config", false) then
+			return nil, "config: value is not cacheable"
 		end
 	elseif spec.opts ~= nil then
-		local ok = add("opts", spec.opts)
-		if not ok then
+		if not add("opts", spec.opts) then
 			needs_config = true
 		end
 	end
@@ -278,103 +202,65 @@ local function entry_code(spec)
 		or type(spec.init) == "function"
 		or type(spec.enabled) == "function"
 		or type(spec.cond) == "function"
-	if type(spec.enabled) ~= "function" and spec.enabled ~= nil then
-		local ok, err = add("enabled", spec.enabled)
-		if not ok then
-			return nil, err
-		end
+	if type(spec.enabled) ~= "function" and spec.enabled ~= nil and not add("enabled", spec.enabled) then
+		return nil, "enabled: value is not cacheable"
 	end
-	if type(spec.cond) ~= "function" and spec.cond ~= nil then
-		local ok, err = add("cond", spec.cond)
-		if not ok then
-			return nil, err
-		end
+	if type(spec.cond) ~= "function" and spec.cond ~= nil and not add("cond", spec.cond) then
+		return nil, "cond: value is not cacheable"
 	end
-	if spec.build ~= nil and build_ok then
-		local ok, err = add("build", spec.build)
-		if not ok then
-			return nil, err
-		end
+	if spec.build ~= nil and build_ok and not add("build", spec.build) then
+		return nil, "build: value is not cacheable"
 	end
 
-	local ok, err = add("source", source)
-	if not ok then
-		return nil, err
-	end
-	ok, err = add("dep", spec._.dep == true)
-	if not ok then
-		return nil, err
-	end
-	ok, err = add("top", spec._.top == true)
-	if not ok then
-		return nil, err
-	end
-	ok, err = add("explicit_lazy", spec._.explicit_lazy == true)
-	if not ok then
-		return nil, err
-	end
-	ok, err = add("explicit_priority", spec._.explicit_priority == true)
-	if not ok then
-		return nil, err
-	end
-	ok, err = add("explicit_enabled", spec._.explicit_enabled == true)
-	if not ok then
-		return nil, err
-	end
-	ok, err = add("has_config", has_config)
-	if not ok then
-		return nil, err
-	end
-	ok, err = add("needs_hydrate", needs_hydrate)
-	if not ok then
-		return nil, err
-	end
-	ok, err = add("needs_config", needs_config)
-	if not ok then
-		return nil, err
-	end
-
-	return "{" .. table.concat(fields, ",") .. "}"
-end
-
-local function encode_list(values)
-	local encoded = {}
-	for _, value in ipairs(values) do
-		encoded[#encoded + 1] = string.format("%q", value)
-	end
-	return "{" .. table.concat(encoded, ",") .. "}"
+	entry.dep = spec._.dep == true
+	entry.top = spec._.top == true
+	entry.explicit_lazy = spec._.explicit_lazy == true
+	entry.explicit_priority = spec._.explicit_priority == true
+	entry.explicit_enabled = spec._.explicit_enabled == true
+	entry.has_config = has_config
+	entry.needs_hydrate = needs_hydrate
+	entry.needs_config = needs_config
+	return entry
 end
 
 function M.save(specs)
 	local entries = {}
 	for _, spec in ipairs(specs) do
-		local code, err = entry_code(spec)
-		if not code then
+		local entry, err = entry_of(spec)
+		if not entry then
 			return nil, err
 		end
-		entries[#entries + 1] = code
+		entries[#entries + 1] = entry
 	end
 	local fingerprint, sources, directories = manifest(specs)
 	if not fingerprint then
 		return nil, sources
 	end
-	local data = table.concat({
-		"return {",
-		"version=" .. tostring(VERSION) .. ",",
-		"fingerprint=" .. string.format("%q", fingerprint) .. ",",
-		"sources=" .. encode_list(sources) .. ",",
-		"directories=" .. encode_list(directories) .. ",",
-		"specs={",
-		table.concat(entries, ",\n"),
-		"},}",
-	}, "\n")
-	local written, err = U.write_atomic(cache_path(), data)
+	local cache = {
+		version = VERSION,
+		fingerprint = fingerprint,
+		sources = sources,
+		directories = directories,
+		specs = entries,
+	}
+	local encoded_ok, data = pcall(vim.json.encode, cache)
+	if not encoded_ok or type(data) ~= "string" then
+		return nil, "cache is not encodable: " .. tostring(data)
+	end
+	-- JSON turns integer keys into strings and sparse arrays into nulls, so the
+	-- cache is only written when it decodes back to exactly what was built.
+	local decoded_ok, decoded = pcall(vim.json.decode, data)
+	if not decoded_ok or not vim.deep_equal(decoded, cache) then
+		return nil, "cache does not survive a JSON round trip"
+	end
+	local written, err = U.write_atomic(cache_path(), data, { mode = 384 })
 	if not written then
 		return nil, err
 	end
-	local bytecode = dump_bytecode(loadstring(data))
-	if bytecode then
-		U.write_atomic(bytecode_path(), bytecode)
+	-- The directory is shared with other tools; keep it private as well.
+	pcall(uv.fs_chmod, cache_dir(), 448)
+	for _, path in ipairs(legacy_paths()) do
+		uv.fs_unlink(path)
 	end
 	return true
 end
@@ -410,21 +296,15 @@ local function verify(cache)
 	return table.concat(parts, "\n")
 end
 
+-- Never execute cache files: they live in a shared cache directory and are not
+-- authenticated. Decoding JSON is data-only, so a forged file can only cause a
+-- cache miss.
 function M.load()
-	local chunk, err = loadfile(bytecode_path())
-	if not chunk then
-		chunk, err = loadfile(cache_path())
-		if chunk then
-			local bytecode = dump_bytecode(chunk)
-			if bytecode then
-				U.write_atomic(bytecode_path(), bytecode)
-			end
-		end
+	local data, read_err = U.read_file(cache_path())
+	if not data then
+		return nil, read_err
 	end
-	if not chunk then
-		return nil, err
-	end
-	local ok, cache = pcall(chunk)
+	local ok, cache = pcall(vim.json.decode, data)
 	if not ok or type(cache) ~= "table" or cache.version ~= VERSION or type(cache.specs) ~= "table" then
 		return nil
 	end
@@ -432,9 +312,15 @@ function M.load()
 	if not fingerprint or cache.fingerprint ~= fingerprint then
 		return nil
 	end
-	local specs, by_name = cache.specs, {}
-	for _, spec in ipairs(specs) do
-		if type(spec) ~= "table" or type(spec.name) ~= "string" or type(spec.source) ~= "string" then
+	local specs, by_name = {}, {}
+	for _, spec in ipairs(cache.specs) do
+		if
+			type(spec) ~= "table"
+			or type(spec.name) ~= "string"
+			or spec.name == ""
+			or type(spec.source) ~= "string"
+			or by_name[spec.name] ~= nil
+		then
 			return nil
 		end
 		spec._ = {
@@ -453,6 +339,7 @@ function M.load()
 			hydrated = false,
 		}
 		spec._.main = spec.main
+		specs[#specs + 1] = spec
 		by_name[spec.name] = spec
 	end
 

@@ -54,6 +54,9 @@ end
 
 local function open_float(width, height, opts)
 	opts = opts or {}
+	-- Small terminals must not make the caller fail: clamp to the editor size.
+	width = math.max(1, math.min(width, math.max(1, vim.o.columns - 2)))
+	height = math.max(1, math.min(height, math.max(1, vim.o.lines - 2)))
 	local buf = vim.api.nvim_create_buf(false, true)
 	vim.bo[buf].buftype = "nofile"
 	vim.bo[buf].bufhidden = "wipe"
@@ -86,7 +89,17 @@ end
 -- the animation and schedules the window to close itself.
 function M.start_progress(title)
 	local width, height = 64, 14
-	local buf, win = open_float(width, height)
+	local created, buf, win = pcall(open_float, width, height)
+	local timer = created and vim.uv.new_timer() or nil
+	if not created or type(buf) ~= "number" or not timer then
+		if created and type(buf) == "number" and win then
+			pcall(vim.api.nvim_win_close, win, true)
+		end
+		-- No drawable UI (headless, tiny screen, failed timer): keep the API so
+		-- the install path never leaks a half-open progress window.
+		local noop = function() end
+		return { push = noop, finish = noop, close = noop }
+	end
 	local started = vim.uv.hrtime()
 	local rows = {} -- [name] = { name, phase, err }
 	local order = {}
@@ -132,7 +145,6 @@ function M.start_progress(title)
 		vim.api.nvim_win_set_cursor(win, { #lines, 0 })
 	end
 
-	local timer = vim.uv.new_timer()
 	local scheduled = false
 	local function frame()
 		scheduled = false
@@ -216,7 +228,11 @@ function M.browse(plugins_state)
 	local by_name = plugins_state.by_name or {}
 	local lock = plugins_state.lock or {}
 	local width, height = 80, 20
-	local buf, win = open_float(width, height, { enter = true })
+	local created, buf, win = pcall(open_float, width, height, { enter = true })
+	if not created or type(buf) ~= "number" then
+		require("nazoplug.util").error("cannot open the plugin browser: " .. tostring(buf))
+		return nil
+	end
 
 	local sorted = vim.deepcopy(specs)
 	table.sort(sorted, function(a, b)
@@ -253,31 +269,36 @@ function M.browse(plugins_state)
 	end
 
 	local function refresh()
-		local pool = require("nazoplug.pool")
-		local G = require("nazoplug.git")
-		local tasks = {}
-		for _, spec in ipairs(specs) do
-			tasks[#tasks + 1] = function()
-				local entry = { repo = G.is_repo(spec.dir) }
-				if entry.repo then
-					entry.branch = G.current_branch(spec.dir)
-					entry.commit = G.head(spec.dir)
-				end
-				return true, nil, entry
-			end
-		end
-		local results = pool.run(tasks, { concurrency = plugins_state.concurrency or 16 })
-		for idx, result in ipairs(results) do
-			local spec = specs[idx]
-			if spec and result.extra then
-				info[spec.name] = result.extra
-				if result.extra.commit then
-					result.extra.commit = result.extra.commit:sub(1, 7)
+		local refreshed, refresh_err = pcall(function()
+			local pool = require("nazoplug.pool")
+			local G = require("nazoplug.git")
+			local tasks = {}
+			for _, spec in ipairs(specs) do
+				tasks[#tasks + 1] = function()
+					local entry = { repo = G.is_repo(spec.dir) }
+					if entry.repo then
+						entry.branch = G.current_branch(spec.dir)
+						entry.commit = G.head(spec.dir)
+					end
+					return true, nil, entry
 				end
 			end
+			local results = pool.run(tasks, { concurrency = plugins_state.concurrency or 16 })
+			for idx, result in ipairs(results) do
+				local spec = specs[idx]
+				if spec and result.extra then
+					info[spec.name] = result.extra
+					if result.extra.commit then
+						result.extra.commit = result.extra.commit:sub(1, 7)
+					end
+				end
+			end
+			pcall(render)
+			pcall(vim.cmd.redraw)
+		end)
+		if not refreshed then
+			require("nazoplug.util").warn("browse refresh failed: " .. tostring(refresh_err))
 		end
-		pcall(render)
-		pcall(vim.cmd.redraw)
 	end
 
 	local function close()

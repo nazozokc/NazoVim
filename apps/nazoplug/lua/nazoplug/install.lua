@@ -107,6 +107,17 @@ function M.ensure(spec, opts)
 		if not entry then
 			return nil, string.format("failed to read HEAD for %s: %s", spec.name, entry_err)
 		end
+		-- An installed plugin never repins itself to whatever HEAD happens to
+		-- be: the lock entry stays authoritative unless the caller asked for an
+		-- update. Otherwise the startup install path silently rewrote the lock.
+		local locked_entry = opts.lock and opts.lock[spec.name]
+		if locked_entry and locked_entry.commit and locked_entry.commit ~= entry.commit then
+			local kept = { commit = locked_entry.commit }
+			if locked_entry.branch then
+				kept.branch = locked_entry.branch
+			end
+			entry = kept
+		end
 		local built, build_err = M.build(spec, opts)
 		if not built then
 			return entry, build_err

@@ -25,14 +25,37 @@ local function normalize_entry(entry)
 	return result
 end
 
+-- Lock names become path components under the pack directory, so they must not
+-- be able to escape it: reject separators, parent references and flag-like
+-- names (git would read a leading "-" as an option).
+function M.valid_name(name)
+	if type(name) ~= "string" or name == "" then
+		return nil, "invalid lock name"
+	end
+	if name == "." or name == ".." then
+		return nil, "invalid lock name: " .. name
+	end
+	if name:find("/", 1, true) or name:find("\\", 1, true) then
+		return nil, "invalid lock name: " .. name
+	end
+	if name:find("\0", 1, true) then
+		return nil, "invalid lock name: " .. name
+	end
+	if name:sub(1, 1) == "-" then
+		return nil, "invalid lock name: " .. name
+	end
+	return true
+end
+
 local function sanitize(lock)
 	if type(lock) ~= "table" then
 		return nil, "lock must be a table"
 	end
 	local result = {}
 	for name, entry in pairs(lock) do
-		if type(name) ~= "string" or name == "" then
-			return nil, "invalid lock name"
+		local valid, name_err = M.valid_name(name)
+		if not valid then
+			return nil, name_err
 		end
 		local normalized, err = normalize_entry(entry)
 		if not normalized then
