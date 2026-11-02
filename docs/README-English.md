@@ -10,9 +10,9 @@
 █   █ █   █ █████  ███    █   ███ █   █
 ```
 
-**A personal Neovim distribution by [NazoVim-org](https://github.com/NazoVim-org)**
+**A personal Neovim distribution by [nazozokc](https://github.com/nazozokc)**
 
-[![CI](https://github.com/NazoVim-org/NazoVim/actions/workflows/nvim.yml/badge.svg)](https://github.com/NazoVim-org/NazoVim/actions/workflows/nvim.yml)
+[![CI](https://github.com/nazozokc/NazoVim/actions/workflows/nvim.yml/badge.svg)](https://github.com/nazozokc/NazoVim/actions/workflows/nvim.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 ![Neovim](https://img.shields.io/badge/Neovim-0.10%2B-blueviolet?logo=neovim)
 ![Nix](https://img.shields.io/badge/Nix-flake-blue?logo=nixos)
@@ -81,7 +81,7 @@ Built on the [kanagawa](https://github.com/rebelot/kanagawa.nvim) color scheme a
 ### Option 1: `nix run` (try it without touching your config)
 
 ```bash
-nix run github:NazoVim-org/NazoVim
+nix run github:nazozokc/NazoVim
 ```
 
 <!-- markdownlint-disable MD013 -->
@@ -97,7 +97,7 @@ The configuration is deployed in isolation under `~/.config/nvim-nazozokc`, leav
 ```bash
 # Sparse checkout — downloads apps/nvim/ and apps/nazoplug/
 git clone --depth 1 --filter=blob:none --sparse \
-  https://github.com/NazoVim-org/NazoVim.git ~/.config/nvim
+  https://github.com/nazozokc/NazoVim.git ~/.config/nvim
 cd ~/.config/nvim
 git sparse-checkout set apps/nvim apps/nazoplug
 mv apps/nvim/* .
@@ -112,7 +112,7 @@ If you have an existing lazy.nvim setup,
 run `:NazoPlug migrate` to reuse its data directory.
 
 > For development, clone the full repository instead:
-> `git clone https://github.com/NazoVim-org/NazoVim.git`
+> `git clone https://github.com/nazozokc/NazoVim.git`
 
 ---
 
@@ -409,13 +409,13 @@ This distribution is fully managed as a Nix flake.
 
 ```bash
 # Isolated launch (non-destructive)
-nix run github:NazoVim-org/NazoVim
+nix run github:nazozokc/NazoVim
 
 # Dev shell with LSP/formatter included
-nix develop github:NazoVim-org/NazoVim
+nix develop github:nazozokc/NazoVim
 
 # Build config files only
-nix build github:NazoVim-org/NazoVim
+nix build github:nazozokc/NazoVim
 
 # Supported platforms
 # x86_64-linux / aarch64-linux / aarch64-darwin
@@ -427,7 +427,7 @@ nix build github:NazoVim-org/NazoVim
 
 Issues and PRs are always welcome.
 <!-- markdownlint-disable MD013 -->
-For questions, head over to [GitHub Discussions](https://github.com/NazoVim-org/NazoVim/discussions).
+For questions, head over to [GitHub Discussions](https://github.com/nazozokc/NazoVim/discussions).
 <!-- markdownlint-enable MD013 -->
 
 Issue templates are available for:
@@ -440,4 +440,4 @@ Issue templates are available for:
 
 ## 📄 License
 
-MIT © [NazoVim-org](https://github.com/NazoVim-org)
+MIT © [nazozokc](https://github.com/nazozokc)

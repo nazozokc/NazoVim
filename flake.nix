@@ -1,5 +1,5 @@
 {
-  description = "NazoVim-org's Neovim configuration";
+  description = "nazozokc's Neovim configuration";
 
   # ============================================================
   # monorepo structure:

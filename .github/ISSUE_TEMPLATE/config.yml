@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: "💬 Question / 質問"
-    url: https://github.com/NazoVim-org/NazoVim/discussions
+    url: https://github.com/nazozokc/NazoVim/discussions
     about: |
       For questions or discussions, please use GitHub Discussions.
       質問・相談はGitHub Discussionsをご利用ください。

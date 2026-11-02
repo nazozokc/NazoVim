@@ -10,9 +10,9 @@
 █   █ █   █ █████  ███    █   ███ █   █
 ```
 
-**A personal Neovim distribution by [NazoVim-org](https://github.com/NazoVim-org)**
+**A personal Neovim distribution by [nazozokc](https://github.com/nazozokc)**
 
-[![CI](https://github.com/NazoVim-org/NazoVim/actions/workflows/nvim.yml/badge.svg)](https://github.com/NazoVim-org/NazoVim/actions/workflows/nvim.yml)
+[![CI](https://github.com/nazozokc/NazoVim/actions/workflows/nvim.yml/badge.svg)](https://github.com/nazozokc/NazoVim/actions/workflows/nvim.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 ![Neovim](https://img.shields.io/badge/Neovim-0.10%2B-blueviolet?logo=neovim)
 ![Nix](https://img.shields.io/badge/Nix-flake-blue?logo=nixos)
@@ -76,7 +76,7 @@
 ### 方法1: `nix run`（まずは使ってみる人）
 
 ```bash
-nix run github:NazoVim-org/NazoVim
+nix run github:nazozokc/NazoVim
 ```
 
 <!-- markdownlint-disable MD013 -->
@@ -92,7 +92,7 @@ nix run github:NazoVim-org/NazoVim
 セッションの設定・プラグイン・キャッシュを終了時に破棄するには:
 
 ```bash
-nix run github:NazoVim-org/NazoVim -- --temporary
+nix run github:nazozokc/NazoVim -- --temporary
 ```
 
 一時セッションでは導入したプラグインも終了時に削除されます。編集したファイルは
@@ -119,7 +119,7 @@ return {
 ```
 
 ```bash
-NAZOVIM_STARTUP_CONFIG="$HOME/startup.lua" nix run github:NazoVim-org/NazoVim
+NAZOVIM_STARTUP_CONFIG="$HOME/startup.lua" nix run github:nazozokc/NazoVim
 ```
 
 タイミングは `startup`、`on_demand`、`VeryLazy`、`InsertEnter` などの Neovim イベント、
@@ -143,7 +143,7 @@ NAZOVIM_STARTUP_CONFIG="$HOME/startup.lua" nix run github:NazoVim-org/NazoVim
 ```bash
 # Sparse checkout — `apps/nvim/` と `apps/nazoplug/` をダウンロード
 git clone --depth 1 --filter=blob:none --sparse \
-  https://github.com/NazoVim-org/NazoVim.git ~/.config/nvim
+  https://github.com/nazozokc/NazoVim.git ~/.config/nvim
 cd ~/.config/nvim
 git sparse-checkout set apps/nvim apps/nazoplug
 mv apps/nvim/* .
@@ -456,13 +456,13 @@ return {
 
 ```bash
 # 隔離起動（設定を汚さない）
-nix run github:NazoVim-org/NazoVim
+nix run github:nazozokc/NazoVim
 
 # LSP/formatter 完備の開発シェル
-nix develop github:NazoVim-org/NazoVim
+nix develop github:nazozokc/NazoVim
 
 # 設定ファイルだけビルド
-nix build github:NazoVim-org/NazoVim
+nix build github:nazozokc/NazoVim
 
 # 対応プラットフォーム
 # x86_64-linux / aarch64-linux / aarch64-darwin
@@ -474,7 +474,7 @@ nix build github:NazoVim-org/NazoVim
 
 Issue・PRはお気軽にどうぞ。
 <!-- markdownlint-disable MD013 -->
-質問は [GitHub Discussions](https://github.com/NazoVim-org/NazoVim/discussions) へ。
+質問は [GitHub Discussions](https://github.com/nazozokc/NazoVim/discussions) へ。
 <!-- markdownlint-enable MD013 -->
 
 Issue templateが用意されています:
@@ -487,4 +487,4 @@ Issue templateが用意されています:
 
 ## 📄 License
 
-MIT © [NazoVim-org](https://github.com/NazoVim-org)
+MIT © [nazozokc](https://github.com/nazozokc)

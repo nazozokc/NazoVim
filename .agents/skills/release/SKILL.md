@@ -18,13 +18,13 @@ description: When creating releases, tagging, or managing version bumps for Nazo
 Add a new section at the top (below the markdownlint comments):
 
 ```markdown
-## [vX.Y.Z](https://github.com/NazoVim-org/NazoVim/releases/tag/vX.Y.Z) (YYYY-MM-DD)
+## [vX.Y.Z](https://github.com/nazozokc/NazoVim/releases/tag/vX.Y.Z) (YYYY-MM-DD)
 
 ### What's Changed
 
 * description of change (#PR_NUMBER)
 
-**Full Changelog**: https://github.com/NazoVim-org/NazoVim/compare/vPREV...vX.Y.Z
+**Full Changelog**: https://github.com/nazozokc/NazoVim/compare/vPREV...vX.Y.Z
 ```
 
 ### 2. Commit and tag
