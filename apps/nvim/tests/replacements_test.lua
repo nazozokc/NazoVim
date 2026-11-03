@@ -108,6 +108,9 @@ equal({ srow, scol, erow, ecol }, { 1, 0, 1, 6 })
 
 -- Spider motions split camelCase and snake_case.
 local motion = require("nazovim.motion")
+equal(motion.hints("axxbaz", 0, 1), { 3, 4, 5 })
+equal(motion.hints("abcabc", 5, -1), { 2 })
+equal(motion.hints("あxあy", 0, 1), { 3, 4, 7 })
 local texts = {}
 for _, token in ipairs(motion.tokens("fooBar_baz qux")) do
 	texts[#texts + 1] = token.text
@@ -130,6 +133,7 @@ api.nvim_win_set_cursor(0, { 1, 0 })
 require("nazovim.motion").setup()
 vim.api.nvim_feedkeys("fx", "xt", false)
 equal(api.nvim_win_get_cursor(0), { 1, 1 })
+equal(api.nvim_buf_get_extmarks(0, api.nvim_create_namespace("NazoMotionHints"), 0, -1, {}), {})
 vim.api.nvim_feedkeys(";", "xt", false)
 equal(api.nvim_win_get_cursor(0), { 2, 1 })
 vim.api.nvim_feedkeys(",", "xt", false)

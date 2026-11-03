@@ -26,6 +26,7 @@
 | dial.nvim | `dial.lua` | 数値・真偽値・定数の `<C-a>` / `<C-x>` 拡張 |
 | nvim-spider | `motion.lua` | camelCase / snake_case を分割する `w` / `e` / `b` / `ge` |
 | （Neovim標準） | `motion.lua` | `f` / `F` / `t` / `T` の複数行検索と `;` / `,` の繰り返し |
+| quick-scope | `motion.lua` | `f` / `F` / `t` / `T` 入力前に一意な検索候補を下線表示 |
 | marks.nvim | `marks.lua` | マークのサイン表示、`:Marks` 一覧、`]m` / `[m` 移動 |
 | spellsitter.nvim | `spell.lua` | 散文ファイルタイプだけspellを有効化 |
 | barbar.nvim | `tabline.lua` | バッファタブ、クリック遷移、バッファ移動キー |

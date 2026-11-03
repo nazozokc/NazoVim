@@ -1,5 +1,49 @@
 local M = {}
 local jump = { char = nil, direction = 1, till = false }
+local hint_ns = vim.api.nvim_create_namespace("NazoMotionHints")
+
+---Return byte columns of characters that occur only once in the search direction.
+function M.hints(line, col, direction)
+	local chars = vim.fn.split(line, "\\zs")
+	local positions, counts = {}, {}
+	local byte = 0
+	for _, char in ipairs(chars) do
+		local start = byte
+		byte = byte + #char
+		if (direction > 0 and start > col) or (direction < 0 and start < col) then
+			positions[#positions + 1] = { col = start, char = char }
+			counts[char] = (counts[char] or 0) + 1
+		end
+	end
+	local result = {}
+	for _, item in ipairs(positions) do
+		if counts[item.char] == 1 then
+			result[#result + 1] = item.col
+		end
+	end
+	return result
+end
+
+local function show_hints(direction)
+	local buf = vim.api.nvim_get_current_buf()
+	local line, col = vim.api.nvim_get_current_line(), vim.api.nvim_win_get_cursor(0)[2]
+	vim.api.nvim_buf_clear_namespace(buf, hint_ns, 0, -1)
+	for _, start in ipairs(M.hints(line, col, direction)) do
+		local char = vim.fn.strcharpart(line:sub(start + 1), 0, 1)
+		vim.api.nvim_buf_set_extmark(buf, hint_ns, vim.api.nvim_win_get_cursor(0)[1] - 1, start, {
+			end_col = start + #char,
+			hl_group = "NazoMotionHint",
+		})
+	end
+	vim.cmd("redraw")
+end
+
+local function clear_hints()
+	local buf = vim.api.nvim_get_current_buf()
+	if vim.api.nvim_buf_is_valid(buf) then
+		vim.api.nvim_buf_clear_namespace(buf, hint_ns, 0, -1)
+	end
+end
 
 local function split_camel(text, base)
 	local chars = vim.fn.split(text, "\\zs")
@@ -206,10 +250,13 @@ local function repeat_jump(reverse)
 end
 
 function M.setup()
+	vim.api.nvim_set_hl(0, "NazoMotionHint", { underline = true, default = true })
 	local directions = { f = { 1, false }, F = { -1, false }, t = { 1, true }, T = { -1, true } }
 	for key, motion in pairs(directions) do
 		vim.keymap.set({ "n", "x", "o" }, key, function()
+			show_hints(motion[1])
 			local ok, char = pcall(vim.fn.getcharstr)
+			clear_hints()
 			if not ok or char == "" then
 				return
 			end
