@@ -27,7 +27,7 @@
 
 <!-- markdownlint-disable MD013 -->
 **nazovim** is a personal Neovim distribution tailored for CLI/TUI-centric workflows.
-Built on the [kanagawa](https://github.com/rebelot/kanagawa.nvim) color scheme and aggressive lazy-loading via the in-house `nazoplug` manager, it comes with everything needed for TypeScript, Lua, Nix, Ruby, and more.
+Built on an original transparent dark palette and aggressive lazy-loading via the in-house `nazoplug` manager, it comes with everything needed for TypeScript, Lua, Nix, Ruby, and more.
 
 > Distributed as a Nix flake — run it instantly in an isolated environment with a single `nix run` command.
 <!-- markdownlint-enable MD013 -->
@@ -45,14 +45,14 @@ Built on the [kanagawa](https://github.com/rebelot/kanagawa.nvim) color scheme a
 <!-- markdownlint-disable MD013 -->
 - **⚡ Fast startup** — Aggressive lazy-loading with nazoplug. Anything that can wait is deferred to `VeryLazy`
 - **🔧 Full LSP** — Multi-language support: TypeScript / Lua / Ruby / Nix / C / Java / Zig and more. Dual setup with mason + manual (nixd)
-- **🎨 kanagawa** — `kanagawa-dragon` theme with transparent background that blends seamlessly with your terminal
+- **🎨 NazoVim theme** — Original blue-green dark palette with a transparent background
 - **🧠 AI integration** — Supports both Claude Code (`claudecode.nvim`) and opencode (`opencode.nvim`)
-- **🌊 snacks.nvim** — Dashboard, Picker, Zen mode, and session management all unified in one plugin
+- **🌊 snacks.nvim** — Dashboard and Zen mode
 - **🐛 DAP** — Minimal debug environment for JavaScript / TypeScript
 - **📦 Nix-ready** — Isolated launch via `nix run` / LSP-equipped devShell via `nix develop`
-- **🧪 Testing** — neotest with Jest / Vitest / Playwright adapters
-- **🔍 Fuzzy finding** — snacks.nvim Picker (ivy layout) as primary, Telescope as secondary
-- **📝 Treesitter textobjects** — High-precision text objects at function / class / argument granularity
+- **🧪 Testing** — NazoVim built-in runner using project Jest / Vitest / Playwright CLIs
+- **🔍 Fuzzy finding** — NazoVim's built-in picker for files, buffers, recent files, and search results
+- **📝 Treesitter textobjects** — Custom syntax-node selection, movement, and argument swapping
 <!-- markdownlint-enable MD013 -->
 
 ---
@@ -69,7 +69,7 @@ Built on the [kanagawa](https://github.com/rebelot/kanagawa.nvim) color scheme a
 | ----------- | ------- |
 | Nix (with flakes) | Isolated launch via `nix run` / `nix develop` |
 | Node.js | TypeScript LSP / prettier |
-| lazygit | LazyGit integration |
+| NazoVim built-in | Floating LazyGit terminal (`lazygit.lua`, requires external `lazygit`) |
 | yazi | File manager integration |
 | ripgrep | Grep search |
 | fd | File search |
@@ -155,11 +155,15 @@ run `:NazoPlug migrate` to reuse its data directory.
 | nvim-lspconfig + mason | LSP management |
 | typescript-tools.nvim | TypeScript-specific LSP (performance-tuned) |
 | nvim-cmp | Completion engine |
-| LuaSnip + denippet.vim | Snippets (VSCode-compatible) |
-| lspsaga.nvim | Enhanced LSP UI |
-| actions-preview.nvim | Code action preview |
-| conform.nvim | Formatter (stylua / prettier / etc.) |
-| nvim-lint | Additional diagnostics (rubocop, etc.) |
+| NazoVim built-in | Command-line completion (`cmdline_completion.lua`) |
+| NazoVim built-in | Independent snippet expansion and placeholder navigation (`snippets.lua`, VSCode JSON subset) |
+| NazoVim built-in | Tree-sitter node selection expansion and contraction (`incremental_selection.lua`) |
+| NazoVim built-in | Neovim code actions (`lsp_actions.lua`) |
+| NazoVim built-in | LSP code action diff preview (`action_preview.lua`) |
+| NazoVim built-in | LSP refactoring actions (`refactor.lua`) |
+| NazoVim built-in | External formatters (`format.lua`) |
+| NazoVim built-in | External lint diagnostics (ESLint, RuboCop, Luacheck, Nix, markdownlint) |
+| NazoVim built-in | Task runner and history (`tasks.lua`) |
 | NazoVim built-in | LSP progress display |
 | NazoVim built-in | Inline diagnostics |
 | lazydev.nvim | Enhanced Lua/Neovim API completion and type checking |
@@ -168,63 +172,75 @@ run `:NazoPlug migrate` to reuse its data directory.
 
 | Plugin | Purpose |
 | ------ | ------ |
-| snacks.nvim | Picker / Dashboard / Zen / Words / Session |
+| snacks.nvim | Dashboard / Zen |
+| NazoVim built-in | File, buffer, recent-item, and text-search picker (`picker.lua`) |
 | telescope.nvim | Fuzzy finder (secondary) |
-| oil.nvim | Buffer-based file explorer |
+| NazoVim built-in | Buffer-based file browser (`file_browser.lua`) |
 | neo-tree.nvim | Tree-style file explorer |
 | yazi.nvim | yazi file manager integration |
-| dropbar.nvim | Winbar / breadcrumbs |
+| NazoVim built-in | Winbar / syntax breadcrumbs (`breadcrumb.lua`) |
+| NazoVim built-in | Translation command (`translate.lua`, uses Translate Shell) |
+| NazoVim built-in | package.json dependency versions and package manager actions (`package_info.lua`) |
 | NazoVim built-in | Visible-range `<CR>` and Treesitter-node `<S-CR>` jumps (`jump.lua`) |
-| aerial.nvim | Symbol outline |
+| NazoVim built-in | Symbol outline (`outline.lua`) |
 | project.nvim | Automatic project root detection |
 
 ### UI / Appearance
 
 | Plugin | Purpose |
 | ------ | ------ |
-| kanagawa.nvim | Color scheme (dragon + transparent) |
+| NazoVim built-in | Original color scheme (blue-green dark palette + transparent background, `colorscheme.lua`) |
 | NazoVim built-in | Status line |
 | NazoVim built-in | Buffer tabs with click navigation |
 | NazoVim built-in | Indent guides / current block highlight |
-| noice.nvim | Command line UI / notifications |
-| nvim-notify | Notification system |
+| NazoVim built-in | Command line popup, notifications, and message history (`cmdline_ui.lua` / `notifications.lua`) |
 | NazoVim built-in | Scrollbar |
 | Built into NazoVim | Mode-based line number colors |
 | NazoVim built-in | Highlight symbol under cursor |
 | Built into NazoVim | Floating filename |
 | NazoVim built-in | Highlight TODO/FIXME and similar |
-| render-markdown.nvim | Rich Markdown rendering |
+| NazoVim built-in | Rich Markdown / Avante rendering (`markdown_render.lua`) |
 | NazoVim built-in | Inline color code preview |
 
 ### Git (Plugins)
 
 | Plugin | Purpose |
 | ------ | ------ |
-| gitsigns.nvim | Git diff sign column |
-| diffview.nvim | Diff view / file history |
-| lazygit.nvim | LazyGit integration |
+| NazoVim built-in | Git change signs, hunk navigation and preview, line blame (`git_signs.lua`) |
+| NazoVim built-in | Git change list, history, and conflict selection (`git_review.lua`) |
+| NazoVim built-in | Floating LazyGit terminal (`lazygit.lua`) |
 | vim-fugitive | Git operations |
-| octo.nvim | GitHub Issues / PRs / Notifications |
+| NazoVim built-in | GitHub issue / PR lists, details, creation, title/body editing, comments, and close/reopen (`github.lua`, uses `gh` CLI) |
+| NazoVim built-in | GitHub notifications and issue / PR search (`github.lua`); discussion create/edit/delete/reply, comment management, poll voting, accepted answers, upvotes, reactions, categories, subscriptions, close/reopen (`github_discussions.lua`) |
+| NazoVim built-in | Issue / PR labels, assignees, milestones, project membership, reactions, and PR reviewer requests (`github_metadata.lua`) |
+| NazoVim built-in | GitHub issue pinning and notification subscriptions (`github_issue_extras.lua`) |
+| NazoVim built-in | PR checks, merge, checkout, ready/draft, and branch updates (`github_pr_actions.lua`) |
+| NazoVim built-in | Pull request diff, inline comments, thread replies/resolution, and overall reviews (`github_review.lua`) |
+| octo.nvim | Remaining GitHub operations such as project board workflows and PR commits/runs/changes |
 
 ### Editor
 
 | Plugin | Purpose |
 | ------ | ------ |
 | nvim-treesitter | Syntax highlighting / indentation |
-| nvim-treesitter-textobjects | Function / class / argument text objects |
+| NazoVim built-in | Tree-sitter node selection expansion and contraction (`incremental_selection.lua`) |
+| NazoVim built-in | Function / class / conditional / loop / block / argument text objects (`textobjects.lua`) |
 | NazoVim built-in | `motion.lua`: multi-line f/F/t/T and `;` / `,` repeat |
 | NazoVim built-in | Automatic bracket / quote closing (`pairs.lua`) |
 | NazoVim built-in | Surround (`sa` / `sd` / `sr`) |
+| NazoVim built-in | Repeat custom edits with `.` (`repeat_action.lua`) |
 | NazoVim built-in | CamelCase / snake_case-aware `w` / `e` / `b` / `ge` |
+| NazoVim built-in | HTML/CSS abbreviation expansion (`abbreviations.lua`, `<C-e>,`) |
 | NazoVim built-in | Extended `<C-a>/<C-x>` increment |
 | NazoVim built-in | Keymap help (`<leader>?`) |
 | NazoVim built-in | Mark signs and `:Marks` list |
 | NazoVim built-in | Prose spell checking (`:SpellToggle`) |
 | NazoVim built-in | Treesitter folding (`zR` / `zM`) |
-| substitute.nvim | Register-based substitution |
+| NazoVim built-in | Register-based substitution (`substitute.lua`) |
 | Built into NazoVim | Floating terminal (`:ToggleTerm`) |
-| kulala.nvim | REST client (.http files) |
-| persistence.nvim | Session management |
+| NazoVim built-in | Send `.http` requests and display responses (`http_client.lua`, requires `curl`) |
+| NazoVim built-in | OpenAPI / Swagger preview (`swagger_preview.lua`, uses `swagger-ui-watcher`) |
+| NazoVim built-in | Session save and restore (`session.lua`) |
 
 ### AI Integration
 
@@ -239,11 +255,13 @@ run `:NazoPlug migrate` to reuse its data directory.
 
 | Plugin | Purpose |
 | ------ | ------ |
-| nvim-dap + nvim-dap-ui | Debugger |
+| nvim-dap | DAP debugger backend |
+| NazoVim built-in | DAP information panel (`dap_ui.lua`: expandable scopes, frame selection, watches) |
 | nvim-dap-vscode-js | JS/TS debug adapter |
-| neotest | Test runner |
-| neotest-jest / vitest / playwright | Test adapters |
-| nvim-coverage | Coverage display |
+| NazoVim built-in | Test execution and latest output (`test_runner.lua`) |
+| NazoVim built-in | LCOV coverage display (`coverage.lua`) |
+| NazoVim built-in | DAP variable values and exception stop reasons (`dap_virtual_text.lua`) |
+| NazoVim built-in | Original procedural terminal animation (`animation.lua`) |
 
 ---
 
@@ -261,7 +279,7 @@ run `:NazoPlug migrate` to reuse its data directory.
 | `<Leader>r` | Recent files |
 | `<Leader>h` | Clear search highlight |
 | `<Leader>z` | Zen mode |
-| `<Leader>m` | Oil file explorer |
+| `<Leader>m` | File browser |
 | `<Leader>n` | Neo-tree |
 | `<Leader>t` | Floating terminal |
 | `<Leader>f` | Format |
@@ -271,6 +289,7 @@ run `:NazoPlug migrate` to reuse its data directory.
 | Key | Action |
 | ---- | ----- |
 | `K` | Hover |
+| `<Leader>ls` | Signature help |
 | `gd` | Go to definition |
 | `ga` | Code action (Lspsaga) |
 | `<Leader>ca` | Code action (preview) |
@@ -299,12 +318,26 @@ run `:NazoPlug migrate` to reuse its data directory.
 
 | Key | Action |
 | ---- | ----- |
-| `<Leader>gd` | DiffviewOpen |
+| `<Leader>gd` | Select a changed file to review |
 | `<Leader>gh` | File history |
 | `<Leader>gH` | Branch history |
-| `<Leader>gc` | Diffview close |
+| `<Leader>gc` | Close Git review view |
 | `<Leader>gp` | Hunk preview |
 | `<Leader>gt` | Blame toggle |
+| `<Leader>gg` | Open LazyGit |
+| `<Leader>gi` | List issues; press `e` to edit, `c` to comment, or `x` to close/reopen in details |
+| `<Leader>op` | List PRs; press `e` to edit, `c` to comment, or `x` to close/reopen in details |
+| `<Leader>on` | List GitHub notifications |
+| `<Leader>os` | Search GitHub issues and pull requests |
+| `<Leader>od` | List GitHub Discussions; detail view supports editing, replies, comments, poll votes, reactions, subscription, and state changes |
+| `<Leader>oD` | Create a GitHub Discussion |
+| `<Leader>gI` | Open the GitHub issue creation form; first line is the title, `<C-s>` submits |
+| `<Leader>oP` | Open the GitHub pull request creation form; first line is the title, `<C-s>` submits |
+| `<Leader>oR` | Choose a pull request; use `c` on a diff line or Visual range for comments, `t` for threads; thread views use `r` to reply and `x` to resolve/reopen |
+| `<Leader>om` | Manage issue / PR labels, assignees, and reactions |
+| `<Leader>oA` | PR checks, merge, checkout, ready/draft, and branch updates |
+| `<Leader>od` | List discussions; detail keys: `c` reply, `e` edit, `a` answer, `u` upvote, `x` close/reopen |
+| `<Leader>oD` | Create a discussion |
 
 ### Session
 
@@ -399,8 +432,8 @@ You can also override existing plugin settings in the same file:
 
 ```lua
 return {
-  "rebelot/kanagawa.nvim",
-  opts = { transparent = false }
+  "folke/snacks.nvim",
+  opts = { dashboard = { enabled = false } }
 }
 ```
 

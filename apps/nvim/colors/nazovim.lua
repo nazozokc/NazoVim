@@ -1,0 +1,1 @@
+require("nazovim.colorscheme").apply()

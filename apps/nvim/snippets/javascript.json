@@ -1,0 +1,12 @@
+{
+  "Console output": {
+    "prefix": "clog",
+    "body": "console.log(${1:value});$0",
+    "description": "Write a value to the console"
+  },
+  "Async function": {
+    "prefix": "asyncfn",
+    "body": ["async function ${1:name}(${2:args}) {", "\t$0", "}"],
+    "description": "Define an async function"
+  }
+}

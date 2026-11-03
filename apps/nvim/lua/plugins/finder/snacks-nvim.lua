@@ -4,7 +4,7 @@ return {
 	lazy = false,
 	opts = {
 		notifier = {
-			enabled = true,
+			enabled = false, -- NazoVim owns vim.notify.
 		},
 		-- =========================
 		-- Dashboard
@@ -24,16 +24,9 @@ return {
 				keys = {
 					{ icon = "", desc = "New file", key = "e", action = ":enew" },
 					{ icon = "󰒲", desc = "Plugins", key = "z", action = ":NazoPlug" },
-					{ icon = "󰈙", desc = "Oil", key = ".", action = ":Oil" },
+					{ icon = "󰈙", desc = "Browse files", key = ".", action = ":NazoFiles" },
 					{ icon = "", desc = "Dotfiles", key = "d", action = ":Config" },
-					{
-						icon = "󰈙",
-						desc = "Files",
-						key = "f",
-						action = function()
-							require("snacks").picker.files()
-						end,
-					},
+					{ icon = "󰈙", desc = "Files", key = "f", action = ":NazoPickFiles" },
 					{ icon = "󰅚", desc = "Quit", key = "q", action = ":qa" },
 				},
 				header = [[
@@ -48,7 +41,7 @@ return {
 a neovim distribution]],
 			},
 		},
-		-- Session は persistence.nvim で管理
+		-- Session は NazoVim の独立機能で管理
 		session = {
 			enabled = false,
 		},

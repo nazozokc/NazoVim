@@ -55,4 +55,4 @@ if not initialized then
 	error("nazoplug setup failed")
 end
 
-require("nazovim.quickstart").setup(nazoplug)
+require("nazovim.features").setup_after_plugins(nazoplug)

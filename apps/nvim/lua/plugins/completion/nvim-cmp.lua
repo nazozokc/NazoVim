@@ -8,24 +8,16 @@ return {
 		"hrsh7th/cmp-buffer",
 		"hrsh7th/cmp-path",
 		"hrsh7th/cmp-calc",
-		"uga-rosa/cmp-denippet",
 		"zbirenbaum/copilot-cmp",
-
-		-- Snippets
-		"L3MON4D3/LuaSnip",
-		"saadparwaiz1/cmp_luasnip",
-		"rafamadriz/friendly-snippets",
-
-		-- TailwindCSS color display
-		"roobert/tailwindcss-colorizer-cmp.nvim",
 	},
 
 	config = function()
 		local cmp = require("cmp")
-		local luasnip = require("luasnip")
-		local tailwindcss_colorizer = require("tailwindcss-colorizer-cmp")
+		local snippets = require("nazovim.snippets")
+		local tailwind_completion = require("nazovim.tailwind_completion")
+		local features = require("nazovim.features")
 
-		require("luasnip.loaders.from_vscode").lazy_load()
+		snippets.register(cmp)
 
 		------------------------------------------------------------------
 		-- Highlights
@@ -48,7 +40,7 @@ return {
 
 			snippet = {
 				expand = function(args)
-					luasnip.lsp_expand(args.body)
+					snippets.expand(args.body)
 				end,
 			},
 
@@ -67,13 +59,13 @@ return {
 
 					item.kind = (icons[item.kind] or "") .. " " .. item.kind
 					item.menu = ({
-						luasnip = "[SNIP]",
+						nazovim_snippets = "[SNIP]",
 						nvim_lsp = "[LSP]",
 						buffer = "[BUF]",
 						path = "[PATH]",
 					})[entry.source.name]
 
-					tailwindcss_colorizer.formatter(entry, item)
+					tailwind_completion.format(entry, item, features.enabled("tailwind_completion"))
 
 					return item
 				end,
@@ -86,16 +78,16 @@ return {
 				["<Tab>"] = function(fallback)
 					if cmp.visible() then
 						cmp.confirm({ select = true })
-					elseif luasnip.expand_or_jumpable() then
-						luasnip.expand_or_jump()
+					elseif snippets.jumpable(1) then
+						snippets.jump(1)
 					else
 						fallback()
 					end
 				end,
 
 				["<S-Tab>"] = function(fallback)
-					if luasnip.jumpable(-1) then
-						luasnip.jump(-1)
+					if snippets.jumpable(-1) then
+						snippets.jump(-1)
 					else
 						fallback()
 					end
@@ -110,16 +102,15 @@ return {
 				if is_ts then
 					return {
 						{ name = "copilot", priority = 1050 },
-						{ name = "luasnip", priority = 1000 },
+						{ name = "nazovim_snippets", priority = 1000 },
 						{ name = "nvim_lsp", priority = 900 },
 						{ name = "path", priority = 500 },
 						{ name = "buffer", priority = 250 },
 					}
 				end
 				return {
-					{ name = "denippet", priority = 1100 },
+					{ name = "nazovim_snippets", priority = 1100 },
 					{ name = "copilot", priority = 1050 },
-					{ name = "luasnip", priority = 1000 },
 					{ name = "nvim_lsp", priority = 900 },
 					{ name = "path", priority = 500 },
 					{ name = "buffer", priority = 250 },
@@ -136,7 +127,7 @@ return {
 		-- snippet hover ghost preview
 		-- 選択中のスニペットを行末にプレビュー表示
 		------------------------------------------------------------------
-		local ns = vim.api.nvim_create_namespace("cmp_snippet_preview")
+		local ns = vim.api.nvim_create_namespace("NazoCmpSnippetPreview")
 
 		vim.api.nvim_create_autocmd("CompleteChanged", {
 			callback = vim.schedule_wrap(function()
@@ -177,7 +168,7 @@ return {
 					})
 				end)
 				if not ok then
-					vim.notify("[cmp] snippet preview error: " .. tostring(err), vim.log.levels.WARN)
+					vim.notify("[nazovim-cmp] snippet preview error: " .. tostring(err), vim.log.levels.WARN)
 				end
 			end),
 		})

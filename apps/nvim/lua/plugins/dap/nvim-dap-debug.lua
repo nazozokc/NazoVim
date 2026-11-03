@@ -10,6 +10,12 @@ return {
 		config = function()
 			local dap = require("dap")
 			dap.set_log_level("ERROR")
+			if require("nazovim.features").enabled("dap_ui") then
+				require("nazovim.dap_ui").attach(dap)
+			end
+			if require("nazovim.features").enabled("dap_virtual_text") then
+				require("nazovim.dap_virtual_text").attach(dap)
+			end
 		end,
 		keys = {
 			{
@@ -48,6 +54,13 @@ return {
 				desc = "Toggle Breakpoint",
 			},
 			{
+				"<leader>du",
+				function()
+					require("nazovim.dap_ui").toggle()
+				end,
+				desc = "Toggle Debugger Panel",
+			},
+			{
 				"<leader>B",
 				function()
 					require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
@@ -55,38 +68,6 @@ return {
 				desc = "Conditional Breakpoint",
 			},
 		},
-	},
-
-	-- DAP UI (not auto-open)
-	{
-		"rcarriga/nvim-dap-ui",
-		dependencies = { "mfussenegger/nvim-dap" },
-		keys = {
-			{
-				"<leader>du",
-				function()
-					require("dapui").toggle()
-				end,
-				desc = "DAP UI Toggle",
-			},
-		},
-		config = function()
-			require("dapui").setup({
-				layouts = {
-					{
-						elements = {
-							{ id = "scopes", size = 0.4 },
-							{ id = "breakpoints", size = 0.2 },
-							{ id = "stacks", size = 0.2 },
-							{ id = "watches", size = 0.2 },
-						},
-						size = 40,
-						position = "right",
-					},
-				},
-				controls = { enabled = false },
-			})
-		end,
 	},
 
 	-- vscode-js-debug (skip build)
@@ -125,18 +106,5 @@ return {
 				}
 			end
 		end,
-	},
-
-	-- Virtual Text (minimal config)
-	{
-		"theHamsta/nvim-dap-virtual-text",
-		event = "VeryLazy",
-		opts = {
-			enabled = true,
-			enabled_commands = false,
-			highlight_changed_variables = false,
-			show_stop_reason = true,
-			commented = true,
-		},
 	},
 }

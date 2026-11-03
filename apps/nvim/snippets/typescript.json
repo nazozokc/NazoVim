@@ -1,0 +1,12 @@
+{
+  "Typed arrow function": {
+    "prefix": "arrow",
+    "body": ["const ${1:name} = (${2:args}): ${3:void} => {", "\t$0", "};"],
+    "description": "Define a typed arrow function"
+  },
+  "Interface": {
+    "prefix": "iface",
+    "body": ["interface ${1:Name} {", "\t${2:property}: ${3:string};", "\t$0", "}"],
+    "description": "Define a TypeScript interface"
+  }
+}

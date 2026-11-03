@@ -101,4 +101,11 @@ function M.treesitter_jump()
 		vim.api.nvim_win_set_cursor(win, selected)
 	end
 end
+
+---Register the visible-text and Treesitter jump mappings.
+function M.setup()
+	vim.keymap.set({ "n", "x", "o" }, "<CR>", M.jump, { silent = true, desc = "Jump to visible text" })
+	vim.keymap.set({ "n", "x", "o" }, "<S-CR>", M.treesitter_jump, { silent = true, desc = "Jump to Treesitter node" })
+end
+
 return M

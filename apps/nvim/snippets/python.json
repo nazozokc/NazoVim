@@ -1,0 +1,12 @@
+{
+  "Main guard": {
+    "prefix": "main",
+    "body": ["if __name__ == \"__main__\":", "\t${1:main()}$0"],
+    "description": "Add the Python script entry point"
+  },
+  "Function": {
+    "prefix": "def",
+    "body": ["def ${1:name}(${2:args}):", "\t$0"],
+    "description": "Define a Python function"
+  }
+}

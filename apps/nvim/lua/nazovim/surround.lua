@@ -179,25 +179,43 @@ local function prompt(label)
 	return char
 end
 
+local function remember_add(anchor, srow, scol, erow, ecol, open, close, linewise)
+	local start_row, start_col = srow - anchor[1], scol - anchor[2]
+	local end_row, end_col = erow - anchor[1], ecol - anchor[2]
+	require("nazovim.repeat_action").set(function(buf)
+		local cursor = vim.api.nvim_win_get_cursor(0)
+		local row, col = cursor[1], cursor[2]
+		M.add(buf, row + start_row, col + start_col, row + end_row, col + end_col, open, close, linewise)
+		return true
+	end)
+end
+
 ---Operator function for `sa`.
 function M.add_operator(type)
 	local first, last = vim.fn.getpos("'["), vim.fn.getpos("']")
+	local anchor = M.pending_anchor or { first[2], first[3] - 1 }
+	M.pending_anchor = nil
 	local char = prompt("Surround with: ")
 	if not char then
 		return
 	end
 	local open, close = char, pairs[char] or char
-	M.add(0, first[2], first[3] - 1, last[2], last[3], open, close, type == "V")
+	local linewise = type == "line"
+	local srow, scol, erow, ecol = first[2], first[3] - 1, last[2], last[3]
+	M.add(0, srow, scol, erow, ecol, open, close, linewise)
+	remember_add(anchor, srow, scol, erow, ecol, open, close, linewise)
 end
 
 local function visual_add()
 	local srow, scol, erow, ecol, kind = require("nazovim.ui").visual_range()
+	local cursor = vim.api.nvim_win_get_cursor(0)
 	local char = prompt("Surround with: ")
 	if not char then
 		return
 	end
 	local open, close = char, pairs[char] or char
 	M.add(0, srow, scol, erow, ecol + 1, open, close, kind == "V")
+	remember_add({ cursor[1], cursor[2] }, srow, scol, erow, ecol + 1, open, close, kind == "V")
 	vim.api.nvim_feedkeys(termcodes("<Esc>"), "nx", false)
 end
 
@@ -207,7 +225,12 @@ local function delete_prompt()
 		return
 	end
 	local cursor = vim.api.nvim_win_get_cursor(0)
-	M.delete(0, cursor[1], cursor[2], char, pairs[char] or char)
+	if M.delete(0, cursor[1], cursor[2], char, pairs[char] or char) then
+		require("nazovim.repeat_action").set(function(buf)
+			local pos = vim.api.nvim_win_get_cursor(0)
+			return M.delete(buf, pos[1], pos[2], char, pairs[char] or char)
+		end)
+	end
 end
 
 local function replace_prompt()
@@ -220,11 +243,18 @@ local function replace_prompt()
 		return
 	end
 	local cursor = vim.api.nvim_win_get_cursor(0)
-	M.replace(0, cursor[1], cursor[2], old, pairs[old] or old, new, pairs[new] or new)
+	if M.replace(0, cursor[1], cursor[2], old, pairs[old] or old, new, pairs[new] or new) then
+		require("nazovim.repeat_action").set(function(buf)
+			local pos = vim.api.nvim_win_get_cursor(0)
+			return M.replace(buf, pos[1], pos[2], old, pairs[old] or old, new, pairs[new] or new)
+		end)
+	end
 end
 
 function M.setup()
 	vim.keymap.set("n", "sa", function()
+		local cursor = vim.api.nvim_win_get_cursor(0)
+		M.pending_anchor = { cursor[1], cursor[2] }
 		vim.o.operatorfunc = "v:lua.require'nazovim.surround'.add_operator"
 		return "g@"
 	end, { expr = true, desc = "Add surrounding" })

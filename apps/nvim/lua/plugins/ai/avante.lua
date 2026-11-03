@@ -7,13 +7,6 @@ return {
 		"MunifTanjim/nui.nvim",
 		{ "ColinKennedy/mega.cmdparse", dependencies = { "ColinKennedy/mega.logging" } },
 		"nvim-tree/nvim-web-devicons",
-		{
-			"MeanderingProgrammer/render-markdown.nvim",
-			opts = {
-				file_types = { "markdown", "Avante" },
-			},
-			ft = { "markdown", "Avante" },
-		},
 	},
 	opts = {
 		-- Provider設定: 環境変数 AVANTE_PROVIDER で上書き可能
