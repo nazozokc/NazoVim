@@ -3,7 +3,6 @@
 local options = {
 	very_lazy_delay_ms = 100,
 	plugins = {
-		["dial.nvim"] = "on_demand",
 		["neo-tree.nvim"] = "on_demand",
 	},
 }

@@ -221,6 +221,20 @@ local removed = {
 	"nvim-highlight-colors",
 	"satellite.nvim",
 	"nvim-scrollbar",
+	"nvim-autopairs",
+	"mini.ai",
+	"mini.surround",
+	"mini.comment",
+	"mini.indentscope",
+	"which-key.nvim",
+	"dial.nvim",
+	"nvim-spider",
+	"marks.nvim",
+	"spellsitter.nvim",
+	"barbar.nvim",
+	"hlchunk.nvim",
+	"indent-blankline.nvim",
+	"nvim-ufo",
 }
 for _, spec in ipairs(specs) do
 	assert(not vim.tbl_contains(removed, spec.name), spec.name)

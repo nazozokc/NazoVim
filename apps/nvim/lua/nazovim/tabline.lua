@@ -86,7 +86,7 @@ function M.setup()
 	map("n", "<C-t>", "<cmd>enew<cr>", { desc = "New buffer" })
 	map("n", "<C-q>", M.close, { desc = "Close buffer" })
 	local group = vim.api.nvim_create_augroup("NazoBufferline", { clear = true })
-	vim.api.nvim_create_autocmd({ "BufAdd", "BufDelete", "BufEnter", "BufModifiedChanged" }, {
+	vim.api.nvim_create_autocmd({ "BufAdd", "BufDelete", "BufEnter", "TextChanged", "TextChangedI", "BufWritePost" }, {
 		group = group,
 		callback = function()
 			vim.cmd.redrawtabline()

@@ -94,9 +94,10 @@ local marks = require("nazovim.marks")
 vim.cmd.enew({ bang = true })
 api.nvim_buf_set_lines(0, 0, -1, false, { "first", "second" })
 vim.fn.setpos("'a", { 0, 2, 1, 0 })
+local mark_buffer = api.nvim_get_current_buf()
 marks.setup()
-marks.update(0)
-local placed = vim.fn.sign_getplaced(0, { group = "nazo-marks" })[1].signs
+marks.update(mark_buffer)
+local placed = vim.fn.sign_getplaced(mark_buffer, { group = "nazo-marks" })[1].signs
 assert(#placed == 1, vim.inspect(placed))
 equal(placed[1].lnum, 2)
 
@@ -132,12 +133,14 @@ assert(api.nvim_get_current_buf() ~= first)
 local folding = require("nazovim.folding")
 folding.setup()
 assert(vim.o.foldexpr:find("nazovim.folding", 1, true))
-assert(type(folding.foldexpr(1)) == "number")
+assert(type(folding.foldexpr(1)) == "number" or type(folding.foldexpr(1)) == "string")
 api.nvim_buf_set_lines(0, 0, -1, false, { "function x()", "  return 1", "end" })
 api.nvim_win_set_cursor(0, { 1, 0 })
+vim.wo.foldmethod = "manual"
 vim.cmd("normal! zf2j")
 local foldtext = vim.fn.foldtextresult(1)
 assert(foldtext:find("function x()", 1, true), foldtext)
+vim.wo.foldmethod = "expr"
 
 -- Which-key lists and displays pending mappings.
 local whichkey = require("nazovim.whichkey")

@@ -14,6 +14,9 @@ end
 
 ---Refresh the mark signs for one buffer.
 function M.update(buf)
+	if not buf or buf == 0 then
+		buf = vim.api.nvim_get_current_buf()
+	end
 	if not vim.api.nvim_buf_is_valid(buf) then
 		return
 	end
@@ -35,7 +38,13 @@ end
 ---All marks as quickfix items.
 function M.list()
 	local result = {}
-	for _, item in ipairs(vim.fn.getmarklist()) do
+	local items = {}
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+		for _, item in ipairs(vim.fn.getmarklist(buf)) do
+			items[#items + 1] = item
+		end
+	end
+	for _, item in ipairs(items) do
 		local letter = mark_letter(item.mark)
 		local pos = item.pos
 		if letter and pos and pos[1] and vim.api.nvim_buf_is_valid(pos[1]) and pos[2] > 0 then

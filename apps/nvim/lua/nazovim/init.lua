@@ -5,6 +5,18 @@ function M.setup()
 	-- Commands are cheap to register; their implementations load on first use.
 	require("nazovim.commands").setup()
 
+	-- Editor primitives: mappings and buffer-local hooks.
+	require("nazovim.pairs").setup()
+	require("nazovim.surround").setup()
+	require("nazovim.dial").setup()
+	require("nazovim.motion").setup()
+	require("nazovim.marks").setup()
+	require("nazovim.spell").setup()
+	require("nazovim.folding").setup()
+	require("nazovim.indent").setup()
+	require("nazovim.tabline").setup()
+	require("nazovim.whichkey").setup()
+
 	-- Diagnostics/progress must be ready before the first LspAttach/notification.
 	require("nazovim.diagnostics").setup()
 	require("nazovim.progress").setup()
