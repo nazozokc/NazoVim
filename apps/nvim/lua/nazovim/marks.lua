@@ -6,6 +6,12 @@ local function mark_letter(mark)
 	return mark:match("^'([a-zA-Z])$")
 end
 
+local function sign_name(letter)
+	local name = "NazoMark" .. letter
+	vim.fn.sign_define(name, { text = letter, texthl = "NazoMark" })
+	return name
+end
+
 ---Refresh the mark signs for one buffer.
 function M.update(buf)
 	if not vim.api.nvim_buf_is_valid(buf) then
@@ -18,9 +24,9 @@ function M.update(buf)
 			vim.fn.sign_place(
 				1000 + letter:byte(),
 				group,
-				"NazoMark",
+				sign_name(letter),
 				buf,
-				{ lnum = item.pos[2], priority = 10, text = letter }
+				{ lnum = item.pos[2], priority = 10 }
 			)
 		end
 	end
@@ -101,7 +107,6 @@ function M.jump(direction)
 end
 
 function M.setup()
-	vim.fn.sign_define("NazoMark", { text = "", texthl = "NazoMark" })
 	vim.api.nvim_set_hl(0, "NazoMark", { link = "Special", default = true })
 	vim.api.nvim_create_user_command("Marks", M.qf, { desc = "List marks" })
 	vim.keymap.set("n", "]m", function()

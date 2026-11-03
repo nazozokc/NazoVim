@@ -79,6 +79,14 @@ function M.find(line, col)
 	return nil
 end
 
+local function pad(number, width)
+	local text = tostring(math.abs(number))
+	while #text < width do
+		text = "0" .. text
+	end
+	return (number < 0 and "-" or "") .. text
+end
+
 ---Return the next value for a token, preserving its notation.
 function M.next(token, step)
 	local text = token.text

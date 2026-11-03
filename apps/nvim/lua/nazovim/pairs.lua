@@ -99,7 +99,7 @@ function M.enter()
 	local base = line:match("^%s*") or ""
 	local shift = vim.bo.expandtab and string.rep(" ", vim.bo.shiftwidth) or "\t"
 	local inner = base .. shift
-	vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { "\n" .. inner .. "\n" .. base })
+	vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { "", inner, base })
 	vim.api.nvim_win_set_cursor(0, { row + 1, #inner })
 end
 
