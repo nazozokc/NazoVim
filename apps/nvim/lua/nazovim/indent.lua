@@ -21,11 +21,14 @@ local function line_indent(buf, row)
 end
 
 ---Rows spanned by the block at guide column `col` that contains `row`.
----Blank lines stay inside the block.
-function M.block(buf, row, col)
+---Blank lines stay inside the block. `first`/`last` bound the scan so a
+---cursor move does not walk a whole large file.
+function M.block(buf, row, col, first, last)
 	local total = vim.api.nvim_buf_line_count(buf)
+	first = first or 1
+	last = last or total
 	local top = row
-	while top > 1 do
+	while top > first do
 		local indent, line = line_indent(buf, top - 1)
 		if line:match("^%s*$") then
 			top = top - 1
@@ -36,7 +39,7 @@ function M.block(buf, row, col)
 		end
 	end
 	local bottom = row
-	while bottom < total do
+	while bottom < last do
 		local indent, line = line_indent(buf, bottom + 1)
 		if line:match("^%s*$") then
 			bottom = bottom + 1
@@ -63,11 +66,10 @@ function M.update()
 	if not col then
 		return
 	end
-	local top, bottom = M.block(buf, row, col)
 	-- Draw only the visible part; the block can span a whole file.
-	local first = math.max(top, vim.fn.line("w0"))
-	local last = math.min(bottom, vim.fn.line("w$"))
-	for r = first, last do
+	local win_first, win_last = vim.fn.line("w0"), vim.fn.line("w$")
+	local top, bottom = M.block(buf, row, col, win_first, win_last)
+	for r = top, bottom do
 		local _, text = line_indent(buf, r)
 		vim.api.nvim_buf_set_extmark(buf, ns, r - 1, math.min(col, #text), {
 			virt_text = { { "│", "NazoIndentScope" } },

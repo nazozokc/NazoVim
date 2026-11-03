@@ -6,9 +6,14 @@ local function mark_letter(mark)
 	return mark:match("^'([a-zA-Z])$")
 end
 
+local defined = {}
+
 local function sign_name(letter)
 	local name = "NazoMark" .. letter
-	vim.fn.sign_define(name, { text = letter, texthl = "NazoMark" })
+	if not defined[name] then
+		vim.fn.sign_define(name, { text = letter, texthl = "NazoMark" })
+		defined[name] = true
+	end
 	return name
 end
 

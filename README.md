@@ -256,6 +256,7 @@ nvim
 | ---------- | ---- |
 | nvim-treesitter | シンタックスハイライト / インデント |
 | nvim-treesitter-textobjects | 関数・クラス・引数単位のテキストオブジェクト |
+| mini.jump | f/F/t/T の複数行拡張と `;` リピート |
 | NazoVim 内蔵 | 括弧・クォート自動補完（`pairs.lua`） |
 | NazoVim 内蔵 | Surround（`sa` / `sd` / `sr`） |
 | NazoVim 内蔵 | camelCase/snake_case対応 `w` / `e` / `b` / `ge` |

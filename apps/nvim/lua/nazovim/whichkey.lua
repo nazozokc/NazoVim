@@ -39,35 +39,21 @@ local function maps(mode_name, buf)
 	return result
 end
 
-local function has_prefix(prefix, mode_name, buf)
+---Classify a pending prefix in one pass over the keymaps.
+local function lookup(prefix, mode_name, buf)
 	prefix = normalize(prefix)
-	for _, map in ipairs(maps(mode_name, buf)) do
-		if vim.startswith(normalize(map.lhs), prefix) then
-			return true
-		end
-	end
-	return false
-end
-
-local function has_mapping(prefix, mode_name, buf)
-	prefix = normalize(prefix)
-	for _, map in ipairs(maps(mode_name, buf)) do
-		if normalize(map.lhs) == prefix then
-			return true
-		end
-	end
-	return false
-end
-
-local function has_longer_prefix(prefix, mode_name, buf)
-	prefix = normalize(prefix)
+	local result = { prefix = false, exact = false, longer = false }
 	for _, map in ipairs(maps(mode_name, buf)) do
 		local lhs = normalize(map.lhs)
-		if lhs ~= prefix and vim.startswith(lhs, prefix) then
-			return true
+		if lhs == prefix then
+			result.prefix = true
+			result.exact = true
+		elseif vim.startswith(lhs, prefix) then
+			result.prefix = true
+			result.longer = true
 		end
 	end
-	return false
+	return result
 end
 
 ---List mappings that continue the given prefix. Pure enough to test directly.
@@ -203,13 +189,13 @@ function M.on_key(key)
 	end
 	mode = current
 	local candidate = pending .. name
-	local buf = vim.api.nvim_get_current_buf()
-	if not has_prefix(candidate, mode, buf) then
+	local state = lookup(candidate, mode, vim.api.nvim_get_current_buf())
+	if not state.prefix then
 		reset()
 		return
 	end
 	pending = candidate
-	if has_mapping(pending, mode, buf) and not has_longer_prefix(pending, mode, buf) then
+	if state.exact and not state.longer then
 		reset()
 		return
 	end

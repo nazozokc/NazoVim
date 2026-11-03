@@ -14,10 +14,11 @@ return {
 			end
 		end, { nargs = "*", desc = "OpenCode: Ask or select action" })
 
-		vim.keymap.set({ "n", "x" }, "<C-a>", function()
+		-- <C-a>/<C-x> are reserved for the built-in dial (nazovim/dial.lua).
+		vim.keymap.set({ "n", "x" }, "<leader>oa", function()
 			require("opencode").ask("@this: ", { submit = true })
 		end, { desc = "Ask opencode" })
-		vim.keymap.set({ "n", "x" }, "<C-x>", function()
+		vim.keymap.set({ "n", "x" }, "<leader>ox", function()
 			require("opencode").select()
 		end, { desc = "Execute opencode action…" })
 		vim.keymap.set({ "n", "t" }, "<C-.>", function()
