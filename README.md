@@ -485,12 +485,6 @@ Issue templateが用意されています:
 
 ---
 
-## 📄 License
-
-MIT © [nazozokc](https://github.com/nazozokc)
-
----
-
 ## Special Thanks
 
 NazoVim は多くの優れた Neovim プラグインに支えられています。以下のプロジェクトの作者・コントリビュータの皆様に感謝します。
