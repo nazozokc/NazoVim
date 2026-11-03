@@ -1,4 +1,5 @@
 local M = {}
+local jump = { char = nil, direction = 1, till = false }
 
 local function split_camel(text, base)
 	local chars = vim.fn.split(text, "\\zs")
@@ -147,7 +148,91 @@ function M.move(kind, count)
 	vim.api.nvim_win_set_cursor(0, { row, col })
 end
 
+local function find_match(char, direction, till)
+	local pos = vim.api.nvim_win_get_cursor(0)
+	local row, col = pos[1], pos[2]
+	local line_count = vim.api.nvim_buf_line_count(0)
+	while row >= 1 and row <= line_count do
+		local text = vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1] or ""
+		local index
+		if direction > 0 then
+			local start = col + 2
+			while start <= #text do
+				local found = text:find(char, start, true)
+				if not found then
+					break
+				end
+				local byte = text:byte(found)
+				if byte < 0x80 or byte >= 0xC0 then
+					index = found
+					break
+				end
+				start = found + 1
+			end
+		else
+			local start = 1
+			while true do
+				local found = text:find(char, start, true)
+				if not found or found - 1 >= col then
+					break
+				end
+				local byte = text:byte(found)
+				if byte < 0x80 or byte >= 0xC0 then
+					index = found
+				end
+				start = found + 1
+			end
+		end
+		if index then
+			return { row, index - 1 + (till and -direction or 0) }
+		end
+		row = row + direction
+		col = direction > 0 and -1 or math.huge
+	end
+end
+
+local function repeat_jump(reverse)
+	if not jump.char then
+		return
+	end
+	local direction = reverse and -jump.direction or jump.direction
+	for _ = 1, vim.v.count1 do
+		local found = find_match(jump.char, direction, jump.till)
+		if not found then
+			break
+		end
+		vim.api.nvim_win_set_cursor(0, found)
+	end
+end
+
 function M.setup()
+	local directions = { f = { 1, false }, F = { -1, false }, t = { 1, true }, T = { -1, true } }
+	for key, motion in pairs(directions) do
+		vim.keymap.set({ "n", "x", "o" }, key, function()
+			local ok, char = pcall(vim.fn.getcharstr)
+			if not ok or char == "" then
+				return
+			end
+			-- getcharstr() can return a special-key encoding; find() expects literal text.
+			if vim.fn.strchars(char) ~= 1 then
+				return
+			end
+			jump = { char = char, direction = motion[1], till = motion[2] }
+			for _ = 1, vim.v.count1 do
+				local found = find_match(char, motion[1], motion[2])
+				if not found then
+					break
+				end
+				vim.api.nvim_win_set_cursor(0, found)
+			end
+		end, { desc = "Jump to character" })
+	end
+	vim.keymap.set({ "n", "x", "o" }, ";", function()
+		repeat_jump(false)
+	end, { desc = "Repeat character jump" })
+	vim.keymap.set({ "n", "x", "o" }, ",", function()
+		repeat_jump(true)
+	end, { desc = "Reverse character jump" })
 	local function map(key, kind, description)
 		vim.keymap.set({ "n", "x", "o" }, key, function()
 			M.move(kind, vim.v.count1)

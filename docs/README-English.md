@@ -212,7 +212,7 @@ run `:NazoPlug migrate` to reuse its data directory.
 | ------ | ------ |
 | nvim-treesitter | Syntax highlighting / indentation |
 | nvim-treesitter-textobjects | Function / class / argument text objects |
-| mini.jump | Multi-line f/F/t/T and `;` repeat |
+| NazoVim built-in | `motion.lua`: multi-line f/F/t/T and `;` / `,` repeat |
 | NazoVim built-in | Automatic bracket / quote closing (`pairs.lua`) |
 | NazoVim built-in | Surround (`sa` / `sd` / `sr`) |
 | NazoVim built-in | CamelCase / snake_case-aware `w` / `e` / `b` / `ge` |
