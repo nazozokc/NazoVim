@@ -616,3 +616,11 @@ NazoVim は多くの優れた Neovim プラグインに支えられています�
 - [zigtools/zls](https://github.com/zigtools/zls)
 
 （リストは `apps/nvim/nazoplug-lock.json` およびプラグイン仕様から自動生成）
+
+---
+
+## 📄 License
+
+MIT © [nazozokc](https://github.com/nazozokc)
+
+---
