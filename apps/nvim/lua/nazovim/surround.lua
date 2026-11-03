@@ -54,14 +54,22 @@ function M.find(buf, row, col, open, close)
 		local line = vim.api.nvim_buf_get_lines(buf, row - 1, row, false)[1] or ""
 		local start_col
 		for i = math.min(col + 1, #line), 1, -1 do
-			if line:sub(i, i) == open and not escaped(line, i - 1) and not in_comment_or_string(buf, row - 1, i - 1) then
+			if
+				line:sub(i, i) == open
+				and not escaped(line, i - 1)
+				and not in_comment_or_string(buf, row - 1, i - 1)
+			then
 				start_col = i - 1
 				break
 			end
 		end
 		local end_col
 		for i = math.max(col + 2, 1), #line do
-			if line:sub(i, i) == close and not escaped(line, i - 1) and not in_comment_or_string(buf, row - 1, i - 1) then
+			if
+				line:sub(i, i) == close
+				and not escaped(line, i - 1)
+				and not in_comment_or_string(buf, row - 1, i - 1)
+			then
 				end_col = i - 1
 				break
 			end
@@ -83,11 +91,10 @@ function M.find(buf, row, col, open, close)
 		for c = first, 1, -1 do
 			local ch = line:sub(c, c)
 			if not in_comment_or_string(buf, r - 1, c - 1) then
-				if matches(ch, close) then
+				if ch == close then
 					depth = depth + 1
-				elseif matches(ch, open) then
+				elseif ch == open then
 					if depth == 0 then
-						depth = -1
 						local srow, scol = r, c - 1
 						-- Scan forward from the opening character for its match.
 						local inner = 0
@@ -97,9 +104,9 @@ function M.find(buf, row, col, open, close)
 							for fc = start, #fline - 1 do
 								local fch = fline:sub(fc + 1, fc + 1)
 								if not in_comment_or_string(buf, fr - 1, fc) then
-									if matches(fch, open) then
+									if fch == open then
 										inner = inner + 1
-									elseif matches(fch, close) then
+									elseif fch == close then
 										if inner == 0 then
 											return { srow = srow, scol = scol, erow = fr, ecol = fc }
 										end

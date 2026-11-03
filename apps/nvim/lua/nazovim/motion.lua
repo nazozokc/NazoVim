@@ -8,7 +8,10 @@ local function split_camel(text, base)
 		local previous, following = chars[i - 1], chars[i + 1]
 		local boundary = i > 1
 			and char:match("%u")
-			and ((previous:match("%l") or previous:match("%d")) or (previous:match("%u") and following and following:match("%l")))
+			and (
+				(previous:match("%l") or previous:match("%d"))
+				or (previous:match("%u") and following and following:match("%l"))
+			)
 		if boundary then
 			result[#result + 1] = { start = start, finish = pos, text = table.concat(buffer) }
 			start = pos

@@ -114,7 +114,8 @@ done
 | ---------- | ---- |
 | kanagawa.nvim | カラースキーム（dragon + 透明背景） |
 | NazoVim 内蔵 | ステータスライン |
-| barbar.nvim | タブバー |
+| NazoVim 内蔵 | バッファタブ（クリック遷移対応） |
+| NazoVim 内蔵 | インデントガイド / 現在ブロック強調 |
 | noice.nvim | コマンドラインUI / 通知 |
 | nvim-notify | 通知システム |
 | NazoVim 内蔵 | スクロールバー |
@@ -141,12 +142,15 @@ done
 | ---------- | ---- |
 | nvim-treesitter | シンタックスハイライト / インデント |
 | nvim-treesitter-textobjects | 関数・クラス・引数単位のテキストオブジェクト |
-| nvim-autopairs | 括弧自動補完 |
-| mini.ai / surround / comment | テキストオブジェクト・Surround・コメント |
-| nvim-spider | CamelCase/snake_case対応 w/e/b |
+| NazoVim 内蔵 | 括弧・クォート自動補完（`pairs.lua`） |
+| NazoVim 内蔵 | Surround（`sa` / `sd` / `sr`） |
+| NazoVim 内蔵 | camelCase/snake_case対応 `w` / `e` / `b` / `ge` |
+| NazoVim 内蔵 | `<C-a>/<C-x>` の拡張インクリメント |
+| NazoVim 内蔵 | キーマップヘルプ（`<leader>?`） |
+| NazoVim 内蔵 | マークのサイン表示・`:Marks` 一覧 |
+| NazoVim 内蔵 | 散文のスペルチェック（`:SpellToggle`） |
+| NazoVim 内蔵 | Treesitterフォールド（`zR` / `zM`） |
 | substitute.nvim | レジスタを使った置換 |
-| dial.nvim | `<C-a>/<C-x>` の拡張インクリメント |
-| which-key.nvim | キーマップヘルプ |
 | NazoVim 内蔵 | フローティングターミナル |
 | kulala.nvim | REST client (.http ファイル) |
 | persistence.nvim | セッション管理 |

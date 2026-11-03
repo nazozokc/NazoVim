@@ -17,9 +17,40 @@
 | vim-illuminate | `references.lua` | LSP優先、Treesitterのスコープ解析をフォールバックに使用 |
 | nvim-highlight-colors | `colors.lua` | 色リテラルの背景色プレビュー |
 | satellite.nvim / nvim-scrollbar | `scrollbar.lua` | 現在位置・診断のスクロールバー |
+| nvim-autopairs | `pairs.lua` | 括弧・クォートの自動補完、ペア内Enter展開、空ペアのBS削除 |
+| mini.surround | `surround.lua` | `sa` / `sd` / `sr` による囲みの追加・削除・置換 |
+| mini.comment | （Neovim標準） | `gc` / `gcc`。専用モジュールは不要 |
+| mini.indentscope / hlchunk / indent-blankline | `indent.lua` | インデントガイドとカーソル行のスコープ強調 |
+| nvim-ufo | `folding.lua` | Treesitter優先・インデントfallbackのフォールドと折り畳み表示 |
+| which-key.nvim | `whichkey.lua` | 保留中のキー候補と説明をフローティング表示 |
+| dial.nvim | `dial.lua` | 数値・真偽値・定数の `<C-a>` / `<C-x>` 拡張 |
+| nvim-spider | `motion.lua` | camelCase / snake_case を分割する `w` / `e` / `b` / `ge` |
+| marks.nvim | `marks.lua` | マークのサイン表示、`:Marks` 一覧、`]m` / `[m` 移動 |
+| spellsitter.nvim | `spell.lua` | 散文ファイルタイプだけspellを有効化 |
+| barbar.nvim | `tabline.lua` | バッファタブ、クリック遷移、バッファ移動キー |
 
 Snacks の `words`、Noice のLSP進捗と検索件数表示は無効化し、
 同じ情報の二重表示を防いでいます。他のSnacks／Noice機能は引き続き使います。
+
+## エディタ操作
+
+- `sa` + motion + 文字: 囲みを追加（例: `saiw)`）。Visualモードでも可。
+- `sd` + 文字: カーソルを囲むペアを削除。
+- `sr` + 文字 + 文字: 囲みを置換。
+- `<C-a>` / `<C-x>`: カーソル下の数値・真偽値・`let`/`const`/`var` などを増減。Visualモードは行内の全トークン。
+- `w` / `e` / `b` / `ge`: camelCase と snake_case の境界で移動。operator-pending と Visual でも動作。
+- `]m` / `[m`: 現在バッファの次／前のマークへ移動。`:Marks` でquickfix一覧。
+- `<leader>?`: 保留中のキー候補を表示。通常は200ms待つと自動表示。
+- `<C-PageDown>` / `<C-PageUp>`: 次／前のバッファ。タブをクリックしても移動。
+- `<C-t>` / `<C-q>`: 新規バッファ／現在バッファを閉じる。
+- `:SpellToggle`: 散文のスペルチェックを一括で切り替え。
+- `zR` / `zM`: 全フォールドを開く／閉じる（Neovim標準）。
+
+自動補完はコメント・文字列内ではTreesitterがある場合に無効化されます。
+パーサーがない場合は単純な文字判定にフォールバックします。
+`sa` は `(` `[` `{` `<` `"` `'` `` ` `` に対応します。タグ囲みは未対応です。
+インデントガイドは `tabstop == shiftwidth` を前提に `listchars.leadmultispace` を使います。
+折り畳みは `foldmethod=expr` と `foldexpr` を使うため、手動フォールドとは併用しません。
 
 ## 操作
 
@@ -102,6 +133,7 @@ vim.g.nazovim_template_email = "you@example.com"
 ```sh
 nvim --headless -u NONE -l apps/nvim/tests/builtin_test.lua
 nvim --headless -u NONE -l apps/nvim/tests/features_test.lua
+nvim --headless -u NONE -l apps/nvim/tests/replacements_test.lua
 ```
 
 テンプレートの上書き防止、色・コメント判定、診断、検索、

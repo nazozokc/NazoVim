@@ -60,7 +60,7 @@ vim.bo.shiftwidth = 2
 vim.bo.tabstop = 2
 indent.setup()
 indent.update()
-equal(#extmarks("NazoIndent") , 1)
+equal(#extmarks("NazoIndent"), 1)
 
 -- Dial: integers, booleans, constants, floats, and line updates.
 local dial = require("nazovim.dial")

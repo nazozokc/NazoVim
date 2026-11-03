@@ -171,12 +171,10 @@ end
 function M.increment_line(line, step)
 	local result, position = {}, 1
 	for _, token in ipairs(all_tokens(line)) do
-		local value = M.next(token, step)
-		if value then
-			result[#result + 1] = line:sub(position, token.start)
-			result[#result + 1] = value
-			position = token.finish + 1
-		end
+		local value = M.next(token, step) or token.text
+		result[#result + 1] = line:sub(position, token.start)
+		result[#result + 1] = value
+		position = token.finish + 1
 	end
 	result[#result + 1] = line:sub(position)
 	return table.concat(result)

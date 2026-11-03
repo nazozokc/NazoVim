@@ -184,7 +184,8 @@ run `:NazoPlug migrate` to reuse its data directory.
 | ------ | ------ |
 | kanagawa.nvim | Color scheme (dragon + transparent) |
 | NazoVim built-in | Status line |
-| barbar.nvim | Tab bar |
+| NazoVim built-in | Buffer tabs with click navigation |
+| NazoVim built-in | Indent guides / current block highlight |
 | noice.nvim | Command line UI / notifications |
 | nvim-notify | Notification system |
 | NazoVim built-in | Scrollbar |
@@ -211,12 +212,15 @@ run `:NazoPlug migrate` to reuse its data directory.
 | ------ | ------ |
 | nvim-treesitter | Syntax highlighting / indentation |
 | nvim-treesitter-textobjects | Function / class / argument text objects |
-| nvim-autopairs | Automatic bracket closing |
-| mini.ai / surround / comment | Text objects / surround / commenting |
-| nvim-spider | CamelCase / snake_case-aware w/e/b |
+| NazoVim built-in | Automatic bracket / quote closing (`pairs.lua`) |
+| NazoVim built-in | Surround (`sa` / `sd` / `sr`) |
+| NazoVim built-in | CamelCase / snake_case-aware `w` / `e` / `b` / `ge` |
+| NazoVim built-in | Extended `<C-a>/<C-x>` increment |
+| NazoVim built-in | Keymap help (`<leader>?`) |
+| NazoVim built-in | Mark signs and `:Marks` list |
+| NazoVim built-in | Prose spell checking (`:SpellToggle`) |
+| NazoVim built-in | Treesitter folding (`zR` / `zM`) |
 | substitute.nvim | Register-based substitution |
-| dial.nvim | Extended `<C-a>/<C-x>` increment |
-| which-key.nvim | Keymap help |
 | Built into NazoVim | Floating terminal (`:ToggleTerm`) |
 | kulala.nvim | REST client (.http files) |
 | persistence.nvim | Session management |

@@ -26,7 +26,7 @@ function M.apply(buf)
 		return
 	end
 	local enabled = vim.g.nazovim_spell ~= false and M.wanted(vim.bo[buf].filetype)
-	vim.api.nvim_buf_call(buf, function()
+	pcall(vim.api.nvim_buf_call, buf, function()
 		vim.wo.spell = enabled
 	end)
 end

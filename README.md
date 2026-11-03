@@ -112,8 +112,7 @@ return {
   very_lazy_delay_ms = 200,
   plugins = {
     ["kanagawa.nvim"] = "startup",
-    ["nvim-autopairs"] = "InsertEnter",
-    ["barbar.nvim"] = "VeryLazy",
+    ["snacks.nvim"] = "VeryLazy",
   },
 }
 ```
@@ -128,7 +127,7 @@ NAZOVIM_STARTUP_CONFIG="$HOME/startup.lua" nix run github:nazozokc/NazoVim
 100ms です。`NAZOVIM_VERY_LAZY_DELAY_MS=200` でも指定でき、
 こちらが Lua ファイルの値より優先されます。
 
-既定では `dial.nvim` と `neo-tree.nvim` は `on_demand` で、キーやコマンドで
+既定では `neo-tree.nvim` は `on_demand` で、キーやコマンドで
 必要になったときに読み込みます。`plugins` を指定すると既定の一覧を置き換えます。
 
 コマンド・キー・ファイルタイプによる読み込みは残るため、指定イベントより早く
@@ -229,7 +228,8 @@ nvim
 | ---------- | ---- |
 | kanagawa.nvim | カラースキーム（dragon + 透明） |
 | NazoVim 内蔵 | ステータスライン |
-| barbar.nvim | タブバー |
+| NazoVim 内蔵 | バッファタブ（クリック遷移対応） |
+| NazoVim 内蔵 | インデントガイド / 現在ブロック強調 |
 | noice.nvim | コマンドラインUI / 通知 |
 | nvim-notify | 通知システム |
 | NazoVim 内蔵 | スクロールバー |
@@ -256,12 +256,15 @@ nvim
 | ---------- | ---- |
 | nvim-treesitter | シンタックスハイライト / インデント |
 | nvim-treesitter-textobjects | 関数・クラス・引数単位のテキストオブジェクト |
-| nvim-autopairs | 括弧自動補完 |
-| mini.ai / surround / comment | テキストオブジェクト・Surround・コメント |
-| nvim-spider | CamelCase/snake_case対応 w/e/b |
+| NazoVim 内蔵 | 括弧・クォート自動補完（`pairs.lua`） |
+| NazoVim 内蔵 | Surround（`sa` / `sd` / `sr`） |
+| NazoVim 内蔵 | camelCase/snake_case対応 `w` / `e` / `b` / `ge` |
+| NazoVim 内蔵 | `<C-a>/<C-x>` の拡張インクリメント |
+| NazoVim 内蔵 | キーマップヘルプ（`<leader>?`） |
+| NazoVim 内蔵 | マークのサイン表示・`:Marks` 一覧 |
+| NazoVim 内蔵 | 散文のスペルチェック（`:SpellToggle`） |
+| NazoVim 内蔵 | Treesitterフォールド（`zR` / `zM`） |
 | substitute.nvim | レジスタを使った置換 |
-| dial.nvim | `<C-a>/<C-x>` の拡張インクリメント |
-| which-key.nvim | キーマップヘルプ |
 | NazoVim 内蔵 | フローティングターミナル（`:ToggleTerm`） |
 | kulala.nvim | REST client (.http ファイル) |
 | persistence.nvim | セッション管理 |

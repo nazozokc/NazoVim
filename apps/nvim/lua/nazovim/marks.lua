@@ -21,7 +21,11 @@ function M.update(buf)
 		return
 	end
 	vim.fn.sign_unplace(group, { buffer = buf })
-	for _, item in ipairs(vim.fn.getmarklist(buf)) do
+	local ok, items = pcall(vim.fn.getmarklist, buf)
+	if not ok then
+		return
+	end
+	for _, item in ipairs(items) do
 		local letter = mark_letter(item.mark)
 		if letter and item.pos and item.pos[2] and item.pos[2] > 0 then
 			vim.fn.sign_place(
@@ -40,8 +44,11 @@ function M.list()
 	local result = {}
 	local items = {}
 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-		for _, item in ipairs(vim.fn.getmarklist(buf)) do
-			items[#items + 1] = item
+		local ok, buffer_marks = pcall(vim.fn.getmarklist, buf)
+		if ok then
+			for _, item in ipairs(buffer_marks) do
+				items[#items + 1] = item
+			end
 		end
 	end
 	for _, item in ipairs(items) do
