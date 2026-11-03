@@ -97,7 +97,8 @@ function M.enter()
 	end
 	local line = vim.api.nvim_get_current_line()
 	local base = line:match("^%s*") or ""
-	local shift = vim.bo.expandtab and string.rep(" ", vim.bo.shiftwidth) or "\t"
+	local width = vim.bo.shiftwidth > 0 and vim.bo.shiftwidth or vim.bo.tabstop
+	local shift = vim.bo.expandtab and string.rep(" ", width) or "\t"
 	local inner = base .. shift
 	vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { "", inner, base })
 	vim.api.nvim_win_set_cursor(0, { row + 1, #inner })
@@ -105,6 +106,9 @@ end
 
 ---Attach buffer-local insert-mode mappings once.
 function M.attach(buf)
+	if not require("nazovim.ui").normal(buf) or vim.bo[buf].filetype == "terminal" then
+		return
+	end
 	if vim.b[buf].nazo_pairs then
 		return
 	end

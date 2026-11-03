@@ -5,6 +5,23 @@ function M.normal(buf)
 	return vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buftype == ""
 end
 
+---Range of the active Visual selection. `ecol` is an inclusive byte column.
+---`'<` and `'>` are only set after leaving Visual mode, so use the anchor mark.
+---The last value is the Visual mode: "v", "V" or "\22".
+function M.visual_range()
+	local anchor = vim.fn.getpos("v")
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local srow, scol = math.max(1, anchor[2]), math.max(0, anchor[3] - 1)
+	local erow, ecol = math.max(1, cursor[1]), math.max(0, cursor[2])
+	local line = vim.api.nvim_buf_get_lines(0, erow - 1, erow, false)[1] or ""
+	ecol = math.min(ecol, math.max(0, #line - 1))
+	if srow > erow or (srow == erow and scol > ecol) then
+		srow, erow = erow, srow
+		scol, ecol = ecol, scol
+	end
+	return srow, scol, erow, ecol, vim.fn.visualmode()
+end
+
 ---Coalesce event bursts; run once with the latest editor state.
 function M.throttle(ms, callback)
 	local pending = false

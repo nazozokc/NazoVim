@@ -15,11 +15,45 @@ function M.scope_col(line, shiftwidth)
 	return nil
 end
 
+local function line_indent(buf, row)
+	local line = vim.api.nvim_buf_get_lines(buf, row - 1, row, false)[1] or ""
+	return #(line:match("^%s*") or ""), line
+end
+
+---Rows spanned by the block at guide column `col` that contains `row`.
+---Blank lines stay inside the block.
+function M.block(buf, row, col)
+	local total = vim.api.nvim_buf_line_count(buf)
+	local top = row
+	while top > 1 do
+		local indent, line = line_indent(buf, top - 1)
+		if line:match("^%s*$") then
+			top = top - 1
+		elseif indent > col then
+			top = top - 1
+		else
+			break
+		end
+	end
+	local bottom = row
+	while bottom < total do
+		local indent, line = line_indent(buf, bottom + 1)
+		if line:match("^%s*$") then
+			bottom = bottom + 1
+		elseif indent > col then
+			bottom = bottom + 1
+		else
+			break
+		end
+	end
+	return top, bottom
+end
+
 ---Highlight the guide of the block that contains the cursor.
 function M.update()
 	local buf = vim.api.nvim_get_current_buf()
 	vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
-	if not vim.wo.list then
+	if not vim.wo.list or not require("nazovim.ui").normal(buf) then
 		return
 	end
 	local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -29,18 +63,26 @@ function M.update()
 	if not col then
 		return
 	end
-	vim.api.nvim_buf_set_extmark(buf, ns, row - 1, col, {
-		virt_text = { { "│", "NazoIndentScope" } },
-		virt_text_pos = "overlay",
-		priority = 20,
-	})
+	local top, bottom = M.block(buf, row, col)
+	-- Draw only the visible part; the block can span a whole file.
+	local first = math.max(top, vim.fn.line("w0"))
+	local last = math.min(bottom, vim.fn.line("w$"))
+	for r = first, last do
+		local _, text = line_indent(buf, r)
+		vim.api.nvim_buf_set_extmark(buf, ns, r - 1, math.min(col, #text), {
+			virt_text = { { "│", "NazoIndentScope" } },
+			virt_text_pos = "overlay",
+			virt_text_win_col = col,
+			priority = 20,
+		})
+	end
 end
 
 function M.setup()
 	-- `leadmultispace` draws one guide per tabstop of leading whitespace.
 	-- NazoVim keeps tabstop == shiftwidth == 2, so guides land on indent levels.
 	vim.opt.list = true
-	vim.opt.listchars = { leadmultispace = "│ ", extends = "›", precedes = "‹", nbsp = "␣" }
+	vim.opt.listchars:append({ leadmultispace = "│ ", extends = "›", precedes = "‹" })
 	vim.api.nvim_set_hl(0, "NazoIndentScope", { link = "Special", default = true })
 	local group = vim.api.nvim_create_augroup("NazoIndent", { clear = true })
 	vim.api.nvim_create_autocmd(

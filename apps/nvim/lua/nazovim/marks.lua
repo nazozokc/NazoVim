@@ -61,7 +61,7 @@ function M.list()
 				result[#result + 1] = {
 					filename = filename,
 					lnum = pos[2],
-					col = pos[3] + 1,
+					col = pos[3],
 					text = letter .. ": " .. vim.trim(line),
 				}
 			end

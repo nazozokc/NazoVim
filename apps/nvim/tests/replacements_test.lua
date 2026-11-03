@@ -33,6 +33,12 @@ pairs.enter()
 equal(api.nvim_buf_get_lines(0, 0, -1, false), { "(", "  ", ")" })
 equal(api.nvim_win_get_cursor(0)[1], 2)
 
+-- Special buffers must not receive insert-mode pair mappings.
+local scratch = api.nvim_create_buf(false, true)
+pairs.attach(scratch)
+equal(#api.nvim_buf_get_keymap(scratch, "i"), 0)
+api.nvim_buf_delete(scratch, { force = true })
+
 -- Surround: add, find, replace, delete.
 local surround = require("nazovim.surround")
 vim.cmd.enew({ bang = true })
@@ -48,6 +54,12 @@ equal(api.nvim_get_current_line(), "local value = foo")
 api.nvim_buf_set_lines(0, 0, -1, false, { 'local s = "text"' })
 local quote = surround.find(0, 1, 12, '"', '"')
 assert(quote and quote.scol == 10 and quote.ecol == 15)
+vim.cmd.enew({ bang = true })
+api.nvim_buf_set_lines(0, 0, -1, false, { "(foo)" })
+api.nvim_win_set_cursor(0, { 1, 2 })
+assert(surround.delete(0, 1, 2, "(", ")"))
+equal(api.nvim_get_current_line(), "foo")
+equal(api.nvim_win_get_cursor(0), { 1, 1 })
 
 -- Indent guide scope.
 local indent = require("nazovim.indent")
@@ -61,6 +73,12 @@ vim.bo.tabstop = 2
 indent.setup()
 indent.update()
 equal(#extmarks("NazoIndent"), 1)
+api.nvim_buf_set_lines(0, 0, -1, false, { "function x()", "  if y then", "    a", "    b", "  end", "end" })
+api.nvim_win_set_cursor(0, { 3, 4 })
+local top, bottom = indent.block(0, 3, 2)
+equal({ top, bottom }, { 3, 4 })
+indent.update()
+equal(#extmarks("NazoIndent"), 2)
 
 -- Dial: integers, booleans, constants, floats, and line updates.
 local dial = require("nazovim.dial")
@@ -71,6 +89,22 @@ equal(dial.next(dial.find("const name", 2), 1), "var")
 equal(dial.next(dial.find("0x1f", 2), 1), "0x20")
 equal(dial.next(dial.find("3.14", 2), 1), "3.15")
 equal(dial.increment_line("a 1 b 2", 1), "a 2 b 3")
+equal(dial.tokens("foo-1")[1].text, "1")
+equal(dial.increment_line("foo-1", 1), "foo-2")
+equal(dial.increment_line("a 1 b 2", 1, 4, 6), "a 1 b 3")
+vim.cmd.enew({ bang = true })
+api.nvim_buf_set_lines(0, 0, -1, false, { "x = 41" })
+api.nvim_win_set_cursor(0, { 1, 4 })
+dial.increment(1)
+equal(api.nvim_get_current_line(), "x = 42")
+
+-- Visual ranges come from the anchor mark, not the unset '< / '> marks.
+vim.cmd.enew({ bang = true })
+api.nvim_buf_set_lines(0, 0, -1, false, { "a 1 b 2" })
+vim.cmd("normal! 0v$")
+local srow, scol, erow, ecol = require("nazovim.ui").visual_range()
+vim.cmd("normal! \27")
+equal({ srow, scol, erow, ecol }, { 1, 0, 1, 6 })
 
 -- Spider motions split camelCase and snake_case.
 local motion = require("nazovim.motion")
@@ -113,6 +147,26 @@ vim.bo.filetype = "lua"
 spell.apply(0)
 assert(not vim.wo.spell)
 
+-- `spell` is window-local: applying it must not leak into other windows.
+vim.cmd.enew({ bang = true })
+api.nvim_buf_set_lines(0, 0, -1, false, { "# title" })
+vim.bo.filetype = "markdown"
+local markdown_buf = api.nvim_get_current_buf()
+vim.cmd.enew({ bang = true })
+api.nvim_buf_set_lines(0, 0, -1, false, { "local x = 1" })
+vim.bo.filetype = "lua"
+vim.cmd("split")
+local markdown_win = api.nvim_get_current_win()
+api.nvim_win_set_buf(markdown_win, markdown_buf)
+spell.apply(markdown_buf)
+assert(vim.wo[markdown_win].spell)
+for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
+	if win ~= markdown_win then
+		assert(not vim.wo[win].spell)
+	end
+end
+vim.cmd("only")
+
 -- Buffer tabline renders, clicks, and cycles.
 local tabline = require("nazovim.tabline")
 vim.cmd.enew({ bang = true })
@@ -154,6 +208,8 @@ whichkey.show(" ", "n")
 assert(#api.nvim_tabpage_list_wins(0) == 2)
 whichkey.hide()
 equal(#api.nvim_tabpage_list_wins(0), 1)
+vim.keymap.set("x", "<leader>zz", function() end, { desc = "Visual test mapping" })
+assert(#whichkey.items(" ", "x") > 0)
 
 print("replacements: pairs, surround, indent, dial, motion, marks, spell, tabline, folding and which-key passed")
 vim.cmd("qall!")

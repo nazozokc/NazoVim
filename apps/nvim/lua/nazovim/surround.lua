@@ -138,17 +138,6 @@ function M.delete(buf, row, col, open, close)
 	end
 	remove_char(buf, found.erow, found.ecol)
 	remove_char(buf, found.srow, found.scol)
-	local cursor = vim.api.nvim_win_get_cursor(0)
-	if cursor[1] == found.srow then
-		local shift = 0
-		if cursor[2] > found.scol then
-			shift = shift + 1
-		end
-		if found.erow == found.srow and cursor[2] > found.ecol then
-			shift = shift + 1
-		end
-		vim.api.nvim_win_set_cursor(0, { cursor[1], math.max(0, cursor[2] - shift) })
-	end
 	return true
 end
 
@@ -202,14 +191,13 @@ function M.add_operator(type)
 end
 
 local function visual_add()
-	local first, last = vim.fn.getpos("'<"), vim.fn.getpos("'>")
-	local mode = vim.fn.visualmode()
+	local srow, scol, erow, ecol, kind = require("nazovim.ui").visual_range()
 	local char = prompt("Surround with: ")
 	if not char then
 		return
 	end
 	local open, close = char, pairs[char] or char
-	M.add(0, first[2], first[3] - 1, last[2], last[3], open, close, mode == "V")
+	M.add(0, srow, scol, erow, ecol + 1, open, close, kind == "V")
 	vim.api.nvim_feedkeys(termcodes("<Esc>"), "nx", false)
 end
 

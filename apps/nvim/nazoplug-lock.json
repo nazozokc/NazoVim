@@ -179,10 +179,6 @@
 		"branch": "main",
 		"commit": "5b9076dae1bfbe47ba4a14bc8b967cde0ab5d77e"
 	},
-	"mini.jump": {
-		"branch": "main",
-		"commit": "c1678446e887bb987b4a4351204b183b00984f8b"
-	},
 	"mini.nvim": {
 		"branch": "main",
 		"commit": "a95dc67ecff78de138543a20c20f29f47111b122"

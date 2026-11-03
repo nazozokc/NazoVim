@@ -33,7 +33,11 @@ local function all_tokens(line)
 				break
 			end
 			local before = first > 1 and line:sub(first - 1, first - 1) or ""
-			if not before:match("[%w_%.]") then
+			if before:match("[%w_%.]") then
+				-- A signed number after an identifier ("foo-1") must still count,
+				-- so retry from the next byte instead of skipping the match.
+				init = first + 1
+			else
 				local token = { start = first - 1, finish = last, text = line:sub(first, last), kind = kind }
 				local overlaps = false
 				for _, other in ipairs(found) do
@@ -45,8 +49,8 @@ local function all_tokens(line)
 				if not overlaps then
 					found[#found + 1] = token
 				end
+				init = last + 1
 			end
-			init = last + 1
 		end
 	end
 	add("bool", "%f[%w_]true%f[^%w_]")
@@ -167,31 +171,48 @@ local function replace_token(buf, row, token, step)
 	return true
 end
 
----Increment or decrement every token on a line. Used by visual mode.
-function M.increment_line(line, step)
+---Increment or decrement tokens on a line. `from` and `to` are inclusive
+---0-based byte columns; omit them to cover the whole line.
+function M.increment_line(line, step, from, to)
+	from = from or 0
+	to = to or math.max(0, #line - 1)
 	local result, position = {}, 1
 	for _, token in ipairs(all_tokens(line)) do
-		local value = M.next(token, step) or token.text
-		result[#result + 1] = line:sub(position, token.start)
-		result[#result + 1] = value
-		position = token.finish + 1
+		if token.start <= to and token.finish > from then
+			local value = M.next(token, step) or token.text
+			result[#result + 1] = line:sub(position, token.start)
+			result[#result + 1] = value
+			position = token.finish + 1
+		end
 	end
 	result[#result + 1] = line:sub(position)
 	return table.concat(result)
 end
 
 local function visual(step)
-	local first, last = vim.fn.getpos("'<"), vim.fn.getpos("'>")
-	for row = first[2], last[2] do
+	local srow, scol, erow, ecol, kind = require("nazovim.ui").visual_range()
+	for row = srow, erow do
 		local line = vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1] or ""
-		vim.api.nvim_buf_set_lines(0, row - 1, row, false, { M.increment_line(line, step) })
+		local from, to
+		if kind == "V" then
+			from, to = 0, math.max(0, #line - 1)
+		elseif kind == "\22" then
+			from, to = scol, ecol
+		else
+			from = row == srow and scol or 0
+			to = row == erow and ecol or math.max(0, #line - 1)
+		end
+		if from <= to then
+			vim.api.nvim_buf_set_lines(0, row - 1, row, false, { M.increment_line(line, step, from, to) })
+		end
 	end
 	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
 end
 
 ---Increment/decrement the token under the cursor, falling back to native <C-a>/<C-x>.
 function M.increment(step)
-	if vim.fn.mode(1) == "x" then
+	local current = vim.fn.mode(1)
+	if current == "v" or current == "V" or current == "\22" then
 		visual(step)
 		return
 	end

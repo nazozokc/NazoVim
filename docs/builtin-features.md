@@ -20,7 +20,7 @@
 | nvim-autopairs | `pairs.lua` | 括弧・クォートの自動補完、ペア内Enter展開、空ペアのBS削除 |
 | mini.surround | `surround.lua` | `sa` / `sd` / `sr` による囲みの追加・削除・置換 |
 | mini.comment | （Neovim標準） | `gc` / `gcc`。専用モジュールは不要 |
-| mini.indentscope / hlchunk / indent-blankline | `indent.lua` | インデントガイドとカーソル行のスコープ強調 |
+| mini.indentscope / hlchunk / indent-blankline | `indent.lua` | インデントガイドとカーソル行が属するブロックの強調 |
 | nvim-ufo | `folding.lua` | Treesitter優先・インデントfallbackのフォールドと折り畳み表示 |
 | which-key.nvim | `whichkey.lua` | 保留中のキー候補と説明をフローティング表示 |
 | dial.nvim | `dial.lua` | 数値・真偽値・定数の `<C-a>` / `<C-x>` 拡張 |
@@ -37,7 +37,7 @@ Snacks の `words`、Noice のLSP進捗と検索件数表示は無効化し、
 - `sa` + motion + 文字: 囲みを追加（例: `saiw)`）。Visualモードでも可。
 - `sd` + 文字: カーソルを囲むペアを削除。
 - `sr` + 文字 + 文字: 囲みを置換。
-- `<C-a>` / `<C-x>`: カーソル下の数値・真偽値・`let`/`const`/`var` などを増減。Visualモードは行内の全トークン。
+- `<C-a>` / `<C-x>`: カーソル下の数値・真偽値・`let`/`const`/`var` などを増減。Visualモードは選択範囲内のトークン（行選択なら行全体）。
 - `w` / `e` / `b` / `ge`: camelCase と snake_case の境界で移動。operator-pending と Visual でも動作。
 - `]m` / `[m`: 現在バッファの次／前のマークへ移動。`:Marks` でquickfix一覧。
 - `<leader>?`: 保留中のキー候補を表示。通常は200ms待つと自動表示。
@@ -50,6 +50,8 @@ Snacks の `words`、Noice のLSP進捗と検索件数表示は無効化し、
 パーサーがない場合は単純な文字判定にフォールバックします。
 `sa` は `(` `[` `{` `<` `"` `'` `` ` `` に対応します。タグ囲みは未対応です。
 インデントガイドは `tabstop == shiftwidth` を前提に `listchars.leadmultispace` を使います。
+`listchars` の他の設定は保持されます。特殊バッファ（`buftype` が空でないもの）には
+自動補完を適用しません。
 折り畳みは `foldmethod=expr` と `foldexpr` を使うため、手動フォールドとは併用しません。
 
 ## 操作

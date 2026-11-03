@@ -11,6 +11,21 @@ local function normalize(keys)
 	return ok and result or keys
 end
 
+---Map mode(1) to a keymap mode. Returns nil when no popup should appear.
+local function keymap_mode()
+	local current = vim.fn.mode(1)
+	if current == "n" then
+		return "n"
+	end
+	if current:sub(1, 2) == "no" then
+		return "o"
+	end
+	if current == "v" or current == "V" or current == "\22" then
+		return "x"
+	end
+	return nil
+end
+
 local function maps(mode_name, buf)
 	local result = {}
 	for _, map in ipairs(vim.api.nvim_get_keymap(mode_name)) do
@@ -57,7 +72,7 @@ end
 
 ---List mappings that continue the given prefix. Pure enough to test directly.
 function M.items(prefix, mode_name, buf)
-	mode_name = mode_name or vim.fn.mode(1)
+	mode_name = mode_name or keymap_mode() or "n"
 	buf = buf or vim.api.nvim_get_current_buf()
 	local wanted = normalize(prefix)
 	local seen, result = {}, {}
@@ -181,8 +196,8 @@ function M.on_key(key)
 		reset()
 		return
 	end
-	local current = vim.fn.mode(1)
-	if current ~= "n" and current ~= "x" and current ~= "o" then
+	local current = keymap_mode()
+	if not current then
 		reset()
 		return
 	end
@@ -216,8 +231,7 @@ function M.setup()
 	vim.api.nvim_create_autocmd("ModeChanged", {
 		group = group,
 		callback = function()
-			local current = vim.fn.mode(1)
-			if current ~= "n" and current ~= "x" and current ~= "o" then
+			if not keymap_mode() then
 				reset()
 			end
 		end,

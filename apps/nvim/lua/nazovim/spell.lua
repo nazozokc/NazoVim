@@ -20,15 +20,21 @@ function M.wanted(filetype)
 	return filetypes[filetype] == true
 end
 
----Apply the spell setting to one buffer without changing the current buffer.
+---Apply the spell setting to every window showing one buffer.
+---`spell` is window-local, so hidden buffers are handled when they appear.
 function M.apply(buf)
+	if not buf or buf == 0 then
+		buf = vim.api.nvim_get_current_buf()
+	end
 	if not vim.api.nvim_buf_is_valid(buf) then
 		return
 	end
 	local enabled = vim.g.nazovim_spell ~= false and M.wanted(vim.bo[buf].filetype)
-	pcall(vim.api.nvim_buf_call, buf, function()
-		vim.wo.spell = enabled
-	end)
+	for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+		if vim.api.nvim_win_is_valid(win) then
+			vim.wo[win].spell = enabled
+		end
+	end
 end
 
 ---Toggle spell checking for prose buffers.
@@ -46,7 +52,7 @@ function M.setup()
 	end
 	vim.api.nvim_create_user_command("SpellToggle", M.toggle, { desc = "Toggle prose spell checking" })
 	local group = vim.api.nvim_create_augroup("NazoSpell", { clear = true })
-	vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
+	vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "WinEnter" }, {
 		group = group,
 		callback = function(args)
 			M.apply(args.buf)
