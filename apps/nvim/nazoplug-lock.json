@@ -107,10 +107,6 @@
 		"branch": "main",
 		"commit": "c116aa8dd7aa7e1db6938f872285e598dc9ee00b"
 	},
-	"flash.nvim": {
-		"branch": "main",
-		"commit": "fcea7ff883235d9024dc41e638f164a450c14ca2"
-	},
 	"flatten.nvim": {
 		"branch": "main",
 		"commit": "72527798e75b5e34757491947c2cb853ce21dc0e"

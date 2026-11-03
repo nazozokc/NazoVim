@@ -27,6 +27,7 @@
 | nvim-spider | `motion.lua` | camelCase / snake_case を分割する `w` / `e` / `b` / `ge` |
 | （Neovim標準） | `motion.lua` | `f` / `F` / `t` / `T` の複数行検索と `;` / `,` の繰り返し |
 | quick-scope | `motion.lua` | `f` / `F` / `t` / `T` 入力前に一意な検索候補を下線表示 |
+| flash.nvim | `jump.lua` | `<CR>` で可視範囲の文字へ、`<S-CR>` でTreesitter葉ノードへラベルジャンプ |
 | marks.nvim | `marks.lua` | マークのサイン表示、`:Marks` 一覧、`]m` / `[m` 移動 |
 | spellsitter.nvim | `spell.lua` | 散文ファイルタイプだけspellを有効化 |
 | barbar.nvim | `tabline.lua` | バッファタブ、クリック遷移、バッファ移動キー |
@@ -42,6 +43,7 @@ Snacks の `words`、Noice のLSP進捗と検索件数表示は無効化し、
 - `<C-a>` / `<C-x>`: カーソル下の数値・真偽値・`let`/`const`/`var` などを増減。Visualモードは選択範囲内のトークン（行選択なら行全体）。
 - `w` / `e` / `b` / `ge`: camelCase と snake_case の境界で移動。operator-pending と Visual でも動作。
 - `f` / `F` / `t` / `T`: 現在行の先も含めてバッファ内を文字検索。`;` は同方向、`,` は逆方向に直前の検索を繰り返します。
+- `<CR>`: 表示範囲の行と文字にラベルを表示してジャンプ。`<S-CR>` はTreesitterが使える場合に構文葉ノードへジャンプします。
 - `]m` / `[m`: 現在バッファの次／前のマークへ移動。`:Marks` でquickfix一覧。
 - `<leader>?`: 保留中のキー候補を表示。通常は200ms待つと自動表示。
 - `<C-PageDown>` / `<C-PageUp>`: 次／前のバッファ。タブをクリックしても移動。

@@ -218,7 +218,7 @@ nvim
 | neo-tree.nvim | ツリー形式ファイルエクスプローラー |
 | yazi.nvim | yaziファイルマネージャー統合 |
 | dropbar.nvim | Winbar / パンくずリスト |
-| flash.nvim | ジャンプ（`<CR>` でスマートジャンプ） |
+| NazoVim 内蔵 | `<CR>` の可視範囲ジャンプと `<S-CR>` のTreesitterノードジャンプ（`jump.lua`） |
 | aerial.nvim | シンボルアウトライン |
 | project.nvim | プロジェクトルート自動検出 |
 

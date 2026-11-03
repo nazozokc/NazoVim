@@ -1,7 +1,8 @@
 vim.opt.rtp:prepend("apps/nvim")
 require("nazovim").setup()
 assert(vim.fn.exists(":ToggleTerm") == 2)
-assert(vim.fn.maparg("<Plug>(jumpcursor-jump)", "n") ~= "")
+assert(vim.fn.maparg("<CR>", "n") ~= "")
+assert(vim.fn.maparg("<S-CR>", "n") ~= "")
 
 -- Hiding a terminal must preserve its buffer and process.
 vim.cmd("ToggleTerm")
@@ -28,7 +29,7 @@ require("nazovim.modes").setup()
 assert(vim.api.nvim_get_hl(0, { name = "CursorLineNr" }).fg ~= nil)
 vim.api.nvim_buf_set_lines(0, 0, -1, false, { "abc", "def", "ghi" })
 vim.api.nvim_win_set_cursor(0, { 1, 0 })
-vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>(jumpcursor-jump)aa", true, false, true), "xt")
+vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<CR>aa", true, false, true), "xt")
 assert(vim.deep_equal(vim.api.nvim_win_get_cursor(0), { 1, 0 }))
 vim.fn.feedkeys(vim.api.nvim_replace_termcodes(":3<Esc>", true, false, true), "xt")
 assert(vim.api.nvim_win_get_cursor(0)[1] == 1)

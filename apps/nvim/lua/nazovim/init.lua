@@ -21,9 +21,12 @@ function M.setup()
 	require("nazovim.diagnostics").setup()
 	require("nazovim.progress").setup()
 
-	vim.keymap.set("n", "<Plug>(jumpcursor-jump)", function()
+	vim.keymap.set({ "n", "x", "o" }, "<CR>", function()
 		require("nazovim.jump").jump()
-	end, { silent = true })
+	end, { silent = true, desc = "Jump to visible text" })
+	vim.keymap.set({ "n", "x", "o" }, "<S-CR>", function()
+		require("nazovim.jump").treesitter_jump()
+	end, { silent = true, desc = "Jump to Treesitter node" })
 
 	-- The command-line preview only matters once the user opens ":".
 	vim.api.nvim_create_autocmd("CmdlineEnter", {

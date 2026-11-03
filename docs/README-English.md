@@ -174,7 +174,7 @@ run `:NazoPlug migrate` to reuse its data directory.
 | neo-tree.nvim | Tree-style file explorer |
 | yazi.nvim | yazi file manager integration |
 | dropbar.nvim | Winbar / breadcrumbs |
-| flash.nvim | Jump navigation (`<CR>` for smart jump) |
+| NazoVim built-in | Visible-range `<CR>` and Treesitter-node `<S-CR>` jumps (`jump.lua`) |
 | aerial.nvim | Symbol outline |
 | project.nvim | Automatic project root detection |
 
