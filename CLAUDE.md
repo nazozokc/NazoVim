@@ -150,10 +150,12 @@ done
 | NazoVim 内蔵 | GitHub Issue / PR一覧・詳細・作成・タイトル/本文編集・コメント・close/reopen（`github.lua`、`gh` CLIを使用） |
 | NazoVim 内蔵 | GitHub通知・Issue/PR検索（`github.lua`）、Discussion作成・編集・削除・返信・コメント管理・poll投票・accepted answer・upvote・リアクション・カテゴリ・購読・close/reopen（`github_discussions.lua`） |
 | NazoVim 内蔵 | Issue/PRのラベル・担当者・milestone・project・リアクション、PR reviewer管理（`github_metadata.lua`） |
-| NazoVim 内蔵 | GitHub Issueのpin/unpin・通知購読設定（`github_issue_extras.lua`） |
+| NazoVim 内蔵 | GitHub Issueのpin/unpin・通知購読・リンクブランチ作成（`github_issue_extras.lua`） |
 | NazoVim 内蔵 | PR checks・merge・checkout・ready/draft・branch更新（`github_pr_actions.lua`） |
 | NazoVim 内蔵 | PR diff・行コメント・thread返信/解決・全体レビュー（`github_review.lua`） |
-| octo.nvim | Project board操作、PR commits/runs/changesなど未置換のGitHub操作 |
+| NazoVim 内蔵 | PR commits・変更ファイル・check runsの一覧と差分表示（`github_pr_details.lua`） |
+| NazoVim 内蔵 | Project boardのitem一覧・status変更・issue/PR追加・archive（`github_projects.lua`） |
+| NazoVim 内蔵 | gist一覧とブラウザ表示（`github_gists.lua`） |
 
 ### エディタ機能
 
@@ -273,8 +275,11 @@ done
 | `<Leader>oP` | GitHub PR作成フォーム |
 | `<Leader>oR` | GitHub PR diff・レビュー選択。diffで`c`行コメント（Visual複数行も可）、`t`thread一覧。thread画面で`r`返信、`x`解決/再オープン |
 | `<Leader>om` | GitHub Issue / PRのラベル・担当者・リアクション管理 |
-| `<Leader>oI` | GitHub Issueのpin/unpin・通知購読設定 |
+| `<Leader>oI` | GitHub Issueのpin/unpin・通知購読設定・リンクブランチ作成 |
 | `<Leader>oA` | GitHub PR checks・merge・checkout・ready/draft・branch更新 |
+| `<Leader>oC` | GitHub PR commits・変更ファイル・check runsの一覧。`<CR>`でcommit diffまたはファイルpatch、`gx`でGitHubを開く |
+| `<Leader>oB` | GitHub Projects。item一覧から`<CR>`でstatus変更・archive、issue/PRの追加も行う |
+| `<Leader>oG` | gist一覧。`<CR>`でブラウザ表示、`y`でURLをコピー |
 | `<Leader>on` | GitHub通知一覧 |
 | `<Leader>os` | GitHub Issue / PR検索 |
 | `<Leader>od` | GitHub Discussions一覧。詳細で`c`返信、`e`編集、`d`削除、`p`poll投票、`a`回答指定、`u`upvote、`r`reaction、`m`コメント管理、`g`カテゴリ、`s`購読、`x`close/reopen |

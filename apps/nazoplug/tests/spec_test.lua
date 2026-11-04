@@ -124,6 +124,18 @@ test("spec imports modules and directories", function()
 	eq(names, { "bar", "one", "two" })
 end)
 
+test("spec ignores an import group with no specs", function()
+	local root = U.join(tmp, "empty-import")
+	truthy(U.write_file(U.join(root, "lua/emptygroup/.keep"), ""))
+	vim.opt.runtimepath:append(root)
+	local specs = S.collect({ { import = "emptygroup" } }, { pack_dir = pack_dir })
+	local ok, err = pcall(S.collect, { { import = "missinggroup" } }, { pack_dir = pack_dir })
+	vim.opt.runtimepath:remove(root)
+	eq(#specs, 0)
+	eq(ok, false)
+	truthy(tostring(err):find("no specs found", 1, true), "missing group should still fail")
+end)
+
 test("spec resolves main by normalized name", function()
 	local spec = S.collect({ "owner/nvim-treesitter" }, { pack_dir = pack_dir })[1]
 	truthy(U.write_file(U.join(spec.dir, "lua/nvim-treesitter.lua"), "return {}\n"))

@@ -235,6 +235,7 @@ local removed = {
 	"hlchunk.nvim",
 	"indent-blankline.nvim",
 	"nvim-ufo",
+	"octo.nvim",
 }
 for _, spec in ipairs(specs) do
 	assert(not vim.tbl_contains(removed, spec.name), spec.name)

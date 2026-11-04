@@ -213,10 +213,12 @@ run `:NazoPlug migrate` to reuse its data directory.
 | NazoVim built-in | GitHub issue / PR lists, details, creation, title/body editing, comments, and close/reopen (`github.lua`, uses `gh` CLI) |
 | NazoVim built-in | GitHub notifications and issue / PR search (`github.lua`); discussion create/edit/delete/reply, comment management, poll voting, accepted answers, upvotes, reactions, categories, subscriptions, close/reopen (`github_discussions.lua`) |
 | NazoVim built-in | Issue / PR labels, assignees, milestones, project membership, reactions, and PR reviewer requests (`github_metadata.lua`) |
-| NazoVim built-in | GitHub issue pinning and notification subscriptions (`github_issue_extras.lua`) |
+| NazoVim built-in | GitHub issue pinning, notification subscriptions, and linked branches (`github_issue_extras.lua`) |
 | NazoVim built-in | PR checks, merge, checkout, ready/draft, and branch updates (`github_pr_actions.lua`) |
 | NazoVim built-in | Pull request diff, inline comments, thread replies/resolution, and overall reviews (`github_review.lua`) |
-| octo.nvim | Remaining GitHub operations such as project board workflows and PR commits/runs/changes |
+| NazoVim built-in | PR commits, changed files and check runs with diff previews (`github_pr_details.lua`) |
+| NazoVim built-in | Project board item lists, status changes, issue/PR additions, and archiving (`github_projects.lua`) |
+| NazoVim built-in | Gist listing with browser links (`github_gists.lua`) |
 
 ### Editor
 
@@ -336,6 +338,9 @@ run `:NazoPlug migrate` to reuse its data directory.
 | `<Leader>oR` | Choose a pull request; use `c` on a diff line or Visual range for comments, `t` for threads; thread views use `r` to reply and `x` to resolve/reopen |
 | `<Leader>om` | Manage issue / PR labels, assignees, and reactions |
 | `<Leader>oA` | PR checks, merge, checkout, ready/draft, and branch updates |
+| `<Leader>oC` | PR commits, changed files, and check runs; `<CR>` opens a commit diff or file patch, `gx` opens GitHub |
+| `<Leader>oB` | GitHub Projects; `<CR>` on an item changes its status or archives it, and issues/PRs can be added |
+| `<Leader>oG` | List gists; `<CR>` opens one in the browser and `y` copies its URL |
 | `<Leader>od` | List discussions; detail keys: `c` reply, `e` edit, `a` answer, `u` upvote, `x` close/reopen |
 | `<Leader>oD` | Create a discussion |
 

@@ -126,6 +126,38 @@ local function change_subscription(issue)
 	end)
 end
 
+local function develop_branch(issue)
+	local number = tostring(issue.number)
+	vim.ui.input({ prompt = "Branch name for issue #" .. number .. ": ", default = "issue-" .. number }, function(name)
+		name = vim.trim(name or "")
+		if name == "" then
+			return
+		end
+		local modes = {
+			{ label = "Create and check out", args = { "--checkout" } },
+			{ label = "Create without checking out", args = {} },
+		}
+		vim.ui.select(modes, {
+			prompt = "Linked branch for issue #" .. number,
+			format_item = function(mode)
+				return mode.label
+			end,
+		}, function(mode)
+			if not mode then
+				return
+			end
+			local arguments = { "issue", "develop", number, "--name", name }
+			vim.list_extend(arguments, mode.args)
+			run(arguments, function(output)
+				local message = vim.trim(output)
+				vim.notify(message ~= "" and message or "Linked branch created", vim.log.levels.INFO, {
+					title = "NazoVim GitHub Issues",
+				})
+			end)
+		end)
+	end)
+end
+
 local function choose_action(issue)
 	local actions = {
 		{
@@ -138,6 +170,12 @@ local function choose_action(issue)
 			label = "Change notification subscription",
 			run = function()
 				change_subscription(issue)
+			end,
+		},
+		{
+			label = "Create linked branch",
+			run = function()
+				develop_branch(issue)
 			end,
 		},
 	}

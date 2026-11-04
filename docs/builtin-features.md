@@ -76,10 +76,12 @@ vim.g.nazovim_disabled_features = { "todo", "scrollbar", "terminal.commands" }
 | Octo.nvim (Issue / PR一覧・表示・作成・編集、通知、検索) | `github.lua` | `gh` CLIでIssue/PR作成・タイトル/本文編集・コメント・close/reopen、通知、検索を操作。作成は`:NazoGitHubIssueCreate` / `:NazoGitHubPRCreate`、フォームは1行目がタイトル、2行目以降が本文で`<C-s>`送信 |
 | Octo.nvim (Discussion create/edit/delete/reply/poll/answer/vote/reaction/category/subscription/close) | `github_discussions.lua` | `<leader>od`で一覧、`:NazoGitHubDiscussionCreate` / `<leader>oD`で作成。詳細は`c`返信、`e`編集、`d`削除、`p`poll投票、`a`accepted answer、`u`upvote、`r`reaction、`s`購読、`g`カテゴリ変更、`m`コメント管理、`x`close/reopen。GitHub GraphQLと認証が必要 |
 | Octo.nvim (Issue / PR labels・assignees・milestones・project・reactions、PR reviewers) | `github_metadata.lua` | `:NazoGitHubMetadata` / `<leader>om` で対象を選び、ラベル・担当者・milestone・projectの追加/削除、8種のリアクション切替、PR reviewerの追加/削除を行う。GitHub CLI (`gh`) と認証が必要 |
-| Octo.nvim (Issue pin / subscription) | `github_issue_extras.lua` | `:NazoGitHubIssueExtras` / `<leader>oI` でIssueを選び、pin/unpinと通知購読状態の変更を行う。pin権限・購読可能状態を確認してからGitHub GraphQLを呼び出す |
+| Octo.nvim (Issue pin / subscription / develop) | `github_issue_extras.lua` | `:NazoGitHubIssueExtras` / `<leader>oI` でIssueを選び、pin/unpin・通知購読状態の変更・`gh issue develop` によるリンクブランチ作成を行う。pin権限・購読可能状態を確認してからGitHub GraphQLを呼び出す |
 | Octo.nvim (PR checks・merge・checkout・ready/draft・branch update) | `github_pr_actions.lua` | `:NazoGitHubPRActions` / `<leader>oA` からPRを選び、checksの一覧、branch checkout、merge方式選択、ready/draft切替、base branch更新を操作。merge・checkout・更新は確認後に実行 |
 | Octo.nvim (PR diff・全体/行レビュー) | `github_review.lua` | `:NazoGitHubReview` / `<leader>oR` でopen PRを選び、独立diff bufferで変更を読む。diff上の`c`で行コメント、Visual選択中の`c`で複数行コメント、`t`で既存thread一覧。thread画面で`r`返信・`x`解決/再オープン。`r`からApprove / Comment / Request changesも送信 |
-| Octo.nvim (その他GitHub操作) | 未置換 | Project board列・card操作、PR commits/runs/changesなど。移植が済むまでプラグインを維持 |
+| Octo.nvim (PR commits / changes / runs) | `github_pr_details.lua` | `:NazoGitHubPRDetails` / `<leader>oC` でPRを選び、commits・変更ファイル・check runsを一覧。`<CR>`でcommit diffまたはファイルpatch、`gx`でGitHubを開く |
+| Octo.nvim (Project board) | `github_projects.lua` | `:NazoGitHubProjects` / `<leader>oB` でプロジェクトを選び、item一覧・status変更・issue/PRの追加・archiveを行う。`gh` に `project` スコープが必要 |
+| Octo.nvim (gist) | `github_gists.lua` | `:NazoGitHubGists` / `<leader>oG` で自分のgistを一覧。`<CR>`でブラウザ表示、`y`でURLをコピー。`gh api gists` を使用 |
 | LuaSnip / denippet.vim / friendly-snippets | `snippets.lua` | `snippets/` の独自JSON定義を補完候補として表示し、展開後はTab / Shift-Tabでplaceholderを移動。`:NazoSnippetExpand` / `:NazoSnippetReload` |
 | nvim-treesitter incremental selection | `incremental_selection.lua` | `gnn` で開始、`grn` / `grm` で構文親ノードへ拡張・縮小、`grq` で終了。Neovim標準Tree-sitter APIを使用 |
 | vim-bad-apple | `animation.lua` | `:NazoAnimation [fps]` で独自生成の幾何学アニメーションを再生。任意のテキストフレームも `play(frames, fps)` で再生可能。`q` / `<Esc>` / `:NazoAnimationStop` で停止 |

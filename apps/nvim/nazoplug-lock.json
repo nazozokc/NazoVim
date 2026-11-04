@@ -95,10 +95,6 @@
 		"branch": "master",
 		"commit": "737cf6c657898d0c697311d79d361288a1343d50"
 	},
-	"octo.nvim": {
-		"branch": "master",
-		"commit": "5ae580df72589f25b775ff2bdacfd7f7be8d63bd"
-	},
 	"opencode.nvim": {
 		"branch": "main",
 		"commit": "1b90ae8936245255786b7789496f7d910ab8434d"

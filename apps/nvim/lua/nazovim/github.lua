@@ -404,7 +404,11 @@ function M.setup()
 	)
 	vim.api.nvim_create_user_command("NazoGitHubSearch", M.search, { desc = "Search GitHub issues and pull requests" })
 	vim.api.nvim_create_user_command("NazoGitHubIssueCreate", M.create_issue, { desc = "Create a GitHub issue" })
-	vim.api.nvim_create_user_command("NazoGitHubPRCreate", M.create_pull_request, { desc = "Create a GitHub pull request" })
+	vim.api.nvim_create_user_command(
+		"NazoGitHubPRCreate",
+		M.create_pull_request,
+		{ desc = "Create a GitHub pull request" }
+	)
 	vim.keymap.set("n", "<leader>gi", M.issues, { desc = "List GitHub Issues" })
 	vim.keymap.set("n", "<leader>op", M.pull_requests, { desc = "List GitHub Pull Requests" })
 	vim.keymap.set("n", "<leader>on", M.notifications, { desc = "List GitHub Notifications" })
