@@ -1,3 +1,7 @@
+-- The icon glyphs, names, and brand colors below are derived from
+-- nvim-web-devicons <https://github.com/nvim-tree/nvim-web-devicons>.
+-- Copyright (c) 2023 nvim-tree. Licensed under the MIT License.
+-- The full license text is in THIRD_PARTY_LICENSES.md at the repository root.
 local M = {}
 
 local default_icon = "󰈔"
