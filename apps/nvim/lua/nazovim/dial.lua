@@ -9,20 +9,6 @@ local constants = {
 	large = { "small", "medium", "large" },
 }
 
-local function matches(line, pattern)
-	local result = {}
-	local init = 1
-	while true do
-		local first, last = line:find(pattern, init)
-		if not first then
-			break
-		end
-		result[#result + 1] = { first = first, last = last }
-		init = last + 1
-	end
-	return result
-end
-
 local function all_tokens(line)
 	local found = {}
 	local function add(kind, pattern)

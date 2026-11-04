@@ -1,5 +1,7 @@
 local M = {}
 
+local icons = require("nazovim.icons")
+
 local function listed()
 	local result = {}
 	for _, buf in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
@@ -13,8 +15,10 @@ function M.render()
 	local current = vim.api.nvim_get_current_buf()
 	local parts = {}
 	for _, buf in ipairs(listed()) do
-		local name = buf.name ~= "" and vim.fn.fnamemodify(buf.name, ":t") or "[No Name]"
-		name = name:gsub("%%", "%%%%")
+		local label = buf.name ~= "" and vim.fn.fnamemodify(buf.name, ":t") or "[No Name]"
+		label = label:gsub("%%", "%%%%")
+		local icon = buf.name ~= "" and icons.get_icon(buf.name) or ""
+		local name = icon ~= "" and (icon .. " " .. label) or label
 		local active = buf.bufnr == current
 		local highlight = active and "NazoBufferActive" or "NazoBufferInactive"
 		local modified = buf.changed == 1 and " ●" or ""

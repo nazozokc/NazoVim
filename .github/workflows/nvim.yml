@@ -44,22 +44,11 @@ jobs:
           echo "NVIM_APPNAME=$NVIM_APPNAME" >> "$GITHUB_ENV"
           echo "CONFIG_DIR=$CONFIG_DIR" >> "$GITHUB_ENV"
 
-      # swagger-preview.nvim の build (npm install -g) が Nix 環境で
-      # EACCES を起こさないよう、npm global prefix を書き込み可能な場所に設定する
-      - name: Set up writable npm global prefix
-        run: |
-          mkdir -p /tmp/npm-global
-          npm config set prefix /tmp/npm-global
-          echo "/tmp/npm-global/bin" >> "$GITHUB_PATH"
-
       - name: Install nazoplug plugins
         timeout-minutes: 30
-        env:
-          NPM_CONFIG_PREFIX: /tmp/npm-global
         run: |
           nix develop --command sh -c '
             export NVIM_APPNAME="nvim-nazozokc"
-            export NPM_CONFIG_PREFIX=/tmp/npm-global
             nvim --headless "+NazoPlug sync" +q 2>&1 | tee /tmp/nazoplug-sync.log
             echo "--- nazoplug sync log ---"
             cat /tmp/nazoplug-sync.log
@@ -77,14 +66,12 @@ jobs:
           nix develop --command nvim --headless -u NONE -l apps/nvim/tests/features_test.lua
           nix develop --command nvim --headless -u NONE -l apps/nvim/tests/builtin_test.lua
           nix develop --command nvim --headless -u NONE -l apps/nvim/tests/replacements_test.lua
+          nix develop --command nvim --headless -u NONE -l apps/nvim/tests/github_test.lua
 
       - name: Check Neovim startup (no errors)
-        env:
-          NPM_CONFIG_PREFIX: /tmp/npm-global
         run: |
           nix develop --command sh -c '
             export NVIM_APPNAME="nvim-nazozokc"
-            export NPM_CONFIG_PREFIX=/tmp/npm-global
 
             # --startuptime でタイム計測しつつ headless 起動
             nvim --headless \

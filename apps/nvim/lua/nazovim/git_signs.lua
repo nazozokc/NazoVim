@@ -169,6 +169,10 @@ local function schedule_refresh(buf)
 		0,
 		vim.schedule_wrap(function()
 			debounce[buf] = nil
+			-- A newer refresh may already have closed this timer.
+			if timer:is_closing() then
+				return
+			end
 			timer:stop()
 			timer:close()
 			M.refresh(buf)
@@ -235,8 +239,8 @@ function M.jump(direction)
 			vim.notify("No more Git changes in this direction", vim.log.levels.INFO, { title = "NazoVim" })
 			return
 		end
-		local row = math.max(target.new_start - 1, 0)
-		vim.api.nvim_win_set_cursor(0, { math.min(row + 1, vim.api.nvim_buf_line_count(buf)), 0 })
+		local target_row = math.max(target.new_start - 1, 0)
+		vim.api.nvim_win_set_cursor(0, { math.min(target_row + 1, vim.api.nvim_buf_line_count(buf)), 0 })
 	end)
 end
 

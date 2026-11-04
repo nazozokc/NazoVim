@@ -32,11 +32,11 @@ local function treesitter(buf)
 	if vim.api.nvim_buf_line_count(buf) > 5000 then
 		return
 	end
-	-- nvim-treesitter remains installed; use its cached, scope-aware locals index.
-	local ok, locals = pcall(require, "nvim-treesitter.locals")
+	-- The built-in locals index needs a parser and a locals query.
+	local ok, locals = pcall(require, "nazovim.locals")
 	if not ok then
 		return
-	end -- Optional on first run, before parsers/plugins exist.
+	end
 	local parsed, nodes = pcall(function()
 		local node = vim.treesitter.get_node({ bufnr = buf })
 		if not node then

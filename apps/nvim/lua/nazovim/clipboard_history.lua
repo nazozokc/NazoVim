@@ -134,11 +134,6 @@ local function filtered_items(query)
 	return matches
 end
 
-local function paste(item, after)
-	vim.fn.setreg('"', item.contents, item.regtype)
-	vim.cmd("normal! " .. (after and "p" or "P"))
-end
-
 local function open_editor(item, on_save)
 	local buf = vim.api.nvim_create_buf(false, true)
 	vim.bo[buf].buftype = "acwrite"

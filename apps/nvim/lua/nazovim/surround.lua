@@ -29,11 +29,6 @@ local function in_comment_or_string(buf, row, col)
 	return false
 end
 
-local function char_at(buf, row, col)
-	local line = vim.api.nvim_buf_get_lines(buf, row - 1, row, false)[1]
-	return line and line:sub(col + 1, col + 1) or ""
-end
-
 local function escaped(line, col)
 	local count, i = 0, col
 	while i > 0 and line:sub(i, i) == "\\" do
@@ -78,10 +73,6 @@ function M.find(buf, row, col, open, close)
 			return { srow = row, scol = start_col, erow = row, ecol = end_col }
 		end
 		return nil
-	end
-
-	local function matches(ch, target)
-		return ch == target
 	end
 
 	local depth = 0

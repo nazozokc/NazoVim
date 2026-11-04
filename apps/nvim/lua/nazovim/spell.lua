@@ -39,7 +39,7 @@ end
 
 ---Toggle spell checking for prose buffers.
 function M.toggle()
-	vim.g.nazovim_spell = not (vim.g.nazovim_spell ~= false)
+	vim.g.nazovim_spell = vim.g.nazovim_spell == false
 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
 		M.apply(buf)
 	end

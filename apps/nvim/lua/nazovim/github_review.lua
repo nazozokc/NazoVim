@@ -259,12 +259,15 @@ local function choose_thread(item, threads)
 end
 
 local function add_line_comment(item, pull_request_id, location)
-	local mutation =
-		[[mutation($pullRequestId:ID!, $path:String!, $line:Int!, $side:DiffSide!, $body:String!, $startLine:Int, $startSide:DiffSide) {
+	local mutation = [[mutation($pullRequestId:ID!, $path:String!, $line:Int!, $side:DiffSide!,
+  $body:String!, $startLine:Int, $startSide:DiffSide) {
   addPullRequestReview(input:{
     pullRequestId:$pullRequestId,
     event:COMMENT,
-    threads:[{path:$path, line:$line, side:$side, startLine:$startLine, startSide:$startSide, body:$body}]
+    threads:[{
+      path:$path, line:$line, side:$side,
+      startLine:$startLine, startSide:$startSide, body:$body
+    }]
   }) { pullRequestReview { id state } }
 }]]
 	open_text_editor("NazoGitHub://line-comment/" .. item.number, function(body, editor)

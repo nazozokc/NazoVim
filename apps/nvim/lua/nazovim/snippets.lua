@@ -112,8 +112,11 @@ local function parse(body)
 			elseif body:sub(index + 1, index + 1) == "{" then
 				local close = body:find("}", index + 2, true)
 				local token = close and body:sub(index + 2, close - 1)
-				local number, fallback = token and token:match("^(%d+):(.*)$")
-				local choice_number, choices = token and token:match("^(%d+)|(.+)|$")
+				local number, fallback, choice_number, choices
+				if token then
+					number, fallback = token:match("^(%d+):(.*)$")
+					choice_number, choices = token:match("^(%d+)|(.+)|$")
+				end
 				local simple_number = token and token:match("^(%d+)$")
 				if number then
 					placeholder(tonumber(number), fallback)
@@ -301,6 +304,20 @@ local function entries_for(filetype)
 	local result = {}
 	for _, scope in ipairs({ "all", filetype }) do
 		for _, definition in ipairs(catalog[scope] or {}) do
+			result[#result + 1] = definition
+		end
+	end
+	return result
+end
+
+---Return snippet definitions for the current buffer whose prefix matches.
+---@param prefix? string
+---@return table[]
+function M.candidates(prefix)
+	local result = {}
+	prefix = prefix or ""
+	for _, definition in ipairs(entries_for(vim.bo.filetype)) do
+		if prefix == "" or definition.prefix:sub(1, #prefix) == prefix then
 			result[#result + 1] = definition
 		end
 	end

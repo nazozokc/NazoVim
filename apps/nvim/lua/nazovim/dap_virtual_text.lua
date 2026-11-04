@@ -158,7 +158,7 @@ local function schedule_render(session)
 	end)
 end
 
----Attach custom extmark rendering to an initialized nvim-dap instance.
+---Attach custom extmark rendering to the built-in DAP client.
 function M.attach(dap_instance)
 	if attached or not enabled then
 		return

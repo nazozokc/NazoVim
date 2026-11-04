@@ -148,8 +148,9 @@ local function open_detail(kind, item, existing_buf)
 	if kind == "issue" then
 		fields = "number,title,body,state,stateReason,author,assignees,labels,createdAt,updatedAt,url,comments"
 	else
-		fields =
-			"number,title,body,state,isDraft,mergedAt,author,assignees,labels,createdAt,updatedAt,url,headRefName,baseRefName,reviewDecision,additions,deletions,changedFiles"
+		fields = "number,title,body,state,isDraft,mergedAt,author,assignees,labels,"
+			.. "createdAt,updatedAt,url,headRefName,baseRefName,reviewDecision,"
+			.. "additions,deletions,changedFiles"
 	end
 	run({ kind, "view", tostring(item.url or item.number), "--json", fields }, function(output)
 		local detail = decode_json(output)

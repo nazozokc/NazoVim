@@ -135,8 +135,10 @@ function M.recent()
 	end)
 end
 
-function M.grep()
-	local root = root_directory()
+---Search project text with ripgrep. `directory` defaults to the project root.
+---@param directory? string
+function M.grep(directory)
+	local root = directory and vim.fs.normalize(vim.fn.fnamemodify(directory, ":p")) or root_directory()
 	vim.ui.input({ prompt = "Search in " .. root .. ": " }, function(query)
 		if not query or query == "" then
 			return

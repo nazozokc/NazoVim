@@ -77,9 +77,9 @@ local function render()
 		variable_line_map[scope_start_line + entry_line - 1] = reference
 	end
 
-	local ok, breakpoints = pcall(require, "dap.breakpoints")
+	local ok, debugger = pcall(require, "nazovim.dap")
 	if ok then
-		local grouped = breakpoints.get()
+		local grouped = debugger.breakpoints.get()
 		local buffers = {}
 		for buf in pairs(grouped) do
 			buffers[#buffers + 1] = buf
@@ -100,7 +100,7 @@ local function render()
 	end
 	append_section(lines, "BREAKPOINTS", breakpoint_entries)
 
-	for index, item in ipairs(stack) do
+	for _, item in ipairs(stack) do
 		local marker = frame and item.id == frame.id and "▶ " or "  "
 		stack_entries[#stack_entries + 1] = marker
 			.. concise(item.name)
@@ -221,9 +221,9 @@ function M.toggle()
 		return
 	end
 	if not dap then
-		local ok, instance = pcall(require, "dap")
+		local ok, instance = pcall(require, "nazovim.dap")
 		if not ok then
-			vim.notify("nvim-dap is not loaded", vim.log.levels.ERROR, { title = "NazoVim Debugger" })
+			vim.notify("The NazoVim debugger is not loaded", vim.log.levels.ERROR, { title = "NazoVim Debugger" })
 			return
 		end
 		dap = instance

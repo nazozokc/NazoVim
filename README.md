@@ -39,10 +39,10 @@
 
 <!-- markdownlint-disable MD013 -->
 - **⚡ Fast startup** — nazoplug によるアグレッシブな遅延ロード。起動を邪魔するものは VeryLazy 以降に追いやる
-- **🔧 Full LSP** — TypeScript / Lua / Ruby / Nix / C / Java / Zig など多言語対応。mason + 手動 (nixd) の両刀
+- **🔧 Full LSP** — TypeScript / Lua / Ruby / Nix / C / Java / Zig など多言語対応。PATH上にある言語サーバーを自動で有効化（mason不要）
 - **🎨 NazoVim theme** — 独自の青緑系暗色パレットと透明背景
-- **🧠 AI統合** — Claude Code (`claudecode.nvim`) と opencode (`opencode.nvim`) を両方サポート
-- **🌊 snacks.nvim** — Dashboard・Zen mode
+- **🧠 AI統合** — Claude Code と opencode を内蔵terminal統合で両方サポート（`claudecode.lua` / `opencode.lua`）
+- **🌊 Dashboard / Zen** — 起動ダッシュボードと集中表示をNazoVim内蔵で提供
 - **🐛 DAP** — JavaScript / TypeScript のデバッグ環境を最小構成で内包
 - **📦 Nix対応** — `nix run` で隔離起動 / `nix develop` でLSP完备のdevShell
 - **🧪 テスト** — NazoVim内蔵ランナー（Jest / Vitest / Playwright CLIを利用）
@@ -65,7 +65,6 @@
 | Nix (flakes対応) | `nix run` / `nix develop` での隔離起動 |
 | Node.js | TypeScript LSP / prettier |
 | NazoVim 内蔵 | LazyGit浮動terminal起動（`lazygit.lua`、外部 `lazygit` が必要） |
-| yazi | ファイルマネージャー統合 |
 | ripgrep | Grep検索 |
 | fd | ファイル検索 |
 
@@ -111,7 +110,7 @@ Nix と flakes が必要で、初回は Nix 自体のダウンロードやビル
 return {
   very_lazy_delay_ms = 200,
   plugins = {
-    ["snacks.nvim"] = "VeryLazy",
+    ["tokyonight.nvim"] = "VeryLazy",
   },
 }
 ```
@@ -126,8 +125,8 @@ NAZOVIM_STARTUP_CONFIG="$HOME/startup.lua" nix run github:nazozokc/NazoVim
 100ms です。`NAZOVIM_VERY_LAZY_DELAY_MS=200` でも指定でき、
 こちらが Lua ファイルの値より優先されます。
 
-既定では `neo-tree.nvim` は `on_demand` で、キーやコマンドで
-必要になったときに読み込みます。`plugins` を指定すると既定の一覧を置き換えます。
+NazoVim は外部プラグインを同梱していないため、既定の `plugins` は空です。
+プラグインを追加したら、この設定でキー・コマンド・イベントによる読み込みを指定できます。
 
 コマンド・キー・ファイルタイプによる読み込みは残るため、指定イベントより早く
 使われた場合はその時点で読み込まれます。他のプラグインが依存する場合も先に
@@ -169,8 +168,7 @@ nvim
 │   │   ├── nazoplug-lock.json # プラグインバージョンロック
 │   │   └── lua/
 │   │       ├── config/       # options / keymaps / autocmds
-│   │       ├── plugins.lua   # プラグインカテゴリの import 定義
-│   │       └── plugins/      # プラグイン設定
+│   │       └── plugins.lua   # 追加プラグインの import（既定は空）
 │   └── nazoplug/             # 自作プラグインマネージャー
 │       ├── lua/nazoplug/     # loader / installer / lock / git
 │       └── tests/            # headless tests
@@ -195,14 +193,19 @@ nvim
 
 | プラグイン | 用途 |
 | ---------- | ---- |
-| nvim-lspconfig + mason | LSP管理 |
-| typescript-tools.nvim | TypeScript専用LSP（高速化設定済み） |
-| nvim-cmp | 補完エンジン |
+| NazoVim 内蔵 | LSP管理（`lsp.lua`、`vim.lsp.config` / `vim.lsp.enable`、PATH上のサーバーのみ起動、`:NazoLspInfo`） |
+| NazoVim 内蔵 | ファイルアイコン（`icons.lua`、`get_icon` / `get_icon_by_filetype` のdevicons互換API） |
+| NazoVim 内蔵 | TypeScript / JavaScript LSP（`lsp.lua` の `ts_ls` = typescript-language-server。formatting と semantic tokens を無効化、`<leader>oi` / `<leader>ru`） |
+| NazoVim 内蔵 | Rust LSP（`lsp.lua` の `rust_analyzer` = rust-analyzer。`<leader>rr` で runnables を選択して実行） |
+| NazoVim 内蔵 | Java LSP（`lsp.lua` の `jdtls` = jdt-language-server。プロジェクトごとに `-data` ワークスペースを分ける） |
+| NazoVim 内蔵 | 補完（`completion.lua`、`vim.lsp.completion` + snippet/buffer/path、`<C-Space>` / `<Tab>` / `<S-Tab>` / `<CR>`） |
 | NazoVim 内蔵 | コマンドライン補完（`cmdline_completion.lua`） |
 | NazoVim 内蔵 | 独立snippet展開・placeholder移動（`snippets.lua`、VSCode JSON subset） |
 | NazoVim 内蔵 | Tree-sitter構文ノードの選択拡張・縮小（`incremental_selection.lua`） |
 
-Snippetは `snippets/<filetype>.json` に追加できます。補完候補の確定または `:NazoSnippetExpand [prefix]` で展開し、Tab / Shift-Tabで入力位置を移動します。構文選択は `gnn` で開始し、`grn` / `grm` で拡張・縮小します。
+Snippetは `snippets/<filetype>.json` に追加できます。
+  補完候補の確定または `:NazoSnippetExpand [prefix]` で展開し、Tab / Shift-Tabで入力位置を移動します。
+  構文選択は `gnn` で開始し、`grn` / `grm` で拡張・縮小します。
 | NazoVim 内蔵 | Neovim標準LSPコードアクション（`lsp_actions.lua`） |
 | NazoVim 内蔵 | LSPコードアクション差分プレビュー（`action_preview.lua`） |
 | NazoVim 内蔵 | LSPリファクタリング操作（`refactor.lua`） |
@@ -211,18 +214,17 @@ Snippetは `snippets/<filetype>.json` に追加できます。補完候補の確
 | NazoVim 内蔵 | タスク実行と履歴（`tasks.lua`） |
 | NazoVim 内蔵 | LSPプログレス表示 |
 | NazoVim 内蔵 | インライン診断 |
-| lazydev.nvim | Lua/Neovim API の補完・型チェック強化 |
+| NazoVim 内蔵 | Lua/Neovim API の型補完（`lsp.lua` が lua_ls に `$VIMRUNTIME` を渡す） |
 
 ### Fuzzy Finder / ナビゲーション
 
 | プラグイン | 用途 |
 | ---------- | ---- |
-| snacks.nvim | Dashboard / Zen |
+| NazoVim 内蔵 | 起動ダッシュボード（`dashboard.lua`、`:NazoDashboard`） |
+| NazoVim 内蔵 | Zenモード（`zen.lua`、`<leader>z` / `:NazoZen`） |
+| NazoVim 内蔵 | statuscolumn（sign・fold・行番号を1列に統合、`:NazoStatuscolumn`）と quickfile（書き込み時に親ディレクトリを自動作成、`quickfile.lua`） |
 | NazoVim 内蔵 | ファイル・バッファ・最近使った項目・テキスト検索picker（`picker.lua`） |
-| telescope.nvim | ファジーファインダー（サブ） |
-| NazoVim 内蔵 | バッファベースのファイルブラウザー（`file_browser.lua`） |
-| neo-tree.nvim | ツリー形式ファイルエクスプローラー |
-| yazi.nvim | yaziファイルマネージャー統合 |
+| NazoVim 内蔵 | バッファベースのファイルブラウザー（`file_browser.lua`、`<leader>m` / `<leader>n`）。旧 oil / neo-tree / yazi を置換 |
 | NazoVim 内蔵 | Winbar / パンくずリスト（`breadcrumb.lua`） |
 | NazoVim 内蔵 | 翻訳コマンド（`translate.lua`、Translate Shellを使用） |
 | NazoVim 内蔵 | package.json依存管理（`package_info.lua`） |
@@ -244,7 +246,7 @@ Snippetは `snippets/<filetype>.json` に追加できます。補完候補の確
 | NazoVim 内蔵 | カーソル下シンボルのハイライト |
 | NazoVim 内蔵 | フローティングファイル名 |
 | NazoVim 内蔵 | TODO/FIXME等のハイライト |
-| NazoVim 内蔵 | Markdown / Avante のリッチ表示（`markdown_render.lua`） |
+| NazoVim 内蔵 | Markdown のリッチ表示（`markdown_render.lua`） |
 | NazoVim 内蔵 | カラーコードのインラインプレビュー |
 
 ### Git (Plugins)
@@ -254,7 +256,7 @@ Snippetは `snippets/<filetype>.json` に追加できます。補完候補の確
 | NazoVim 内蔵 | Git差分サイン・hunk移動・preview・blame（`git_signs.lua`） |
 | NazoVim 内蔵 | Git変更一覧・履歴・conflict選択（`git_review.lua`） |
 | NazoVim 内蔵 | LazyGit浮動terminal起動（`lazygit.lua`） |
-| vim-fugitive | Git操作 |
+| NazoVim 内蔵 | Git status・stage/unstage・diff・log・blame・任意の `git` サブコマンド（`git.lua`、`:Git` / `:NazoGitStatus` / `<leader>gs`） |
 | NazoVim 内蔵 | GitHub Issue / PR一覧・詳細・作成・タイトル/本文編集・コメント・close/reopen（`github.lua`、`gh` CLIを使用） |
 | NazoVim 内蔵 | GitHub通知・Issue/PR検索（`github.lua`）、Discussion作成・編集・削除・返信・コメント管理・poll投票・accepted answer・upvote・リアクション・カテゴリ・購読・close/reopen（`github_discussions.lua`） |
 | NazoVim 内蔵 | Issue/PRのラベル・担当者・milestone・project・リアクション、PR reviewer管理（`github_metadata.lua`） |
@@ -269,7 +271,7 @@ Snippetは `snippets/<filetype>.json` に追加できます。補完候補の確
 
 | プラグイン | 用途 |
 | ---------- | ---- |
-| nvim-treesitter | シンタックスハイライト / インデント |
+| NazoVim 内蔵 | Treesitter（`treesitter.lua`、`vim.treesitter.start`、grammarはNix供給、`:NazoTreesitterInfo`） |
 | NazoVim 内蔵 | 関数・クラス・条件・loop・block・引数の選択と移動（`textobjects.lua`） |
 | NazoVim 内蔵 | `f` / `F` / `t` / `T` の複数行検索と `;` / `,` の繰り返し |
 | NazoVim 内蔵 | 括弧・クォート自動補完（`pairs.lua`） |
@@ -294,18 +296,18 @@ Snippetは `snippets/<filetype>.json` に追加できます。補完候補の確
 
 | プラグイン | 用途 |
 | ---------- | ---- |
-| claudecode.nvim | Claude Code統合 |
-| opencode.nvim | opencode統合 |
-| CopilotChat.nvim | GitHub Copilot Chat |
-| copilot.lua | GitHub Copilot補完 |
+| NazoVim 内蔵 | Codex CLI統合（`codex.lua`、`:Codex` / `:CodexToggle`、`<C-q>`で閉じる） |
+| NazoVim 内蔵 | Claude Code CLI統合（`claudecode.lua`、`:ClaudeCode` / `:ClaudeCodeToggle` / `:ClaudeCodeFocus`、`<C-q>`で閉じる） |
+| NazoVim 内蔵 | opencode CLI統合（`opencode.lua`、`:OpenCode` / `:OC`、`<C-.>`で開閉） |
+| NazoVim 内蔵 | 非対話AIクライアント（`ai_ask.lua`、`claude -p` / `codex exec` / `opencode run` を右分割パネルへストリーミング。`:NazoAI` / `<leader>aa` / `<leader>ae` / `<leader>at` / `<leader>a?`） |
 
 ### デバッグ / テスト
 
 | プラグイン | 用途 |
 | ---------- | ---- |
-| nvim-dap | DAPデバッガーbackend |
+| NazoVim 内蔵 | DAPクライアント（`dap.lua`、stdioのDebug Adapter Protocol実装。`js-debug` アダプタを起動し、`<F5>` / `<F10>` / `<F11>` / `<F12>` で実行制御、`<leader>db` でbreakpoint、`<leader>dB` で一覧、`<leader>dl` で開始、`<leader>de` で式評価、`<leader>dq` で終了、`:NazoDapInfo` で状態確認） |
 | NazoVim 内蔵 | DAP情報パネル（`dap_ui.lua`、scope展開・stack選択・watch操作） |
-| nvim-dap-vscode-js | JS/TS デバッグアダプタ |
+| NazoVim 内蔵 | JS/TS デバッグアダプタ起動（`dap.lua`、`js-debug` をTCPモードで起動。devShellが供給） |
 | NazoVim 内蔵 | テスト実行と最新出力表示（`test_runner.lua`） |
 | NazoVim 内蔵 | LCOVカバレッジ表示（`coverage.lua`） |
 | NazoVim 内蔵 | DAP変数値・例外停止理由のインライン表示（`dap_virtual_text.lua`） |
@@ -321,13 +323,13 @@ Snippetは `snippets/<filetype>.json` に追加できます。補完候補の確
 
 | キー | 動作 |
 | ---- | ---- |
-| `<Leader><Leader>` | ファイル検索 (snacks Picker) |
+| `<Leader><Leader>` | ファイル検索 (NazoVim内蔵 picker) |
 | `<Leader>/` | Live Grep |
 | `<Leader>b` | バッファ一覧 |
 | `<Leader>r` | 最近使ったファイル |
 | `<Leader>h` | 検索ハイライト解除 |
 | `<Leader>z` | Zen mode |
-| `<Leader>m` | ファイルブラウザー |
+| `<Leader>m` / `<Leader>n` | ファイルブラウザー |
 | `<Leader>n` | Neo-tree |
 | `<Leader>t` | フローティングターミナル |
 | `<Leader>f` | フォーマット |
@@ -401,11 +403,14 @@ Snippetは `snippets/<filetype>.json` に追加できます。補完候補の確
 
 | キー | 動作 |
 | ---- | ---- |
-| `<Leader>ac` | Claude Code toggle |
-| `<Leader>af` | Claude Code focus |
-| `<Leader>ab` | 現在バッファを追加 |
-| `<C-a>` | opencode ask |
-| `<C-x>` | opencode select action |
+| `<Leader>Cc` | Claude Code toggle |
+| `<Leader>Cf` | Claude Code focus |
+| `<Leader>aa` | NazoAI に質問（claude / codex / opencode CLI） |
+| `<Leader>ae` | 回答のコードブロックをバッファへ適用 |
+| `<Leader>at` | NazoAI パネル開閉 |
+| `<Leader>a?` | NazoAI プロバイダ選択 |
+| `<Leader>oa` | opencode ask（現在バッファを `@path` でメンション） |
+| `<Leader>ox` | opencode command palette |
 | `<C-.>` | opencode toggle |
 
 ### DAP
@@ -417,6 +422,10 @@ Snippetは `snippets/<filetype>.json` に追加できます。補完候補の確
 | `<F11>` | ステップイン |
 | `<F12>` | ステップアウト |
 | `<Leader>db` | ブレークポイント切替 |
+| `<Leader>dB` | ブレークポイント一覧 |
+| `<Leader>dl` | デバッグ開始 |
+| `<Leader>de` | 式を評価 |
+| `<Leader>dq` | セッション終了 |
 | `<Leader>du` | DAP UI toggle |
 
 ### テスト
@@ -465,28 +474,28 @@ Snippetは `snippets/<filetype>.json` に追加できます。補完候補の確
 
 ## 🔧 Customization
 
-`lua/plugins/` 以下にLuaファイルを追加するだけで自動でロードされます。
+NazoVim は外部プラグインを同梱していません。追加するときは
+`lua/plugins.lua` に import を1行足し、`lua/plugins/<group>/` に spec を置きます。
 
 <!-- markdownlint-disable MD013 -->
 ```lua
--- lua/plugins/my-config.lua
+-- lua/plugins.lua
+return {
+  { import = "plugins.my-group" },
+}
+```
 
--- プラグイン追加
+```lua
+-- lua/plugins/my-group/zen-mode.lua
 return {
   "folke/zen-mode.nvim",
-  opts = {}
+  opts = {},
 }
 ```
 <!-- markdownlint-enable MD013 -->
 
-既存プラグインの設定を上書きする場合も同じファイルに書けます。
-
-```lua
-return {
-  "folke/snacks.nvim",
-  opts = { dashboard = { enabled = false } }
-}
-```
+追加したプラグインは `:NazoPlug sync` で導入され、`nazoplug-lock.json` に記録されます。
+読み込みタイミングは `lua/config/startup.lua` の `plugins` で指定できます。
 
 > **Note**: Clone（方法3）でインストールした場合のみ有効です。
 
@@ -533,14 +542,9 @@ NazoVim は多くの優れた Neovim プラグインに支えられています�
 
 - [AckslD/nvim-neoclip.lua](https://github.com/AckslD/nvim-neoclip.lua)
 - [Bekaboo/dropbar.nvim](https://github.com/Bekaboo/dropbar.nvim)
-- [ColinKennedy/mega.cmdparse](https://github.com/ColinKennedy/mega.cmdparse)
-- [ColinKennedy/mega.logging](https://github.com/ColinKennedy/mega.logging)
-- [CopilotC-Nvim/CopilotChat.nvim](https://github.com/CopilotC-Nvim/CopilotChat.nvim)
-- [JavaHello/spring-boot.nvim](https://github.com/JavaHello/spring-boot.nvim)
 - [L3MON4D3/LuaSnip](https://github.com/L3MON4D3/LuaSnip)
 - [MeanderingProgrammer/render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim)
 - [MunifTanjim/eslint.nvim](https://github.com/MunifTanjim/eslint.nvim)
-- [MunifTanjim/nui.nvim](https://github.com/MunifTanjim/nui.nvim)
 - [ThePrimeagen/refactoring.nvim](https://github.com/ThePrimeagen/refactoring.nvim)
 - [alexghergh/nvim-tmux-navigation](https://github.com/alexghergh/nvim-tmux-navigation)
 - [andersevenrud/nvim_context_vt](https://github.com/andersevenrud/nvim_context_vt)
@@ -558,7 +562,6 @@ NazoVim は多くの優れた Neovim プラグインに支えられています�
 - [echasnovski/mini.nvim](https://github.com/echasnovski/mini.nvim)
 - [echasnovski/mini.surround](https://github.com/echasnovski/mini.surround)
 - [folke/flash.nvim](https://github.com/folke/flash.nvim)
-- [folke/lazydev.nvim](https://github.com/folke/lazydev.nvim)
 - [folke/noice.nvim](https://github.com/folke/noice.nvim)
 - [folke/persistence.nvim](https://github.com/folke/persistence.nvim)
 - [folke/snacks.nvim](https://github.com/folke/snacks.nvim)
@@ -586,28 +589,16 @@ NazoVim は多くの優れた Neovim プラグインに支えられています�
 - [marilari88/neotest-vitest](https://github.com/marilari88/neotest-vitest)
 - [mattn/emmet-vim](https://github.com/mattn/emmet-vim)
 - [mcauley-penney/visual-whitespace.nvim](https://github.com/mcauley-penney/visual-whitespace.nvim)
-- [mfussenegger/nvim-dap](https://github.com/mfussenegger/nvim-dap)
 - [mfussenegger/nvim-lint](https://github.com/mfussenegger/nvim-lint)
-- [microsoft/vscode-js-debug](https://github.com/microsoft/vscode-js-debug)
 - [mikavilpas/yazi.nvim](https://github.com/mikavilpas/yazi.nvim)
 - [mistweaverco/kulala.nvim](https://github.com/mistweaverco/kulala.nvim)
 - [monaqa/dial.nvim](https://github.com/monaqa/dial.nvim)
-- [mrcjkb/rustaceanvim](https://github.com/mrcjkb/rustaceanvim)
-- [mxsdev/nvim-dap-vscode-js](https://github.com/mxsdev/nvim-dap-vscode-js)
-- [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)
 - [nickjvandyke/opencode.nvim](https://github.com/nickjvandyke/opencode.nvim)
-- [nvim-java/nvim-java](https://github.com/nvim-java/nvim-java)
-- [nvim-lua/plenary.nvim](https://github.com/nvim-lua/plenary.nvim)
 - [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)
 - [nvim-neotest/neotest](https://github.com/nvim-neotest/neotest)
 - [nvim-neotest/neotest-jest](https://github.com/nvim-neotest/neotest-jest)
 - [nvim-telescope/telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
-- [nvim-tree/nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons)
-- [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
-- [nvim-treesitter/nvim-treesitter-context](https://github.com/nvim-treesitter/nvim-treesitter-context)
-- [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects)
 - [nvimdev/lspsaga.nvim](https://github.com/nvimdev/lspsaga.nvim)
-- [pmizio/typescript-tools.nvim](https://github.com/pmizio/typescript-tools.nvim)
 - [pwntester/octo.nvim](https://github.com/pwntester/octo.nvim)
 - [rafamadriz/friendly-snippets](https://github.com/rafamadriz/friendly-snippets)
 - [rcarriga/nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui)
@@ -629,7 +620,6 @@ NazoVim は多くの優れた Neovim プラグインに支えられています�
 - [stevearc/overseer.nvim](https://github.com/stevearc/overseer.nvim)
 - [theHamsta/nvim-dap-virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text)
 - [thenbe/neotest-playwright](https://github.com/thenbe/neotest-playwright)
-- [tpope/vim-fugitive](https://github.com/tpope/vim-fugitive)
 - [tpope/vim-repeat](https://github.com/tpope/vim-repeat)
 - [tttol/md-outline.nvim](https://github.com/tttol/md-outline.nvim)
 - [uga-rosa/ccc.nvim](https://github.com/uga-rosa/ccc.nvim)
@@ -640,16 +630,10 @@ NazoVim は多くの優れた Neovim プラグインに支えられています�
 - [vim-denops/denops.vim](https://github.com/vim-denops/denops.vim)
 - [vinnymeller/swagger-preview.nvim](https://github.com/vinnymeller/swagger-preview.nvim)
 - [vuki656/package-info.nvim](https://github.com/vuki656/package-info.nvim)
-- [williamboman/mason-lspconfig.nvim](https://github.com/williamboman/mason-lspconfig.nvim)
-- [williamboman/mason.nvim](https://github.com/williamboman/mason.nvim)
 - [willothy/flatten.nvim](https://github.com/willothy/flatten.nvim)
 - [windwp/nvim-autopairs](https://github.com/windwp/nvim-autopairs)
 - [windwp/nvim-ts-autotag](https://github.com/windwp/nvim-ts-autotag)
-- [yetone/avante.nvim](https://github.com/yetone/avante.nvim)
-- [zbirenbaum/copilot-cmp](https://github.com/zbirenbaum/copilot-cmp)
-- [zbirenbaum/copilot.lua](https://github.com/zbirenbaum/copilot.lua)
 - [zeioth/garbage-day.nvim](https://github.com/zeioth/garbage-day.nvim)
-- [zigtools/zls](https://github.com/zigtools/zls)
 
 （リストは `apps/nvim/nazoplug-lock.json` およびプラグイン仕様から自動生成）
 

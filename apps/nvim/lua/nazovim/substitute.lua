@@ -75,10 +75,10 @@ local function replace_block(buf, start_row, start_col, end_row, end_col, conten
 	for row = last_row, first_row, -1 do
 		local replacement = contents[row - first_row + 1] or ""
 		local line = vim.api.nvim_buf_get_lines(buf, row - 1, row, false)[1] or ""
-		local start_col = math.min(left, #line)
+		local from_col = math.min(left, #line)
 		local finish = math.min(#line, right + utf8_width(line, right))
-		vim.api.nvim_buf_set_text(buf, row - 1, start_col, row - 1, finish, { replacement })
-		highlight(buf, row - 1, start_col, row - 1, start_col + #replacement)
+		vim.api.nvim_buf_set_text(buf, row - 1, from_col, row - 1, finish, { replacement })
+		highlight(buf, row - 1, from_col, row - 1, from_col + #replacement)
 	end
 end
 

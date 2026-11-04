@@ -6,7 +6,7 @@ map("n", "<leader>e", function()
 	require("nazovim.lists").diagnostics()
 end, { desc = "Workspace diagnostics" })
 
--- Snacks.nvim (Picker / Zen)
+-- NazoVim picker
 map("n", "<leader><leader>", function()
 	require("nazovim.picker").files()
 end, { desc = "Files" })
@@ -22,7 +22,3 @@ end, { desc = "Buffers" })
 map("n", "<leader>r", function()
 	require("nazovim.picker").recent()
 end, { desc = "Recent Files" })
-
-map("n", "<leader>z", function()
-	require("snacks").zen.toggle()
-end, { desc = "Zen Mode" })

@@ -46,10 +46,9 @@ local function parse_request(request, variables)
 		local variable = raw:match("^%s*@[%w_.-]+%s*=") ~= nil
 		if not method and not variable and not raw:match("^%s*#") and raw:match("%S") then
 			method, url = raw:match("^%s*([%a]+)%s+(%S+)")
-		elseif method and not in_body then
-			if raw:match("^%s*@[%w_.-]+%s*=") then
-				-- Variables can be declared above a request in the block.
-			elseif raw:match("^%s*$") then
+		elseif method and not in_body and not raw:match("^%s*@[%w_.-]+%s*=") then
+			-- Variables can be declared above a request in the block.
+			if raw:match("^%s*$") then
 				in_body = true
 			elseif not raw:match("^%s*#") then
 				local name, value = raw:match("^%s*([^:]+):%s*(.-)%s*$")

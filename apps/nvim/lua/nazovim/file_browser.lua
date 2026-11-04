@@ -1,5 +1,6 @@
 local M = {}
 
+local icons = require("nazovim.icons")
 local uv = vim.uv
 local states = {}
 local namespace = vim.api.nvim_create_namespace("NazoFileBrowser")
@@ -89,7 +90,8 @@ local function render(state, preferred_path)
 		local marker = entry.is_dir and "▸ " or "  "
 		local suffix = entry.is_dir and "/" or ""
 		local git = status and ("  [" .. status .. "]") or ""
-		lines[#lines + 1] = marker .. entry.name .. suffix .. git
+		local icon = entry.is_dir and "" or (icons.get_icon(entry.name) .. " ")
+		lines[#lines + 1] = marker .. icon .. entry.name .. suffix .. git
 		state.line_items[#lines] = entry
 		if preferred_path and normalize(entry.path) == preferred_path then
 			selected_line = #lines
@@ -463,6 +465,9 @@ end
 
 function M.setup()
 	vim.keymap.set("n", "<leader>m", function()
+		M.open(vim.fn.getcwd())
+	end, { desc = "Open file browser" })
+	vim.keymap.set("n", "<leader>n", function()
 		M.open(vim.fn.getcwd())
 	end, { desc = "Open file browser" })
 	vim.api.nvim_create_user_command("NazoFiles", function(command)

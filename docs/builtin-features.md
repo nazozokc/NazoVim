@@ -47,7 +47,6 @@ vim.g.nazovim_disabled_features = { "todo", "scrollbar", "terminal.commands" }
 | nvim-treesitter-context | `scope_context.lua` | カーソルを含む外側スコープをウィンドウ上端に最大3行表示。`:NazoScopeContextToggle` |
 | substitute.nvim | `substitute.lua` | `s` + motion、`ss`、`S`、Visual `s` でレジスタ内容へ置換 |
 | vim-repeat | `repeat_action.lua` | 自作操作を`.`で再実行し、他の操作はNeovim標準の`.`へ委譲 |
-| tailwindcss-colorizer-cmp | `tailwind_completion.lua` | Tailwindの色クラスを補完候補に表示（標準色は色調近似、任意hexは直接表示） |
 | nvim-pnpm-catalog-lens | `pnpm_catalog.lua` | package.jsonの`catalog:`をworkspace版に解決し、診断またはoverlay表示 |
 | ts-error-translator.nvim | `ts_error_hints.lua` | よく使うTypeScript診断コードの短い説明を行末に追加表示 |
 | nvim-coverage | `coverage.lua` | LCOV行カバレッジをsign表示し、ファイル別・全体summaryを表示 |
@@ -65,12 +64,26 @@ vim.g.nazovim_disabled_features = { "todo", "scrollbar", "terminal.commands" }
 | translate.nvim | `translate.lua` | `<leader>T` または `:NazoTranslate [language]` で行・選択範囲を翻訳し、結果をフロート表示。Translate Shell (`trans`) が必要 |
 | aerial.nvim | `outline.lua` | `<leader>so` または `:NazoOutlineToggle` でLSPシンボル、Treesitter構文、Markdown見出しのサイドバーを表示 |
 | package-info.nvim | `package_info.lua` | `package.json` の最新依存バージョンを表示し、追加・更新・削除・バージョン変更を実行。レジストリ照会に `npm`、操作にプロジェクトの package manager を使用 |
+| nvim-web-devicons | `icons.lua` | 拡張子・ファイル名・filetype からアイコンとハイライトを返すdevicons互換API（`get_icon` / `get_icon_by_filetype` / `get_icons` / `set_icon`）。tabline とファイルブラウザーが使用 |
+| vim-fugitive | `git.lua` | `git` CLI を直接呼び、statusバッファ（`s` stage / `u` unstage / `d` diff / `R` refresh / `q` close）、`<leader>ga` / `<leader>gu` / `<leader>gl`、`:Git <args>`（`%` は現在ファイルに展開）、`:NazoGitBlame` を提供 |
+| lazydev.nvim | `lsp.lua` | lua_ls の `workspace.library` に `$VIMRUNTIME`（Neovim API の型）と nazoplug のランタイムディレクトリ（`NazoSpec` 注釈）を登録 |
+| mason.nvim / mason-lspconfig.nvim / nvim-lspconfig / zigtools-zls | `lsp.lua` | 言語サーバーを `vim.lsp.config` / `vim.lsp.enable` で直接設定し、PATH上に実行ファイルがあるものだけを起動（devShellが供給）。`K` / `<leader>ls` / `<leader>ld` / `<leader>gr` をバッファマップし、`:NazoLspInfo` で有効・不足サーバーを確認 |
+| nvim-cmp / cmp-nvim-lsp / cmp-buffer / cmp-path / cmp-calc | `completion.lua` | Neovim標準の `vim.lsp.completion` を有効化（autotrigger + `completeopt=menu,menuone,noselect,popup`）。`<C-Space>` でLSP補完、LSPが無いバッファではsnippet・バッファ内単語・パスを独自候補として表示。`<CR>`確定、`<Tab>`/`<S-Tab>` で確定とsnippetプレースホルダ移動。ファイルパスは `/` を含む入力で補完 |
 | cmp-cmdline | `cmdline_completion.lua` | Neovim標準のwildmenuとpopupでExコマンド・パス・検索入力を補完 |
-| render-markdown.nvim | `markdown_render.lua` | MarkdownとAvanteバッファに見出し・コードブロック・箇条書き・checkbox・引用・表・リンクの装飾を追加。`<leader>um` / `:NazoMarkdownRenderToggle` で切替 |
+| render-markdown.nvim | `markdown_render.lua` | Markdownバッファに見出し・コードブロック・箇条書き・checkbox・引用・表・リンクの装飾を追加。`<leader>um` / `:NazoMarkdownRenderToggle` で切替 |
+| nvim-dap / nvim-dap-vscode-js / vscode-js-debug | `dap.lua` | Debug Adapter Protocol をstdio上で自前実装（`Content-Length` フレーミング、request/response/event、`initialize` → `launch` → `configurationDone`）。`js-debug` アダプタをTCPモードで起動し、`<F5>` / `<F10>` / `<F11>` / `<F12>` でcontinue・step over・step in・step out、`<leader>db` でbreakpoint切替、`<leader>dB` で一覧バッファ、`<leader>dl` で開始、`<leader>de` で式評価、`<leader>dq` で終了、`:NazoDapInfo` で状態確認。breakpointはパス単位で保持し、`setBreakpoints` を自動送信 |
 | nvim-dap-virtual-text | `dap_virtual_text.lua` | Treesitter locals と DAP scope 値から変数定義行に値を表示し、例外停止理由を表示。`:NazoDapVirtualTextToggle` で切替 |
 | nvim-dap-ui | `dap_ui.lua` | DAP scope・breakpoint・stack・watch式を右側パネルに表示。`<leader>du` / `:NazoDapUi` で開閉、値はEnterで展開、stack frame選択、`a` / `d` でwatch追加・削除 |
-| oil.nvim | `file_browser.lua` | ディレクトリバッファ、Git状態、隠しファイル切替、preview、作成・再帰コピー・rename・再帰削除。`<leader>m` / `:NazoFiles` |
-| Snacks Picker / Telescope (基本選択) | `picker.lua` | プロジェクトファイル・バッファ・最近使ったファイル・`rg`検索結果を独自fuzzy順位付けで選択。`<leader><leader>` / `<leader>b` / `<leader>r` / `<leader>/` |
+| opencode.nvim | `opencode.lua` | `opencode` CLIをフローティングterminalで起動。`:OpenCode` / `:OC` で開き（引数はCLIへ渡す）、`:OpenCode --continue` などで会話を再開。`<leader>oa` で `@path` メンション、`<leader>ox` でコマンドパレット、`<C-.>` で開閉、`<C-q>` で閉じる。プラグイン固有の `go` / `goo` オペレータとセッションスクロールコマンドは提供しない |
+| claudecode.nvim | `claudecode.lua` | `claude` CLIをフローティングterminalで起動。`:ClaudeCode` で開き、`:ClaudeCodeToggle` / `:ClaudeCodeFocus` で開閉・フォーカス、`:ClaudeCode --resume` や `--continue` で会話を再開、`:ClaudeCodeAdd` / `:ClaudeCodeSend` で `@path` メンション、`:ClaudeCodeSelectModel` で `/model` を送信。`<C-q>` で閉じる。CLIは `npm install -g @anthropic-ai/claude-code` で導入 |
+| avante.nvim | `ai_ask.lua` | `claude -p` / `codex exec` / `opencode run` を `vim.system` で非対話実行し、右分割パネルへストリーミング表示。`:NazoAI` / `<leader>aa` で質問、`<leader>ae` で回答のコードブロックをバッファへ適用、`<leader>at` でパネル開閉、`<leader>a?` でプロバイダ選択、`<leader>ac` / `<leader>aB` で文脈ファイル添付、`<leader>ah` で履歴。チャットUI・diffプレビュー・repomap は含まない |
+| codex.nvim | `codex.lua` | Codex CLIをフローティングterminalで起動。`:Codex` で開き、`:CodexToggle` でセッションを保持したまま開閉、`<C-q>` で閉じる。CLIは `npm install -g @openai/codex` で導入 |
+| oil.nvim / neo-tree.nvim / yazi.nvim | `file_browser.lua` | ディレクトリバッファ、Git状態、隠しファイル切替、preview、作成・再帰コピー・rename・再帰削除。`<leader>m` / `<leader>n` / `:NazoFiles` |
+| Snacks Picker / Telescope (基本選択) | `picker.lua` | プロジェクトファイル・バッファ・最近使ったファイル・`rg`検索結果を独自fuzzy順位付けで選択。`<leader><leader>` / `<leader>b` / `<leader>r` / `<leader>/`。`grep(directory)` で任意ディレクトリを検索できる |
+| snacks.nvim (Dashboard) | `dashboard.lua` | 起動時に引数なしならヘッダー・最近使ったファイル・キーマップを表示。`e`新規、`f`ファイル検索、`.`ブラウズ、`r`最近使ったファイル、`z`プラグイン、`q`終了、`<CR>`で最近使ったファイルを開く。`:NazoDashboard` で再表示 |
+| snacks.nvim (Statuscolumn) | `statuscolumn.lua` | sign・fold・行番号を1列にまとめる`statuscolumn`式を設定。`number` / `relativenumber` に追従し、`:NazoStatuscolumn` で再適用、`:NazoStatuscolumn!` でリセット |
+| snacks.nvim (Quickfile) | `quickfile.lua` | `BufWritePre` で親ディレクトリが無ければ `mkdir -p` してから書き込む。存在しない深いパスへ `:write` できる |
+| snacks.nvim (Zen) | `zen.lua` | 行番号・sign列・statusline・winbar・診断を隠す集中表示。`<leader>z` / `:NazoZen` でトグルし、終了時に元の設定へ戻す |
 | noice.nvim | `cmdline_ui.lua` / `notifications.lua` | コマンドラインpopup、通知フロートと履歴、`:NazoMessages`。検索件数は`search.lua`、LSP hover/signatureはNeovim標準APIを使用 |
 | kanagawa.nvim | `colorscheme.lua` / `colors/nazovim.lua` | 独自の青緑系暗色パレット、透明な通常背景、標準・Tree-sitter・診断highlightを設定 |
 | Octo.nvim (Issue / PR一覧・表示・作成・編集、通知、検索) | `github.lua` | `gh` CLIでIssue/PR作成・タイトル/本文編集・コメント・close/reopen、通知、検索を操作。作成は`:NazoGitHubIssueCreate` / `:NazoGitHubPRCreate`、フォームは1行目がタイトル、2行目以降が本文で`<C-s>`送信 |
@@ -83,6 +96,10 @@ vim.g.nazovim_disabled_features = { "todo", "scrollbar", "terminal.commands" }
 | Octo.nvim (Project board) | `github_projects.lua` | `:NazoGitHubProjects` / `<leader>oB` でプロジェクトを選び、item一覧・status変更・issue/PRの追加・archiveを行う。`gh` に `project` スコープが必要 |
 | Octo.nvim (gist) | `github_gists.lua` | `:NazoGitHubGists` / `<leader>oG` で自分のgistを一覧。`<CR>`でブラウザ表示、`y`でURLをコピー。`gh api gists` を使用 |
 | LuaSnip / denippet.vim / friendly-snippets | `snippets.lua` | `snippets/` の独自JSON定義を補完候補として表示し、展開後はTab / Shift-Tabでplaceholderを移動。`:NazoSnippetExpand` / `:NazoSnippetReload` |
+| nvim-java / spring-boot.nvim | `lsp.lua` | `jdtls`（jdt-language-server）を `vim.lsp.config` で定義。`cmd` を関数にしてプロジェクトルートごとに `-data` ワークスペースを作る。Lombok・テスト実行・DAP 連携は含まない |
+| rustaceanvim | `lsp.lua` | `rust_analyzer`（rust-analyzer）を `vim.lsp.config` で定義し、`cargo.allFeatures` と `check.command = "clippy"` を設定。`<leader>rr` は `experimental/runnables` を引いて `vim.ui.select` で選び、terminal split で実行 |
+| typescript-tools.nvim | `lsp.lua` | `ts_ls`（typescript-language-server）を `vim.lsp.config` で定義。formatting と semantic tokens を無効化し、`<leader>oi` organize imports / `<leader>ru` remove unused を code action で実行 |
+| nvim-treesitter | `treesitter.lua` | `vim.treesitter.start` で `FileType` ごとにハイライトを開始。grammar（`parser/<lang>.so` と `queries/<lang>/`）は Nix が `NAZOVIM_TREESITTER_DIR` で供給し、runtimepath に追加するだけ。`:NazoTreesitterInfo` で利用可能な言語を確認 |
 | nvim-treesitter incremental selection | `incremental_selection.lua` | `gnn` で開始、`grn` / `grm` で構文親ノードへ拡張・縮小、`grq` で終了。Neovim標準Tree-sitter APIを使用 |
 | vim-bad-apple | `animation.lua` | `:NazoAnimation [fps]` で独自生成の幾何学アニメーションを再生。任意のテキストフレームも `play(frames, fps)` で再生可能。`q` / `<Esc>` / `:NazoAnimationStop` で停止 |
 | vim-kensaku | `romaji_search.lua` | `/` / `?` の入力確定時にローマ字をひらがな・カタカナ検索パターンへ変換。Migemo辞書による漢字展開はなし。`:NazoRomajiSearchToggle` で切替 |
@@ -114,7 +131,8 @@ Snippet定義は `stdpath("config")/snippets/<filetype>.json` に置きます。
 - `sd` + 文字: カーソルを囲むペアを削除。
 - `sr` + 文字 + 文字: 囲みを置換。
 - `<C-a>` / `<C-x>`: カーソル下の数値・真偽値・`let`/`const`/`var` などを増減。Visualモードは選択範囲内のトークン（行選択なら行全体）。
-- `w` / `e` / `b` / `ge`: camelCase と snake_case の境界で移動。operator-pending と Visual でも動作。
+- `w` / `e` / `b` / `ge`: camelCase と snake_case の境界で移動。
+  operator-pending と Visual でも動作。
 - `f` / `F` / `t` / `T`: 現在行の先も含めてバッファ内を文字検索。`;` は同方向、`,` は逆方向に直前の検索を繰り返します。
 - `<CR>`: 表示範囲の行と文字にラベルを表示してジャンプ。`<S-CR>` はTreesitterが使える場合に構文葉ノードへジャンプします。
 - `]m` / `[m`: 現在バッファの次／前のマークへ移動。`:Marks` でquickfix一覧。
@@ -206,7 +224,7 @@ vim.g.nazovim_template_email = "you@example.com"
   色のhighlightグループは最大512個です。
 - 参照は120ms間隔で処理をまとめ、古いLSP応答を破棄します。
   5000行超ではTreesitterフォールバックを使いません。
-  Treesitter解析は引き続き `nvim-treesitter` のlocals APIを利用します。
+  Treesitter解析は内蔵の `locals.lua`（`locals` クエリベース）を利用します。
 - スクロールバーは論理行数に対する概略位置です。
   折り返し・折り畳みを画面行数に換算するミニマップではありません。
   検索・Git差分マーカーとマウス操作はありません。
@@ -218,9 +236,14 @@ vim.g.nazovim_template_email = "you@example.com"
 `NAZOVIM_STARTUP_CONFIG` にある削除済みプラグイン名は取り除いてください。
 既存プラグインのディスク上のデータは自動削除しません。
 
-SvelteのブラウザーInspector連携には、プロジェクト側でVite Inspectorを有効にし、開発サーバーをNazoVimのterminalから起動してください。NazoVimは独自launcherを `LAUNCH_EDITOR` に設定し、既存Neovim serverへ接続します。手動で場所を開く場合は `:NazoOpenLocation file:line:column` を使えます。
+SvelteのブラウザーInspector連携には、プロジェクト側でVite Inspectorを有効にし、
+  開発サーバーをNazoVimのterminalから起動してください。
+  NazoVimは独自launcherを `LAUNCH_EDITOR` に設定し、既存Neovim serverへ接続します。
+  手動で場所を開く場合は `:NazoOpenLocation file:line:column` を使えます。
 
-HTTPクライアントは `###` で区切られたリクエスト、ヘッダー、本文、`@name = value` 形式の変数を扱います。URL・ヘッダー・本文では `{{name}}` を展開し、未定義名は同名の環境変数を参照します。認証フロー、Cookie jar、応答アサーションなどの高機能RESTクライアントAPIは対象外です。
+HTTPクライアントは `###` で区切られたリクエスト、ヘッダー、本文、`@name = value` 形式の変数を扱います。
+  URL・ヘッダー・本文では `{{name}}` を展開し、未定義名は同名の環境変数を参照します。
+  認証フロー、Cookie jar、応答アサーションなどの高機能RESTクライアントAPIは対象外です。
 
 ## 検証
 

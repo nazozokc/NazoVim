@@ -1,10 +1,3 @@
-return {
-	{ import = "plugins.ai" },
-	{ import = "plugins.completion" },
-	{ import = "plugins.dap" },
-	{ import = "plugins.finder" },
-	{ import = "plugins.git" },
-	{ import = "plugins.lang" },
-	{ import = "plugins.lsp" },
-	{ import = "plugins.treesitter" },
-}
+-- Every former plugin now lives in `lua/nazovim/` as a built-in feature.
+-- Add `{ import = "plugins.<group>" }` entries here when a plugin is needed again.
+return {}

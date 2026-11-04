@@ -44,10 +44,10 @@ Built on an original transparent dark palette and aggressive lazy-loading via th
 
 <!-- markdownlint-disable MD013 -->
 - **⚡ Fast startup** — Aggressive lazy-loading with nazoplug. Anything that can wait is deferred to `VeryLazy`
-- **🔧 Full LSP** — Multi-language support: TypeScript / Lua / Ruby / Nix / C / Java / Zig and more. Dual setup with mason + manual (nixd)
+- **🔧 Full LSP** — Multi-language support: TypeScript / Lua / Ruby / Nix / C / Java / Zig and more. Servers found on `PATH` are enabled automatically (no mason)
 - **🎨 NazoVim theme** — Original blue-green dark palette with a transparent background
-- **🧠 AI integration** — Supports both Claude Code (`claudecode.nvim`) and opencode (`opencode.nvim`)
-- **🌊 snacks.nvim** — Dashboard and Zen mode
+- **🧠 AI integration** — Built-in terminal integration for both Claude Code and opencode (`claudecode.lua` / `opencode.lua`)
+- **🌊 Dashboard / Zen** — Built-in startup dashboard and distraction-free mode
 - **🐛 DAP** — Minimal debug environment for JavaScript / TypeScript
 - **📦 Nix-ready** — Isolated launch via `nix run` / LSP-equipped devShell via `nix develop`
 - **🧪 Testing** — NazoVim built-in runner using project Jest / Vitest / Playwright CLIs
@@ -70,7 +70,6 @@ Built on an original transparent dark palette and aggressive lazy-loading via th
 | Nix (with flakes) | Isolated launch via `nix run` / `nix develop` |
 | Node.js | TypeScript LSP / prettier |
 | NazoVim built-in | Floating LazyGit terminal (`lazygit.lua`, requires external `lazygit`) |
-| yazi | File manager integration |
 | ripgrep | Grep search |
 | fd | File search |
 
@@ -152,9 +151,12 @@ run `:NazoPlug migrate` to reuse its data directory.
 
 | Plugin | Purpose |
 | ------ | ------ |
-| nvim-lspconfig + mason | LSP management |
-| typescript-tools.nvim | TypeScript-specific LSP (performance-tuned) |
-| nvim-cmp | Completion engine |
+| NazoVim built-in | LSP management (`lsp.lua`, `vim.lsp.config` / `vim.lsp.enable`, only servers found on `PATH`, `:NazoLspInfo`) |
+| NazoVim built-in | File icons (`icons.lua`, devicons-compatible `get_icon` / `get_icon_by_filetype`) |
+| NazoVim built-in | TypeScript / JavaScript LSP (`lsp.lua` `ts_ls` = typescript-language-server, formatting and semantic tokens disabled, `<leader>oi` / `<leader>ru`) |
+| NazoVim built-in | Rust LSP (`lsp.lua` `rust_analyzer` = rust-analyzer, `<leader>rr` picks and runs a runnable) |
+| NazoVim built-in | Java LSP (`lsp.lua` `jdtls` = jdt-language-server, one `-data` workspace per project) |
+| NazoVim built-in | Completion (`completion.lua`, `vim.lsp.completion` plus snippet/buffer/path sources, `<C-Space>` / `<Tab>` / `<S-Tab>` / `<CR>`) |
 | NazoVim built-in | Command-line completion (`cmdline_completion.lua`) |
 | NazoVim built-in | Independent snippet expansion and placeholder navigation (`snippets.lua`, VSCode JSON subset) |
 | NazoVim built-in | Tree-sitter node selection expansion and contraction (`incremental_selection.lua`) |
@@ -166,18 +168,17 @@ run `:NazoPlug migrate` to reuse its data directory.
 | NazoVim built-in | Task runner and history (`tasks.lua`) |
 | NazoVim built-in | LSP progress display |
 | NazoVim built-in | Inline diagnostics |
-| lazydev.nvim | Enhanced Lua/Neovim API completion and type checking |
+| NazoVim built-in | Lua/Neovim API type completion (`lsp.lua` passes `$VIMRUNTIME` and nazoplug to the lua_ls `workspace.library`) |
 
 ### Fuzzy Finder / Navigation
 
 | Plugin | Purpose |
 | ------ | ------ |
-| snacks.nvim | Dashboard / Zen |
+| NazoVim built-in | Startup dashboard (`dashboard.lua`, `:NazoDashboard`) |
+| NazoVim built-in | Zen mode (`zen.lua`, `<leader>z` / `:NazoZen`) |
+| NazoVim built-in | Status column merging signs, folds and line numbers (`statuscolumn.lua`, `:NazoStatuscolumn`), and quickfile that creates missing parent directories on write (`quickfile.lua`) |
 | NazoVim built-in | File, buffer, recent-item, and text-search picker (`picker.lua`) |
-| telescope.nvim | Fuzzy finder (secondary) |
-| NazoVim built-in | Buffer-based file browser (`file_browser.lua`) |
-| neo-tree.nvim | Tree-style file explorer |
-| yazi.nvim | yazi file manager integration |
+| NazoVim built-in | Buffer-based file browser (`file_browser.lua`, `<leader>m` / `<leader>n`); replaces oil, neo-tree and yazi |
 | NazoVim built-in | Winbar / syntax breadcrumbs (`breadcrumb.lua`) |
 | NazoVim built-in | Translation command (`translate.lua`, uses Translate Shell) |
 | NazoVim built-in | package.json dependency versions and package manager actions (`package_info.lua`) |
@@ -199,7 +200,7 @@ run `:NazoPlug migrate` to reuse its data directory.
 | NazoVim built-in | Highlight symbol under cursor |
 | Built into NazoVim | Floating filename |
 | NazoVim built-in | Highlight TODO/FIXME and similar |
-| NazoVim built-in | Rich Markdown / Avante rendering (`markdown_render.lua`) |
+| NazoVim built-in | Rich Markdown rendering (`markdown_render.lua`) |
 | NazoVim built-in | Inline color code preview |
 
 ### Git (Plugins)
@@ -209,7 +210,7 @@ run `:NazoPlug migrate` to reuse its data directory.
 | NazoVim built-in | Git change signs, hunk navigation and preview, line blame (`git_signs.lua`) |
 | NazoVim built-in | Git change list, history, and conflict selection (`git_review.lua`) |
 | NazoVim built-in | Floating LazyGit terminal (`lazygit.lua`) |
-| vim-fugitive | Git operations |
+| NazoVim built-in | Git status, stage/unstage, diff, log, blame and any `git` subcommand (`git.lua`, `:Git` / `:NazoGitStatus` / `<leader>gs`) |
 | NazoVim built-in | GitHub issue / PR lists, details, creation, title/body editing, comments, and close/reopen (`github.lua`, uses `gh` CLI) |
 | NazoVim built-in | GitHub notifications and issue / PR search (`github.lua`); discussion create/edit/delete/reply, comment management, poll voting, accepted answers, upvotes, reactions, categories, subscriptions, close/reopen (`github_discussions.lua`) |
 | NazoVim built-in | Issue / PR labels, assignees, milestones, project membership, reactions, and PR reviewer requests (`github_metadata.lua`) |
@@ -224,7 +225,7 @@ run `:NazoPlug migrate` to reuse its data directory.
 
 | Plugin | Purpose |
 | ------ | ------ |
-| nvim-treesitter | Syntax highlighting / indentation |
+| NazoVim built-in | Treesitter (`treesitter.lua`, `vim.treesitter.start`, grammars supplied by Nix, `:NazoTreesitterInfo`) |
 | NazoVim built-in | Tree-sitter node selection expansion and contraction (`incremental_selection.lua`) |
 | NazoVim built-in | Function / class / conditional / loop / block / argument text objects (`textobjects.lua`) |
 | NazoVim built-in | `motion.lua`: multi-line f/F/t/T and `;` / `,` repeat |
@@ -248,18 +249,18 @@ run `:NazoPlug migrate` to reuse its data directory.
 
 | Plugin | Purpose |
 | ------ | ------ |
-| claudecode.nvim | Claude Code integration |
-| opencode.nvim | opencode integration |
-| CopilotChat.nvim | GitHub Copilot Chat |
-| copilot.lua | GitHub Copilot completion |
+| NazoVim built-in | Codex CLI integration (`codex.lua`, `:Codex` / `:CodexToggle`, `<C-q>` to close) |
+| NazoVim built-in | Claude Code CLI integration (`claudecode.lua`, `:ClaudeCode` / `:ClaudeCodeToggle` / `:ClaudeCodeFocus`, `<C-q>` to close) |
+| NazoVim built-in | opencode CLI integration (`opencode.lua`, `:OpenCode` / `:OC`, `<C-.>` to toggle) |
+| NazoVim built-in | Non-interactive AI client (`ai_ask.lua`, streams `claude -p` / `codex exec` / `opencode run` into a right split; `:NazoAI` / `<leader>aa` / `<leader>ae` / `<leader>at` / `<leader>a?`) |
 
 ### Debug / Test
 
 | Plugin | Purpose |
 | ------ | ------ |
-| nvim-dap | DAP debugger backend |
+| NazoVim built-in | DAP client (`dap.lua`, a Debug Adapter Protocol implementation over stdio; launches the `js-debug` adapter, `<F5>` / `<F10>` / `<F11>` / `<F12>` for execution control, `<leader>db` to toggle a breakpoint, `<leader>dB` to list them, `<leader>dl` to start, `<leader>de` to evaluate, `<leader>dq` to stop, `:NazoDapInfo` for the state) |
 | NazoVim built-in | DAP information panel (`dap_ui.lua`: expandable scopes, frame selection, watches) |
-| nvim-dap-vscode-js | JS/TS debug adapter |
+| NazoVim built-in | JS/TS debug adapter launcher (`dap.lua` starts `js-debug` in TCP mode; supplied by the devShell) |
 | NazoVim built-in | Test execution and latest output (`test_runner.lua`) |
 | NazoVim built-in | LCOV coverage display (`coverage.lua`) |
 | NazoVim built-in | DAP variable values and exception stop reasons (`dap_virtual_text.lua`) |
@@ -275,13 +276,13 @@ run `:NazoPlug migrate` to reuse its data directory.
 
 | Key | Action |
 | ---- | ----- |
-| `<Leader><Leader>` | File search (snacks Picker) |
+| `<Leader><Leader>` | File search (built-in picker) |
 | `<Leader>/` | Live Grep |
 | `<Leader>b` | Buffer list |
 | `<Leader>r` | Recent files |
 | `<Leader>h` | Clear search highlight |
 | `<Leader>z` | Zen mode |
-| `<Leader>m` | File browser |
+| `<Leader>m` / `<Leader>n` | File browser |
 | `<Leader>n` | Neo-tree |
 | `<Leader>t` | Floating terminal |
 | `<Leader>f` | Format |
@@ -357,22 +358,29 @@ run `:NazoPlug migrate` to reuse its data directory.
 
 | Key | Action |
 | ---- | ----- |
-| `<Leader>ac` | Claude Code toggle |
-| `<Leader>af` | Claude Code focus |
-| `<Leader>ab` | Add current buffer |
-| `<C-a>` | opencode ask |
-| `<C-x>` | opencode select action |
+| `<Leader>aa` | Ask NazoAI (claude / codex / opencode CLI) |
+| `<Leader>ae` | Apply the answer's code block to the buffer |
+| `<Leader>at` | Toggle the NazoAI panel |
+| `<Leader>a?` | Select the NazoAI provider |
+| `<Leader>Cc` | Claude Code toggle |
+| `<Leader>Cf` | Claude Code focus |
+| `<Leader>oa` | opencode ask (mentions the current buffer as `@path`) |
+| `<Leader>ox` | opencode command palette |
 | `<C-.>` | opencode toggle |
 
 ### DAP
 
 | Key | Action |
 | ---- | ----- |
-| `<F5>` | Run / Continue |
+| `<F5>` | Run / continue |
 | `<F10>` | Step over |
-| `<F11>` | Step into |
+| `<F11>` | Step in |
 | `<F12>` | Step out |
 | `<Leader>db` | Toggle breakpoint |
+| `<Leader>dB` | List breakpoints |
+| `<Leader>dl` | Start debugging |
+| `<Leader>de` | Evaluate expression |
+| `<Leader>dq` | Stop the session |
 | `<Leader>du` | DAP UI toggle |
 
 ### Test
@@ -421,26 +429,26 @@ run `:NazoPlug migrate` to reuse its data directory.
 
 ## 🔧 Customization
 
-Any Lua file added under `lua/plugins/` will be auto-loaded.
+NazoVim ships no external plugins. To add one, list an import in
+`lua/plugins.lua` and drop the spec under `lua/plugins/<group>/`.
 
 ```lua
--- lua/plugins/my-config.lua
+-- lua/plugins.lua
+return {
+  { import = "plugins.my-group" },
+}
+```
 
--- Add a plugin
+```lua
+-- lua/plugins/my-group/zen-mode.lua
 return {
   "folke/zen-mode.nvim",
-  opts = {}
+  opts = {},
 }
 ```
 
-You can also override existing plugin settings in the same file:
-
-```lua
-return {
-  "folke/snacks.nvim",
-  opts = { dashboard = { enabled = false } }
-}
-```
+Added plugins are installed by `:NazoPlug sync` and recorded in `nazoplug-lock.json`.
+Loading timing is set in the `plugins` table of `lua/config/startup.lua`.
 
 > **Note**: Only applies when installed via the Clone method (Option 2).
 

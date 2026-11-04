@@ -251,8 +251,9 @@ local function show_discussion(owner, name, number, existing_buf)
 query($owner: String!, $name: String!, $number: Int!) {
   repository(owner: $owner, name: $name) {
     discussion(number: $number) {
-      id number title body url createdAt updatedAt closed upvoteCount viewerCanClose viewerCanReopen
-      viewerCanUpdate viewerCanDelete viewerCanUpvote viewerHasUpvoted viewerCanSubscribe viewerSubscription viewerCanReact
+      id number title body url createdAt updatedAt closed upvoteCount
+      viewerCanClose viewerCanReopen viewerCanUpdate viewerCanDelete viewerCanUpvote
+      viewerHasUpvoted viewerCanSubscribe viewerSubscription viewerCanReact
       author { login }
       category { id name }
       poll {
@@ -262,8 +263,9 @@ query($owner: String!, $name: String!, $number: Int!) {
       answer { id author { login } body }
       comments(first: 50) {
         nodes {
-          id author { login } body createdAt isAnswer viewerCanMarkAsAnswer viewerCanUnmarkAsAnswer
-          viewerCanUpdate viewerCanDelete viewerDidAuthor viewerCanUpvote viewerHasUpvoted viewerCanReact
+          id author { login } body createdAt isAnswer
+          viewerCanMarkAsAnswer viewerCanUnmarkAsAnswer viewerCanUpdate viewerCanDelete
+          viewerDidAuthor viewerCanUpvote viewerHasUpvoted viewerCanReact
         }
       }
     }
@@ -281,7 +283,8 @@ query($owner: String!, $name: String!, $number: Int!) {
 			"Category: " .. ((discussion.category and discussion.category.name) or "unknown"),
 			"Author: " .. ((discussion.author and discussion.author.login) or "unknown"),
 			"State: " .. (discussion.closed and "closed" or "open"),
-			"Actions: c reply · e edit · a answer · u upvote · r reaction · p poll · s subscribe · g category · m comments · x state · d delete",
+			"Actions: c reply · e edit · a answer · u upvote · r reaction · p poll · "
+				.. "s subscribe · g category · m comments · x state · d delete",
 			"Answer: " .. (discussion.answer and "accepted" or "none"),
 			"Replies: " .. tostring(discussion.comments and #discussion.comments.nodes or 0),
 			"Upvotes: " .. tostring(discussion.upvoteCount or 0),
@@ -393,7 +396,6 @@ query($owner: String!, $name: String!, $number: Int!) {
 				return
 			end
 			local function submit(reason)
-				local action = closing and "closeDiscussion" or "reopenDiscussion"
 				local mutation
 				if closing then
 					mutation = string.format(
@@ -552,13 +554,13 @@ query($owner: String!, $name: String!, $number: Int!) {
 				return
 			end
 			with_repository(function(repo_owner, repo_name)
-				local query = [[query($owner:String!, $name:String!) {
+				local category_query = [[query($owner:String!, $name:String!) {
   repository(owner:$owner, name:$name) { discussionCategories(first:100) { nodes { id name emoji } } }
 }]]
-				graphql(query, { owner = repo_owner, name = repo_name }, function(data)
-					local categories = data.repository
-							and data.repository.discussionCategories
-							and data.repository.discussionCategories.nodes
+				graphql(category_query, { owner = repo_owner, name = repo_name }, function(result)
+					local categories = result.repository
+							and result.repository.discussionCategories
+							and result.repository.discussionCategories.nodes
 						or {}
 					if #categories == 0 then
 						vim.notify("No discussion categories are available", vim.log.levels.INFO, {

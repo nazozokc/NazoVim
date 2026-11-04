@@ -1,0 +1,11 @@
+{
+  // markdownlint-cli2 の設定。CI（.github/workflows/markdown-lint.yml）は
+  // リポジトリ直下で `markdownlint-cli2 "**/*.md"` を実行するため、このファイルが読まれる。
+  "config": {
+    // 表の行は1行1項目で書くため、80文字制限の対象から外す。
+    // 長い日本語の段落は各所の `<!-- markdownlint-disable MD013 -->` で個別に制御する。
+    "MD013": {
+      "tables": false
+    }
+  }
+}

@@ -9,6 +9,8 @@ function M.open_file()
 end
 
 local function show()
+	-- Keep the dashboard from covering the first-run instructions.
+	vim.g.nazovim_quickstart_shown = true
 	local buf = vim.api.nvim_create_buf(false, true)
 	vim.bo[buf].bufhidden = "wipe"
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
@@ -37,9 +39,10 @@ function M.setup(manager)
 	vim.api.nvim_create_user_command("NazoHelp", function()
 		vim.cmd.help("user-manual")
 	end, { desc = "Open the Neovim user manual" })
-	local snacks = manager.by_name and manager.by_name["snacks.nvim"]
-	if snacks and vim.fn.isdirectory(snacks.dir) == 1 then
-		return
+	for _, spec in pairs(manager.by_name or {}) do
+		if spec.dir and vim.fn.isdirectory(spec.dir) == 1 then
+			return
+		end
 	end
 	vim.api.nvim_create_autocmd("VimEnter", {
 		once = true,

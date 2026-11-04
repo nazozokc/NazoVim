@@ -79,7 +79,7 @@ local function update()
 
 	local start_row, _, end_row = root:range()
 	local seen = {}
-	local locals_ok, locals = pcall(require, "nvim-treesitter.locals")
+	local locals_ok, locals = pcall(require, "nazovim.locals")
 	-- A language query can contain parser-specific captures; skip unsupported trees safely.
 	pcall(function()
 		for capture, node in query:iter_captures(root, buf, start_row, end_row + 1) do

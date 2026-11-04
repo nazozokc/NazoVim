@@ -3,7 +3,6 @@ local M = {}
 local excluded = {
 	eslint = true,
 	ts_ls = true,
-	["typescript-tools"] = true,
 }
 local timers = {}
 
