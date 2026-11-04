@@ -22,7 +22,7 @@ function M.render()
 	local buf = vim.api.nvim_get_current_buf()
 	local mode = modes[vim.api.nvim_get_mode().mode:sub(1, 1)] or "NORMAL"
 	local branch = vim.b[buf].gitsigns_head or git.branch(buf)
-	local diff = vim.b[buf].gitsigns_status or ""
+	local diff = vim.b[buf].nazovim_git_status or vim.b[buf].gitsigns_status or ""
 	local counts = diagnostics[buf] or {}
 	local diag = {}
 	for severity, label in ipairs({ "E", "W", "I", "H" }) do

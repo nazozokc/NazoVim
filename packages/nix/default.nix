@@ -29,6 +29,49 @@ let
     '';
   };
 
+  # Tree-sitter grammars and queries as plain data. nazovim/treesitter.lua
+  # appends this directory to runtimepath, so Neovim finds parser/<lang>.so and
+  # queries/<lang>/*.scm without loading any plugin.
+  grammars = {
+    bash = pkgs.tree-sitter-grammars.tree-sitter-bash;
+    c = pkgs.tree-sitter-grammars.tree-sitter-c;
+    css = pkgs.tree-sitter-grammars.tree-sitter-css;
+    html = pkgs.tree-sitter-grammars.tree-sitter-html;
+    java = pkgs.tree-sitter-grammars.tree-sitter-java;
+    javascript = pkgs.tree-sitter-grammars.tree-sitter-javascript;
+    json = pkgs.tree-sitter-grammars.tree-sitter-json;
+    lua = pkgs.tree-sitter-grammars.tree-sitter-lua;
+    markdown = pkgs.tree-sitter-grammars.tree-sitter-markdown;
+    markdown_inline = pkgs.tree-sitter-grammars.tree-sitter-markdown-inline;
+    python = pkgs.tree-sitter-grammars.tree-sitter-python;
+    query = pkgs.tree-sitter-grammars.tree-sitter-query;
+    regex = pkgs.tree-sitter-grammars.tree-sitter-regex;
+    tsx = pkgs.tree-sitter-grammars.tree-sitter-tsx;
+    typescript = pkgs.tree-sitter-grammars.tree-sitter-typescript;
+    vim = pkgs.tree-sitter-grammars.tree-sitter-vim;
+  };
+
+  treeSitterGrammars = pkgs.runCommand "nazovim-treesitter" { } ''
+    mkdir -p $out/parser $out/queries
+    ${pkgs.lib.concatStringsSep "\n" (
+      pkgs.lib.mapAttrsToList (language: grammar: ''
+        ln -s ${grammar}/parser $out/parser/${language}.so
+        if [ -d ${grammar}/queries ]; then
+          mkdir -p $out/queries/${language}
+          cp -r ${grammar}/queries/. $out/queries/${language}/
+        fi
+      '') grammars
+    )}
+    # Some grammar packages ship no queries (typescript, tsx). Reuse the
+    # nvim-treesitter query corpus as data; the plugin is never loaded.
+    for language in ${pkgs.lib.concatStringsSep " " (builtins.attrNames grammars)}; do
+      corpus="${pkgs.vimPlugins.nvim-treesitter}/runtime/queries/$language"
+      if [ ! -d "$out/queries/$language" ] && [ -d "$corpus" ]; then
+        cp -r "$corpus" "$out/queries/$language"
+      fi
+    done
+  '';
+
   # NVIM_APPNAME で完全隔離して起動する wrapped neovim
   neovim = pkgs.wrapNeovim pkgs.neovim-unwrapped { };
 
@@ -43,6 +86,7 @@ let
       pkgs.tree-sitter
       pkgs.clang-tools # clangd
       pkgs.jdt-language-server # jdtls
+      pkgs.vscode-js-debug # js-debug adapter for nazovim/dap.lua
       pkgs.ruby
     ];
     text = ''
@@ -61,6 +105,8 @@ let
       CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}/$APPNAME"
       DATA_DIR="''${XDG_DATA_HOME:-$HOME/.local/share}/$APPNAME"
       export NVIM_APPNAME="$APPNAME"
+      # Tree-sitter grammars and queries shipped by Nix, not by a plugin.
+      export NAZOVIM_TREESITTER_DIR="${treeSitterGrammars}"
       # Keep the existing link on the common path; never delete user config.
       mkdir -p "''${XDG_CONFIG_HOME:-$HOME/.config}"
       if [ -L "$CONFIG_DIR" ]; then
@@ -92,5 +138,5 @@ let
   };
 in
 {
-  inherit nvimConfig nvim-nazozokc;
+  inherit nvimConfig nvim-nazozokc treeSitterGrammars;
 }

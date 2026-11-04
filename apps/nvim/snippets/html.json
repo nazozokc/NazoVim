@@ -1,0 +1,7 @@
+{
+  "HTML document": {
+    "prefix": "html5",
+    "body": ["<!doctype html>", "<html lang=\"${1:en}\">", "<head>", "\t<meta charset=\"utf-8\">", "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">", "\t<title>${2:Document}</title>", "</head>", "<body>", "\t$0", "</body>", "</html>"],
+    "description": "Create a small HTML document"
+  }
+}

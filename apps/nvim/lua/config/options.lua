@@ -16,7 +16,3 @@ vim.opt.foldenable = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true
-
-vim.opt.wildmenu = true
-vim.opt.wildmode = "longest:full,full"
-vim.opt.wildignorecase = true

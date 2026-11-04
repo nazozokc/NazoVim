@@ -2,10 +2,7 @@
 -- Use "startup", "on_demand", "VeryLazy", or a Neovim event.
 local options = {
 	very_lazy_delay_ms = 100,
-	plugins = {
-		["dial.nvim"] = "on_demand",
-		["neo-tree.nvim"] = "on_demand",
-	},
+	plugins = {},
 }
 local path = vim.env.NAZOVIM_STARTUP_CONFIG
 if path and path ~= "" then

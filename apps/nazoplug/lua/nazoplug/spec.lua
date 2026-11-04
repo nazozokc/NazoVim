@@ -111,7 +111,12 @@ local function import_module(import, ctx)
 
 	ctx.depth = ctx.depth - 1
 	if #specs == 0 then
-		error("no specs found for import " .. import)
+		if #roots == 0 then
+			error("no specs found for import " .. import)
+		end
+		-- The group exists but holds no specs, which happens after every spec in
+		-- it is replaced by a built-in feature. Treat it as empty.
+		return {}
 	end
 	return specs
 end

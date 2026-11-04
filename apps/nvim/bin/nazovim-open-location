@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+
+const { spawnSync } = require("node:child_process");
+
+const args = process.argv.slice(2);
+let [file, line = "1", column = "1"] = args;
+if (!file) {
+	process.stderr.write("usage: nazovim-open-location <file> [line] [column]\n");
+	process.exit(2);
+}
+if (args.length === 1) {
+	const match = file.match(/^(.*):(\d+)(?::(\d+))?$/);
+	if (match) {
+		[, file, line, column = "1"] = match;
+	}
+}
+
+const server = process.env.NAZOVIM_NVIM_SERVER;
+if (!server) {
+	process.stderr.write("NAZOVIM_NVIM_SERVER is not set; launch the dev server from NazoVim's terminal\n");
+	process.exit(1);
+}
+
+const payload = JSON.stringify({ file, line: Number(line), column: Number(column) });
+const expression = `luaeval("require('nazovim.svelte_inspector').open_json(_A)", ${JSON.stringify(payload)})`;
+const result = spawnSync("nvim", ["--server", server, "--remote-expr", expression], { stdio: "inherit" });
+if (result.error) {
+	process.stderr.write(`${result.error.message}\n`);
+	process.exit(1);
+}
+process.exit(result.status ?? 1);

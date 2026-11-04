@@ -67,16 +67,27 @@
               gnumake
               tree-sitter
 
-              # LSP
+              # LSP (nazovim/lsp.lua enables the ones present on PATH)
               lua-language-server
               nixd
               typescript-language-server
+              clang-tools
+              solargraph
+              zls
+              vscode-langservers-extracted
+              jdt-language-server
+
+              # DAP (nazovim/dap.lua spawns the js-debug adapter)
+              vscode-js-debug
 
               # Formatter
               stylua
               nixfmt-rfc-style
               prettier
             ];
+
+            # Tree-sitter grammars and queries come from Nix, not from a plugin.
+            NAZOVIM_TREESITTER_DIR = "${nixPackages.treeSitterGrammars}";
 
             shellHook = ''
               export NVIM_APPNAME="nvim-nazozokc"

@@ -3,6 +3,7 @@ local M = {}
 local parse = require("nazovim.colors.parse").parse
 local ns = vim.api.nvim_create_namespace("NazoColors")
 local highlights, highlight_count, variables = {}, 0, {}
+local enabled, active, lifecycle_group = true, false, nil
 
 local function group(color)
 	if highlights[color] then
@@ -81,21 +82,47 @@ end
 
 ---Decorate visible color literals, with bounded CSS-variable and highlight caches.
 function M.setup()
-	local group_id = vim.api.nvim_create_augroup("NazoColorCache", { clear = true })
+	if not enabled or active then
+		return
+	end
+	active = true
+	lifecycle_group = vim.api.nvim_create_augroup("NazoColorCache", { clear = true })
 	vim.api.nvim_create_autocmd("ColorScheme", {
-		group = group_id,
+		group = lifecycle_group,
 		callback = function()
 			highlights = {}
 			highlight_count = 0
 		end,
 	})
 	vim.api.nvim_create_autocmd("BufWipeout", {
-		group = group_id,
+		group = lifecycle_group,
 		callback = function(args)
 			variables[args.buf] = nil
 		end,
 	})
 	require("nazovim.ui").decorate("NazoColors", ns, render)
+end
+
+---Stop color-literal previews and clear their extmarks.
+function M.disable()
+	enabled = false
+	if lifecycle_group then
+		pcall(vim.api.nvim_del_augroup_by_id, lifecycle_group)
+		lifecycle_group = nil
+	end
+	pcall(vim.api.nvim_del_augroup_by_name, "NazoColors")
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+		if vim.api.nvim_buf_is_valid(buf) then
+			vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+		end
+	end
+	active = false
+end
+
+---Start color-literal previews.
+function M.enable()
+	enabled = true
+	M.setup()
 end
 
 M.parse = parse
