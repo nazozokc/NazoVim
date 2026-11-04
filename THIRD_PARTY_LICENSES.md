@@ -12,7 +12,7 @@ distributed under their own licenses.
   color) is derived from `nvim-web-devicons`, and its public API mirrors the
   devicons contract.
 
-```
+```text
 MIT License
 
 Copyright (c) 2023 nvim-tree
