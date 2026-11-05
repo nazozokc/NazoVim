@@ -1,1 +1,1 @@
-require("nazovim.colorscheme").apply()
+require("nazovim.colors.scheme").apply()

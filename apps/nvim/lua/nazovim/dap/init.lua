@@ -1014,15 +1014,15 @@ function M.setup()
 	end, { desc = "Evaluate expression" })
 	vim.keymap.set("n", "<leader>dq", M.terminate, { desc = "Stop debug session" })
 	vim.keymap.set("n", "<leader>du", function()
-		require("nazovim.dap_ui").toggle()
+		require("nazovim.dap.ui").toggle()
 	end, { desc = "Toggle debugger panel" })
 
 	local features = require("nazovim.features")
 	if features.enabled("dap_ui") then
-		require("nazovim.dap_ui").attach(M)
+		require("nazovim.dap.ui").attach(M)
 	end
 	if features.enabled("dap_virtual_text") then
-		require("nazovim.dap_virtual_text").attach(M)
+		require("nazovim.dap.virtual_text").attach(M)
 	end
 end
 

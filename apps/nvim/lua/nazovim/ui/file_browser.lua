@@ -1,6 +1,6 @@
 local M = {}
 
-local icons = require("nazovim.icons")
+local icons = require("nazovim.ui.icons")
 local uv = vim.uv
 local states = {}
 local namespace = vim.api.nvim_create_namespace("NazoFileBrowser")

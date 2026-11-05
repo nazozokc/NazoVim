@@ -1,6 +1,6 @@
 local M = {}
 
-local icons = require("nazovim.icons")
+local icons = require("nazovim.ui.icons")
 
 local function listed()
 	local result = {}
@@ -23,7 +23,7 @@ function M.render()
 		local highlight = active and "NazoBufferActive" or "NazoBufferInactive"
 		local modified = buf.changed == 1 and " ●" or ""
 		parts[#parts + 1] = string.format(
-			"%%%d@v:lua.require'nazovim.tabline'.click@%%#%s# %s%s %%#NazoBufferFill#",
+			"%%%d@v:lua.require'nazovim.ui.tabline'.click@%%#%s# %s%s %%#NazoBufferFill#",
 			buf.bufnr,
 			highlight,
 			name,
@@ -79,7 +79,7 @@ function M.setup()
 	vim.api.nvim_set_hl(0, "NazoBufferInactive", { link = "TabLine", default = true })
 	vim.api.nvim_set_hl(0, "NazoBufferFill", { link = "TabLineFill", default = true })
 	vim.opt.showtabline = 2
-	vim.opt.tabline = "%!v:lua.require'nazovim.tabline'.render()"
+	vim.opt.tabline = "%!v:lua.require'nazovim.ui.tabline'.render()"
 	local map = vim.keymap.set
 	map("n", "<C-PageDown>", M.next, { desc = "Next buffer" })
 	map("n", "<C-PageUp>", M.previous, { desc = "Previous buffer" })

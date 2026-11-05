@@ -3,22 +3,22 @@ local map = vim.keymap.set
 -- UI / Toggle
 map("n", "<leader>h", ":nohlsearch<CR>", { desc = "Clear search highlight" })
 map("n", "<leader>e", function()
-	require("nazovim.lists").diagnostics()
+	require("nazovim.ui.lists").diagnostics()
 end, { desc = "Workspace diagnostics" })
 
 -- NazoVim picker
 map("n", "<leader><leader>", function()
-	require("nazovim.picker").files()
+	require("nazovim.search.picker").files()
 end, { desc = "Files" })
 
 map("n", "<leader>/", function()
-	require("nazovim.picker").grep()
+	require("nazovim.search.picker").grep()
 end, { desc = "Live Grep" })
 
 map("n", "<leader>b", function()
-	require("nazovim.picker").buffers()
+	require("nazovim.search.picker").buffers()
 end, { desc = "Buffers" })
 
 map("n", "<leader>r", function()
-	require("nazovim.picker").recent()
+	require("nazovim.search.picker").recent()
 end, { desc = "Recent Files" })

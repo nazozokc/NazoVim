@@ -1,4 +1,4 @@
-local kinds = require("nazovim.todo.kinds")
+local kinds = require("nazovim.todo.lib.kinds")
 
 local M = {}
 local ns = vim.api.nvim_create_namespace("NazoTodo")
@@ -80,7 +80,7 @@ end
 
 ---Highlight TODO keywords in comments without a plugin dependency.
 function M.setup()
-	require("nazovim.ui").decorate("NazoTodo", ns, render)
+	require("nazovim.lib.ui").decorate("NazoTodo", ns, render)
 end
 
 return M

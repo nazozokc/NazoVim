@@ -33,7 +33,7 @@ local function treesitter(buf)
 		return
 	end
 	-- The built-in locals index needs a parser and a locals query.
-	local ok, locals = pcall(require, "nazovim.locals")
+	local ok, locals = pcall(require, "nazovim.lib.locals")
 	if not ok then
 		return
 	end
@@ -63,7 +63,7 @@ function M.update()
 	clear()
 	local buf, win = vim.api.nvim_get_current_buf(), vim.api.nvim_get_current_win()
 	previous = buf
-	if not require("nazovim.ui").normal(buf) or not vim.api.nvim_get_mode().mode:match("^[nvV\22]") then
+	if not require("nazovim.lib.ui").normal(buf) or not vim.api.nvim_get_mode().mode:match("^[nvV\22]") then
 		return
 	end
 	local cursor, tick, current = vim.api.nvim_win_get_cursor(win), vim.api.nvim_buf_get_changedtick(buf), generation
@@ -140,7 +140,7 @@ end
 ---Enable debounced LSP/Treesitter highlights and reference navigation.
 function M.setup()
 	local group = vim.api.nvim_create_augroup("NazoReferences", { clear = true })
-	local update = require("nazovim.ui").throttle(120, M.update)
+	local update = require("nazovim.lib.ui").throttle(120, M.update)
 	vim.api.nvim_create_autocmd(
 		{ "CursorMoved", "BufEnter", "InsertLeave", "LspAttach" },
 		{ group = group, callback = update }

@@ -28,8 +28,8 @@ end
 
 function M.setup()
 	vim.opt.foldmethod = "expr"
-	vim.opt.foldexpr = "v:lua.require'nazovim.folding'.foldexpr()"
-	vim.opt.foldtext = "v:lua.require'nazovim.folding'.foldtext()"
+	vim.opt.foldexpr = "v:lua.require'nazovim.edit.folding'.foldexpr()"
+	vim.opt.foldtext = "v:lua.require'nazovim.edit.folding'.foldtext()"
 	vim.opt.foldlevel = 99
 	vim.opt.foldlevelstart = 99
 	vim.opt.foldenable = true

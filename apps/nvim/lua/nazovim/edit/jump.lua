@@ -1,5 +1,5 @@
 local M = {}
-local ns = vim.api.nvim_create_namespace("nazovim.jump")
+local ns = vim.api.nvim_create_namespace("nazovim.edit.jump")
 local labels = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@[;:],./_-^\\1234567890"
 
 local function choose(buf, positions)

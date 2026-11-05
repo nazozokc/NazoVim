@@ -173,7 +173,7 @@ end
 local function remember_add(anchor, srow, scol, erow, ecol, open, close, linewise)
 	local start_row, start_col = srow - anchor[1], scol - anchor[2]
 	local end_row, end_col = erow - anchor[1], ecol - anchor[2]
-	require("nazovim.repeat_action").set(function(buf)
+	require("nazovim.edit.repeat_action").set(function(buf)
 		local cursor = vim.api.nvim_win_get_cursor(0)
 		local row, col = cursor[1], cursor[2]
 		M.add(buf, row + start_row, col + start_col, row + end_row, col + end_col, open, close, linewise)
@@ -198,7 +198,7 @@ function M.add_operator(type)
 end
 
 local function visual_add()
-	local srow, scol, erow, ecol, kind = require("nazovim.ui").visual_range()
+	local srow, scol, erow, ecol, kind = require("nazovim.lib.ui").visual_range()
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	local char = prompt("Surround with: ")
 	if not char then
@@ -217,7 +217,7 @@ local function delete_prompt()
 	end
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	if M.delete(0, cursor[1], cursor[2], char, pairs[char] or char) then
-		require("nazovim.repeat_action").set(function(buf)
+		require("nazovim.edit.repeat_action").set(function(buf)
 			local pos = vim.api.nvim_win_get_cursor(0)
 			return M.delete(buf, pos[1], pos[2], char, pairs[char] or char)
 		end)
@@ -235,7 +235,7 @@ local function replace_prompt()
 	end
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	if M.replace(0, cursor[1], cursor[2], old, pairs[old] or old, new, pairs[new] or new) then
-		require("nazovim.repeat_action").set(function(buf)
+		require("nazovim.edit.repeat_action").set(function(buf)
 			local pos = vim.api.nvim_win_get_cursor(0)
 			return M.replace(buf, pos[1], pos[2], old, pairs[old] or old, new, pairs[new] or new)
 		end)
@@ -246,7 +246,7 @@ function M.setup()
 	vim.keymap.set("n", "sa", function()
 		local cursor = vim.api.nvim_win_get_cursor(0)
 		M.pending_anchor = { cursor[1], cursor[2] }
-		vim.o.operatorfunc = "v:lua.require'nazovim.surround'.add_operator"
+		vim.o.operatorfunc = "v:lua.require'nazovim.edit.surround'.add_operator"
 		return "g@"
 	end, { expr = true, desc = "Add surrounding" })
 	vim.keymap.set("x", "sa", visual_add, { desc = "Add surrounding" })

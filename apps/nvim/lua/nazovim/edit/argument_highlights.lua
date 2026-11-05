@@ -79,7 +79,7 @@ local function update()
 
 	local start_row, _, end_row = root:range()
 	local seen = {}
-	local locals_ok, locals = pcall(require, "nazovim.locals")
+	local locals_ok, locals = pcall(require, "nazovim.lib.locals")
 	-- A language query can contain parser-specific captures; skip unsupported trees safely.
 	pcall(function()
 		for capture, node in query:iter_captures(root, buf, start_row, end_row + 1) do
@@ -123,7 +123,7 @@ function M.setup()
 	enabled = vim.g.nazovim_argument_highlights ~= false
 	vim.api.nvim_set_hl(0, "NazoArgument", { link = "@variable.parameter", default = true })
 	local group = vim.api.nvim_create_augroup("NazoArgumentHighlights", { clear = true })
-	local update_debounced = require("nazovim.ui").throttle(90, update)
+	local update_debounced = require("nazovim.lib.ui").throttle(90, update)
 	vim.api.nvim_create_autocmd({ "CursorMoved", "BufEnter", "TextChanged", "LspAttach" }, {
 		group = group,
 		callback = update_debounced,

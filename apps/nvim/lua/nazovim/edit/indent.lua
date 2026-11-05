@@ -56,7 +56,7 @@ end
 function M.update()
 	local buf = vim.api.nvim_get_current_buf()
 	vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
-	if not vim.wo.list or not require("nazovim.ui").normal(buf) then
+	if not vim.wo.list or not require("nazovim.lib.ui").normal(buf) then
 		return
 	end
 	local row = vim.api.nvim_win_get_cursor(0)[1]

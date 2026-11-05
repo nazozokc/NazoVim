@@ -106,7 +106,7 @@ end
 
 ---Attach buffer-local insert-mode mappings once.
 function M.attach(buf)
-	if not require("nazovim.ui").normal(buf) or vim.bo[buf].filetype == "terminal" then
+	if not require("nazovim.lib.ui").normal(buf) or vim.bo[buf].filetype == "terminal" then
 		return
 	end
 	if vim.b[buf].nazo_pairs then

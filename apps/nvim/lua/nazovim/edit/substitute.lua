@@ -109,7 +109,7 @@ local function remember(buf, origin_row, origin_col, start_row, start_col, end_r
 	local row_delta_start, col_delta_start = start_row - origin_row, start_col - origin_col
 	local row_delta_end, col_delta_end = end_row - origin_row, end_col - origin_col
 	local snapshot = vim.deepcopy(contents)
-	require("nazovim.repeat_action").set(function(target)
+	require("nazovim.edit.repeat_action").set(function(target)
 		local cursor = vim.api.nvim_win_get_cursor(0)
 		local row, col = cursor[1], cursor[2]
 		return apply(
@@ -151,7 +151,7 @@ end
 function M.operator()
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	pending = { register = vim.v.register or '"', origin = cursor }
-	vim.o.operatorfunc = "v:lua.require'nazovim.substitute'.operator_callback"
+	vim.o.operatorfunc = "v:lua.require'nazovim.edit.substitute'.operator_callback"
 	return "g@"
 end
 
@@ -173,7 +173,7 @@ function M.eol()
 	local line = vim.api.nvim_get_current_line()
 	if apply(0, cursor[1], cursor[2], cursor[1], #line, "char", contents) then
 		local snapshot = vim.deepcopy(contents)
-		require("nazovim.repeat_action").set(function(buf)
+		require("nazovim.edit.repeat_action").set(function(buf)
 			local pos = vim.api.nvim_win_get_cursor(0)
 			local current = vim.api.nvim_buf_get_lines(buf, pos[1] - 1, pos[1], false)[1] or ""
 			return apply(buf, pos[1], pos[2], pos[1], #current, "char", vim.deepcopy(snapshot))
@@ -183,7 +183,7 @@ end
 
 ---Replace the current Visual selection with the selected register.
 function M.visual()
-	local start_row, start_col, end_row, end_col, visual_type = require("nazovim.ui").visual_range()
+	local start_row, start_col, end_row, end_col, visual_type = require("nazovim.lib.ui").visual_range()
 	local kind = visual_type == "V" and "line" or visual_type == "\22" and "block" or "char"
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	local contents = register_contents(vim.v.register)

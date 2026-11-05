@@ -26,21 +26,21 @@ local actions = {
 		key = "f",
 		desc = "Find files",
 		run = function()
-			require("nazovim.picker").files()
+			require("nazovim.search.picker").files()
 		end,
 	},
 	{
 		key = ".",
 		desc = "Browse files",
 		run = function()
-			require("nazovim.file_browser").open(vim.fn.getcwd())
+			require("nazovim.ui.file_browser").open(vim.fn.getcwd())
 		end,
 	},
 	{
 		key = "r",
 		desc = "Recent files",
 		run = function()
-			require("nazovim.picker").recent()
+			require("nazovim.search.picker").recent()
 		end,
 	},
 	{

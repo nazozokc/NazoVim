@@ -3,7 +3,7 @@ local branches, pending = {}, {}
 
 local function refresh_branch()
 	local buf = vim.api.nvim_get_current_buf()
-	if not require("nazovim.ui").normal(buf) or vim.fn.executable("git") == 0 then
+	if not require("nazovim.lib.ui").normal(buf) or vim.fn.executable("git") == 0 then
 		return
 	end
 	local name = vim.api.nvim_buf_get_name(buf)
@@ -32,7 +32,7 @@ function M.setup()
 	local group = vim.api.nvim_create_augroup("NazoStatuslineGit", { clear = true })
 	vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "FocusGained", "TermClose", "DirChanged" }, {
 		group = group,
-		callback = require("nazovim.ui").throttle(100, refresh_branch),
+		callback = require("nazovim.lib.ui").throttle(100, refresh_branch),
 	})
 	refresh_branch()
 end

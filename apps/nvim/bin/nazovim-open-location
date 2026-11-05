@@ -22,7 +22,7 @@ if (!server) {
 }
 
 const payload = JSON.stringify({ file, line: Number(line), column: Number(column) });
-const expression = `luaeval("require('nazovim.svelte_inspector').open_json(_A)", ${JSON.stringify(payload)})`;
+const expression = `luaeval("require('nazovim.tools.svelte_inspector').open_json(_A)", ${JSON.stringify(payload)})`;
 const result = spawnSync("nvim", ["--server", server, "--remote-expr", expression], { stdio: "inherit" });
 if (result.error) {
 	process.stderr.write(`${result.error.message}\n`);

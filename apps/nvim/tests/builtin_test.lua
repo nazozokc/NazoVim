@@ -81,7 +81,7 @@ vim.cmd.cclose()
 vim.cmd.cd(cwd)
 
 -- Native diagnostic config must cooperate with the standard enable/disable lifecycle.
-require("nazovim.diagnostics").setup()
+require("nazovim.lsp.diagnostics").setup()
 equal(vim.diagnostic.config().virtual_lines.current_line, true)
 local diagnostic_ns = api.nvim_create_namespace("builtin-test-diagnostics")
 vim.diagnostic.set(diagnostic_ns, 0, { { lnum = 0, col = 0, message = "test error", severity = 1 } })
@@ -117,7 +117,7 @@ search.update()
 assert(#marks("NazoSearch") == 0)
 
 -- A single scrollbar survives scrolling/resizing without spawning more floats.
-local scrollbar = require("nazovim.scrollbar")
+local scrollbar = require("nazovim.ui.scrollbar")
 local layout = scrollbar.layout(100, 1, 20, 10, { { lnum = 50, severity = 2 }, { lnum = 50, severity = 1 } })
 equal(layout[6].hl, "DiagnosticError")
 local lines = {}
@@ -142,7 +142,7 @@ scrollbar.update()
 equal(#api.nvim_tabpage_list_wins(0), 1)
 
 -- Progress tokens from different clients must not collide or leak windows on completion.
-local progress = require("nazovim.progress")
+local progress = require("nazovim.lsp.progress")
 progress.setup()
 local function event(id, kind)
 	progress.handle({ client_id = id, params = { token = "same", value = { kind = kind, title = "Indexing" } } })
@@ -164,7 +164,7 @@ assert(vim.wait(2600, function()
 end))
 
 -- Mock only the server boundary: verify UTF-16 conversion, cancellation, and stale replies.
-local refs = require("nazovim.references")
+local refs = require("nazovim.lsp.references")
 api.nvim_buf_set_lines(0, 0, -1, false, { "é name name" })
 api.nvim_win_set_cursor(0, { 1, 3 })
 local callbacks, cancelled = {}, 0

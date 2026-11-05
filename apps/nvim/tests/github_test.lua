@@ -152,9 +152,9 @@ local function close_views()
 end
 
 -- Commands and keymaps are registered by setup().
-require("nazovim.github_gists").setup()
-require("nazovim.github_pr_details").setup()
-require("nazovim.github_projects").setup()
+require("nazovim.github.gists").setup()
+require("nazovim.github.pr_details").setup()
+require("nazovim.github.projects").setup()
 for _, command in ipairs({ "NazoGitHubGists", "NazoGitHubPRDetails", "NazoGitHubProjects" }) do
 	assert(vim.fn.exists(":" .. command) == 2, command .. " is missing")
 end
@@ -167,7 +167,7 @@ local opened
 vim.ui.open = function(url)
 	opened = url
 end
-require("nazovim.github_gists").open()
+require("nazovim.github.gists").open()
 wait_view("NazoGitHub://gists", 5)
 local gist_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 assert(gist_lines[4]:find("session.html", 1, true), "first gist line: " .. gist_lines[4])
@@ -182,7 +182,7 @@ close_views()
 -- Pull request details: commits, commit diff, changed files and checks.
 handle("GitHub pull request details", pick("#7 Add feature · open"))
 handle("PR #7", pick("Commits"))
-local details = require("nazovim.github_pr_details")
+local details = require("nazovim.github.pr_details")
 details.open()
 wait_view("NazoGitHub://pr%-commits/7", 4)
 local commit_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -222,7 +222,7 @@ assert(opened == "https://example.com/run/1", "check link: " .. tostring(opened)
 close_views()
 
 -- Projects: items, status move, archive and add.
-local projects = require("nazovim.github_projects")
+local projects = require("nazovim.github.projects")
 handle("GitHub projects for", pick("#3 Roadmap"))
 handle("Project #3", pick("Items"))
 projects.open()

@@ -1,4 +1,4 @@
-local kinds = require("nazovim.todo.kinds")
+local kinds = require("nazovim.todo.lib.kinds")
 
 local M = {}
 local job

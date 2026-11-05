@@ -12,7 +12,7 @@ local function extmarks(namespace, buf)
 end
 
 -- Auto pairs: open, skip, delete, and expand.
-local pairs = require("nazovim.pairs")
+local pairs = require("nazovim.edit.pairs")
 vim.cmd.enew({ bang = true })
 pairs.attach(0)
 assert(vim.fn.maparg("(", "i", false, true).callback ~= nil)
@@ -40,7 +40,7 @@ equal(#api.nvim_buf_get_keymap(scratch, "i"), 0)
 api.nvim_buf_delete(scratch, { force = true })
 
 -- Surround: add, find, replace, delete.
-local surround = require("nazovim.surround")
+local surround = require("nazovim.edit.surround")
 vim.cmd.enew({ bang = true })
 api.nvim_buf_set_lines(0, 0, -1, false, { "local value = foo" })
 surround.add(0, 1, 14, 1, 17, "(", ")")
@@ -62,7 +62,7 @@ equal(api.nvim_get_current_line(), "foo")
 equal(api.nvim_win_get_cursor(0), { 1, 1 })
 
 -- Indent guide scope.
-local indent = require("nazovim.indent")
+local indent = require("nazovim.edit.indent")
 equal(indent.scope_col("    value", 2), 2)
 equal(indent.scope_col("  value", 2), 0)
 vim.cmd.enew({ bang = true })
@@ -81,7 +81,7 @@ indent.update()
 equal(#extmarks("NazoIndent"), 2)
 
 -- Dial: integers, booleans, constants, floats, and line updates.
-local dial = require("nazovim.dial")
+local dial = require("nazovim.edit.dial")
 equal(dial.find("let x = 41", 9).text, "41")
 equal(dial.next(dial.find("let x = 41", 9), 1), "42")
 equal(dial.next(dial.find("enabled = true", 12), 1), "false")
@@ -102,12 +102,12 @@ equal(api.nvim_get_current_line(), "x = 42")
 vim.cmd.enew({ bang = true })
 api.nvim_buf_set_lines(0, 0, -1, false, { "a 1 b 2" })
 vim.cmd("normal! 0v$")
-local srow, scol, erow, ecol = require("nazovim.ui").visual_range()
+local srow, scol, erow, ecol = require("nazovim.lib.ui").visual_range()
 vim.cmd("normal! \27")
 equal({ srow, scol, erow, ecol }, { 1, 0, 1, 6 })
 
 -- Spider motions split camelCase and snake_case.
-local motion = require("nazovim.motion")
+local motion = require("nazovim.edit.motion")
 equal(motion.hints("axxbaz", 0, 1), { 3, 4, 5 })
 equal(motion.hints("abcabc", 5, -1), { 2 })
 equal(motion.hints("あxあy", 0, 1), { 3, 4, 7 })
@@ -130,7 +130,7 @@ equal(api.nvim_win_get_cursor(0), { 1, 3 })
 vim.cmd.enew({ bang = true })
 api.nvim_buf_set_lines(0, 0, -1, false, { "ax", "bxa", "xa" })
 api.nvim_win_set_cursor(0, { 1, 0 })
-require("nazovim.motion").setup()
+require("nazovim.edit.motion").setup()
 vim.api.nvim_feedkeys("fx", "xt", false)
 equal(api.nvim_win_get_cursor(0), { 1, 1 })
 equal(api.nvim_buf_get_extmarks(0, api.nvim_create_namespace("NazoMotionHints"), 0, -1, {}), {})
@@ -150,7 +150,7 @@ api.nvim_win_set_cursor(0, { 3, 2 })
 vim.api.nvim_feedkeys("Tx", "xt", false)
 equal(api.nvim_win_get_cursor(0), { 3, 1 })
 -- Marks: signs and quickfix entries.
-local marks = require("nazovim.marks")
+local marks = require("nazovim.edit.marks")
 vim.cmd.enew({ bang = true })
 api.nvim_buf_set_lines(0, 0, -1, false, { "first", "second" })
 vim.fn.setpos("'a", { 0, 2, 1, 0 })
@@ -162,7 +162,7 @@ assert(#placed == 1, vim.inspect(placed))
 equal(placed[1].lnum, 2)
 
 -- Spell checking only applies to prose filetypes.
-local spell = require("nazovim.spell")
+local spell = require("nazovim.edit.spell")
 assert(spell.wanted("markdown"))
 assert(not spell.wanted("lua"))
 vim.bo.filetype = "markdown"
@@ -194,7 +194,7 @@ end
 vim.cmd("only")
 
 -- Buffer tabline renders, clicks, and cycles.
-local tabline = require("nazovim.tabline")
+local tabline = require("nazovim.ui.tabline")
 vim.cmd.enew({ bang = true })
 vim.cmd.file("one.lua")
 vim.cmd.enew({ bang = true })
@@ -210,9 +210,9 @@ tabline.next()
 assert(api.nvim_get_current_buf() ~= first)
 
 -- Folding uses Treesitter when possible and indentation otherwise.
-local folding = require("nazovim.folding")
+local folding = require("nazovim.edit.folding")
 folding.setup()
-assert(vim.o.foldexpr:find("nazovim.folding", 1, true))
+assert(vim.o.foldexpr:find("nazovim.edit.folding", 1, true))
 assert(type(folding.foldexpr(1)) == "number" or type(folding.foldexpr(1)) == "string")
 api.nvim_buf_set_lines(0, 0, -1, false, { "function x()", "  return 1", "end" })
 api.nvim_win_set_cursor(0, { 1, 0 })
@@ -223,7 +223,7 @@ assert(foldtext:find("function x()", 1, true), foldtext)
 vim.wo.foldmethod = "expr"
 
 -- Which-key lists and displays pending mappings.
-local whichkey = require("nazovim.whichkey")
+local whichkey = require("nazovim.ui.whichkey")
 whichkey.setup()
 vim.keymap.set("n", "<leader>zz", function() end, { desc = "Test mapping" })
 local items = whichkey.items(" ", "n")

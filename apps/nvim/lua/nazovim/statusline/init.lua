@@ -1,5 +1,5 @@
 local M = {}
-local git = require("nazovim.statusline.git")
+local git = require("nazovim.statusline.lib.git")
 local diagnostics = {}
 local modes = {
 	n = "NORMAL",

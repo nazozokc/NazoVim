@@ -30,7 +30,7 @@ end
 
 local function locate_color(buf, row, cursor_col)
 	local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
-	local parse = require("nazovim.colors.parse").parse
+	local parse = require("nazovim.colors.lib.parse").parse
 	local best
 	local function consider(first, value, after)
 		local start_col, end_col = first - 1, after - 1
@@ -190,7 +190,7 @@ local function open_palette(buf, mark)
 				end
 				return
 			end
-			local parsed = require("nazovim.colors.parse").parse(value)
+			local parsed = require("nazovim.colors.lib.parse").parse(value)
 			if not parsed then
 				vim.notify("Invalid color value", vim.log.levels.ERROR, { title = "NazoVim" })
 				if vim.api.nvim_win_is_valid(win) then

@@ -16,7 +16,7 @@ function M.update()
 		not enabled
 		or (vim.v.hlsearch == 0 and not searching)
 		or pattern == ""
-		or not require("nazovim.ui").normal(buf)
+		or not require("nazovim.lib.ui").normal(buf)
 	then
 		return
 	end
@@ -36,7 +36,7 @@ end
 ---Preserve n/N/*/# semantics and install the search count toggle.
 function M.setup()
 	local group = vim.api.nvim_create_augroup("NazoSearch", { clear = true })
-	local update = require("nazovim.ui").throttle(30, M.update)
+	local update = require("nazovim.lib.ui").throttle(30, M.update)
 	vim.api.nvim_create_autocmd(
 		{ "CursorMoved", "BufEnter", "CmdlineLeave", "TextChanged" },
 		{ group = group, callback = update }

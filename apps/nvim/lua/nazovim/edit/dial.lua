@@ -176,7 +176,7 @@ function M.increment_line(line, step, from, to)
 end
 
 local function visual(step)
-	local srow, scol, erow, ecol, kind = require("nazovim.ui").visual_range()
+	local srow, scol, erow, ecol, kind = require("nazovim.lib.ui").visual_range()
 	for row = srow, erow do
 		local line = vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1] or ""
 		local from, to

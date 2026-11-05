@@ -58,7 +58,7 @@ end
 ---@param prefix string
 local function snippet_items(prefix)
 	local items = {}
-	for _, definition in ipairs(require("nazovim.snippets").candidates(prefix)) do
+	for _, definition in ipairs(require("nazovim.completion.snippets").candidates(prefix)) do
 		items[#items + 1] = {
 			word = definition.prefix,
 			abbr = definition.prefix,
@@ -115,7 +115,7 @@ local function tab()
 	if popup_visible() then
 		return "<C-y>"
 	end
-	local snippets = require("nazovim.snippets")
+	local snippets = require("nazovim.completion.snippets")
 	if snippets.jumpable(1) then
 		snippets.jump(1)
 		return ""
@@ -124,7 +124,7 @@ local function tab()
 end
 
 local function shift_tab()
-	local snippets = require("nazovim.snippets")
+	local snippets = require("nazovim.completion.snippets")
 	if snippets.jumpable(-1) then
 		snippets.jump(-1)
 		return ""
@@ -143,7 +143,7 @@ local function on_complete_done()
 		return
 	end
 	vim.schedule(function()
-		require("nazovim.snippets").expand_trigger(data.snippet)
+		require("nazovim.completion.snippets").expand_trigger(data.snippet)
 	end)
 end
 

@@ -1,6 +1,6 @@
 local M = {}
 
-local parse = require("nazovim.colors.parse").parse
+local parse = require("nazovim.colors.lib.parse").parse
 local ns = vim.api.nvim_create_namespace("NazoColors")
 local highlights, highlight_count, variables = {}, 0, {}
 local enabled, active, lifecycle_group = true, false, nil
@@ -100,7 +100,7 @@ function M.setup()
 			variables[args.buf] = nil
 		end,
 	})
-	require("nazovim.ui").decorate("NazoColors", ns, render)
+	require("nazovim.lib.ui").decorate("NazoColors", ns, render)
 end
 
 ---Stop color-literal previews and clear their extmarks.

@@ -20,14 +20,14 @@ vim.cmd("ToggleTerm")
 
 -- Filename overlays should not create an endless WinClosed redraw loop.
 vim.cmd("edit feature-test.txt")
-require("nazovim.filename").setup()
+require("nazovim.ui.filename").setup()
 vim.wait(200)
 assert(#vim.api.nvim_tabpage_list_wins(0) == 2)
 vim.cmd("vsplit")
 vim.wait(200)
 assert(#vim.api.nvim_tabpage_list_wins(0) == 4)
 
-require("nazovim.modes").setup()
+require("nazovim.ui.modes").setup()
 assert(vim.api.nvim_get_hl(0, { name = "CursorLineNr" }).fg ~= nil)
 vim.api.nvim_buf_set_lines(0, 0, -1, false, { "abc", "def", "ghi" })
 vim.api.nvim_win_set_cursor(0, { 1, 0 })
@@ -38,7 +38,7 @@ assert(vim.api.nvim_win_get_cursor(0)[1] == 1)
 vim.fn.feedkeys(vim.api.nvim_replace_termcodes(":3<CR>", true, false, true), "xt")
 assert(vim.api.nvim_win_get_cursor(0)[1] == 3)
 -- Zen mode hides the UI chrome and restores it afterwards.
-local zen = require("nazovim.zen")
+local zen = require("nazovim.ui.zen")
 assert(vim.fn.exists(":NazoZen") == 2, ":NazoZen is missing")
 assert(vim.fn.maparg("<leader>z", "n") ~= "", "<leader>z is missing")
 vim.o.number = true
@@ -60,7 +60,7 @@ assert(vim.o.laststatus == 3, "zen mode did not restore the statusline")
 assert(vim.diagnostic.is_enabled() == true, "zen mode did not restore diagnostics")
 
 -- The dashboard replaces the snacks dashboard with the same keys.
-local dashboard = require("nazovim.dashboard")
+local dashboard = require("nazovim.startup.dashboard")
 assert(vim.fn.exists(":NazoDashboard") == 2, ":NazoDashboard is missing")
 dashboard.show()
 local dashboard_buf = vim.api.nvim_get_current_buf()
@@ -88,7 +88,7 @@ vim.g.nazovim_quickstart_shown = nil
 vim.api.nvim_list_uis = original_uis
 
 -- Codex runs the CLI in a reusable floating terminal.
-local codex = require("nazovim.codex")
+local codex = require("nazovim.ai.codex")
 assert(vim.fn.exists(":Codex") == 2, ":Codex is missing")
 assert(vim.fn.exists(":CodexToggle") == 2, ":CodexToggle is missing")
 local codex_dir = vim.fn.tempname()
@@ -117,7 +117,7 @@ vim.env.PATH = saved_path
 vim.fn.delete(codex_dir, "rf")
 
 -- Claude Code keeps one session, mentions files and restarts on flags.
-local claudecode = require("nazovim.claudecode")
+local claudecode = require("nazovim.ai.claudecode")
 for _, command in ipairs({
 	"ClaudeCode",
 	"ClaudeCodeToggle",
@@ -188,7 +188,7 @@ vim.env.PATH = claude_path
 vim.fn.delete(claude_dir, "rf")
 
 -- opencode keeps one session, mentions files and restarts on flags.
-local opencode = require("nazovim.opencode")
+local opencode = require("nazovim.ai.opencode")
 assert(vim.fn.exists(":OpenCode") == 2, ":OpenCode is missing")
 assert(vim.fn.exists(":OC") == 2, ":OC is missing")
 for _, lhs in ipairs({ "<leader>oa", "<leader>ox" }) do
@@ -273,7 +273,7 @@ end
 assert(found_path, "completion.items missed file paths: " .. vim.inspect(path_items))
 local saved_snippet_dir = vim.g.nazovim_snippet_dir
 vim.g.nazovim_snippet_dir = "apps/nvim/snippets"
-require("nazovim.snippets").reload()
+require("nazovim.completion.snippets").reload()
 vim.bo.filetype = "lua"
 local snippet_items = completion.items("f")
 local found_snippet = false
@@ -452,7 +452,7 @@ assert(git.relative(git_dir) == "note.txt", "git relative path: " .. tostring(gi
 vim.fn.delete(git_dir, "rf")
 
 -- File icons come from the built-in devicons replacement.
-local icons = require("nazovim.icons")
+local icons = require("nazovim.ui.icons")
 assert(icons.has_loaded(), "icons.has_loaded returned false")
 local lua_icon, lua_group = icons.get_icon("init.lua")
 assert(lua_icon ~= "" and lua_group ~= "", "get_icon returned nothing for a lua file")
@@ -467,12 +467,12 @@ assert(icons.get_icons_by_extension().lua ~= nil, "get_icons_by_extension is emp
 assert(icons.get_icons_by_filename()["makefile"] ~= nil, "get_icons_by_filename is empty")
 assert(vim.api.nvim_get_hl(0, { name = lua_group }).fg ~= nil, "the icon highlight group is undefined")
 vim.cmd("edit icon-test.lua")
-local tabline = require("nazovim.tabline")
+local tabline = require("nazovim.ui.tabline")
 tabline.setup()
 assert(tabline.render():find(lua_icon, 1, true), "the tabline is missing the file icon")
 
 -- NazoAI asks a CLI non-interactively and streams the answer into the panel.
-local ai_ask = require("nazovim.ai_ask")
+local ai_ask = require("nazovim.ai.ask")
 for _, command in ipairs({ "NazoAI", "NazoAIEdit", "NazoAIStop", "NazoAIToggle", "NazoAIFiles" }) do
 	assert(vim.fn.exists(":" .. command) == 2, ":" .. command .. " is missing")
 end
@@ -910,8 +910,8 @@ assert(parent.child.closed, "dap.close_all left the child open")
 assert(dap.session() == nil, "dap.session survived dap.close_all")
 
 -- Treesitter highlighting is started by the built-in module, not a plugin.
-local treesitter = require("nazovim.treesitter")
-local locals_index = require("nazovim.locals")
+local treesitter = require("nazovim.edit.treesitter")
+local locals_index = require("nazovim.lib.locals")
 assert(vim.fn.exists(":NazoTreesitterInfo") == 2, ":NazoTreesitterInfo is missing")
 assert(#vim.api.nvim_get_autocmds({ group = "NazoTreesitter" }) == 1, "the treesitter FileType autocmd is missing")
 assert(vim.islist(treesitter.directories()), "treesitter.directories does not return a list")
@@ -975,7 +975,7 @@ assert(vim.fn.isdirectory(quickfile_dir .. "/nested/deep") == 1, "quickfile did 
 vim.fn.delete(quickfile_dir, "rf")
 
 -- The picker must search the directory it is given, not the cwd.
-local picker = require("nazovim.picker")
+local picker = require("nazovim.search.picker")
 local picker_dir = vim.fn.tempname()
 vim.fn.mkdir(picker_dir .. "/sub", "p")
 vim.fn.writefile({ "needle-in-sub" }, picker_dir .. "/sub/hit.txt")

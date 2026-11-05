@@ -78,9 +78,10 @@ done
 
 ## 内蔵機能への置き換え方針
 
-- プラグイン置換コードは `apps/nvim/lua/nazovim/<feature>.lua` など、機能ごとの独立モジュールに実装する。
-- 起動登録は `nazovim/features.lua` に機能名と起動段階を1項目ずつ記録する。
-  不要な機能は `vim.g.nazovim_disabled_features` で個別に止められる。
+- プラグイン置換コードは `apps/nvim/lua/nazovim/<category>/<feature>.lua` に1機能1ファイルで実装する。
+  `nazovim/features.lua` がディレクトリを走査して自動登録するため、追加はファイルを置くだけでよい。
+  初期パス以外で起動する機能だけ `features.lua` の `phases` に1行追加する。
+  不要な機能はファイルを削除するか `vim.g.nazovim_disabled_features` で個別に止められる。
 - 実装はNeovim APIを使って要件から新規に設計する。既存プラグインのソースコードを複写・翻案しない。
 - 置換時は専用モジュール、機能登録、プラグインspecとlock、README・機能一覧を同じ変更で更新する。
 

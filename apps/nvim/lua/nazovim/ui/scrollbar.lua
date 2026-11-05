@@ -50,7 +50,7 @@ function M.update()
 	local total = vim.api.nvim_buf_line_count(buf)
 	if
 		vim.api.nvim_win_get_config(win).relative ~= ""
-		or not require("nazovim.ui").normal(buf)
+		or not require("nazovim.lib.ui").normal(buf)
 		or height < 3
 		or width < 10
 		or total <= height
@@ -97,7 +97,7 @@ end
 ---Replace both scrollbar plugins with a single event-driven active-window overview.
 function M.setup()
 	local group = vim.api.nvim_create_augroup("NazoScrollbar", { clear = true })
-	local update = require("nazovim.ui").throttle(40, M.update)
+	local update = require("nazovim.lib.ui").throttle(40, M.update)
 	vim.api.nvim_create_autocmd({
 		"WinScrolled",
 		"WinEnter",

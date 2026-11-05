@@ -1,5 +1,5 @@
-local expand = require("nazovim.template.expand")
-local store = require("nazovim.template.store")
+local expand = require("nazovim.template.lib.expand")
+local store = require("nazovim.template.lib.store")
 
 local M = {}
 
