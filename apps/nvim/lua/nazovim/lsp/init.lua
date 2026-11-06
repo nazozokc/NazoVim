@@ -236,15 +236,30 @@ end
 ---@param client? { name: string }
 function M.attach_keymaps(buffer, client)
 	local opts = { buffer = buffer }
+
+	-- Hover & signature
 	vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover" }))
-	vim.keymap.set(
-		"n",
-		"<leader>ls",
-		vim.lsp.buf.signature_help,
-		vim.tbl_extend("force", opts, { desc = "Signature help" })
-	)
+	vim.keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature help" }))
+
+	-- Navigation
 	vim.keymap.set("n", "<leader>ld", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Definition" }))
 	vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "References" }))
+	vim.keymap.set("n", "gri", vim.lsp.buf.implementation, vim.tbl_extend("force", opts, { desc = "Implementation" }))
+	vim.keymap.set("n", "gO", vim.lsp.buf.document_symbol, vim.tbl_extend("force", opts, { desc = "Document symbols" }))
+
+	-- Refactor / actions
+	vim.keymap.set("n", "grn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename" }))
+	vim.keymap.set({ "n", "x" }, "gra", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
+
+	-- Formatting
+	vim.keymap.set("n", "<leader>lf", function()
+		vim.lsp.buf.format({ async = true })
+	end, vim.tbl_extend("force", opts, { desc = "Format buffer" }))
+	vim.keymap.set("x", "<leader>lF", function()
+		vim.lsp.buf.format({ async = true })
+	end, vim.tbl_extend("force", opts, { desc = "Format range" }))
+
+	-- Server specific
 	if client and client.name == "rust_analyzer" then
 		vim.keymap.set("n", "<leader>rr", function()
 			M.rust_runnables(buffer)
