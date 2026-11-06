@@ -239,7 +239,12 @@ function M.attach_keymaps(buffer, client)
 
 	-- Hover & signature
 	vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover" }))
-	vim.keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature help" }))
+	vim.keymap.set(
+		"n",
+		"<leader>ls",
+		vim.lsp.buf.signature_help,
+		vim.tbl_extend("force", opts, { desc = "Signature help" })
+	)
 
 	-- Navigation
 	vim.keymap.set("n", "<leader>ld", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Definition" }))
@@ -249,7 +254,12 @@ function M.attach_keymaps(buffer, client)
 
 	-- Refactor / actions
 	vim.keymap.set("n", "grn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename" }))
-	vim.keymap.set({ "n", "x" }, "gra", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
+	vim.keymap.set(
+		{ "n", "x" },
+		"gra",
+		vim.lsp.buf.code_action,
+		vim.tbl_extend("force", opts, { desc = "Code action" })
+	)
 
 	-- Formatting
 	vim.keymap.set("n", "<leader>lf", function()
@@ -323,6 +333,11 @@ function M.setup()
 	end
 
 	vim.api.nvim_create_user_command("NazoLspInfo", M.info, { desc = "Show the enabled language servers" })
+	vim.api.nvim_create_user_command(
+		"NazoLspRestart",
+		M.restart,
+		{ desc = "Restart LSP clients for the current buffer" }
+	)
 end
 
 return M
