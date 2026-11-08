@@ -17,7 +17,11 @@
 不要な機能は、たとえば次のように `nazovim.setup()` より前に名前で無効化できます。
 
 ```lua
-vim.g.nazovim_disabled_features = { "todo", "ui.scrollbar", "terminal.commands" }
+vim.g.nazovim_disabled_features = {
+  "todo",
+  "ui.scrollbar",
+  "terminal.commands",
+}
 ```
 
 | 旧プラグイン | 内蔵モジュール | 動作 |
