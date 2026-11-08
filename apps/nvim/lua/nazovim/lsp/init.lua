@@ -508,17 +508,11 @@ function M.setup()
 	end
 
 	vim.api.nvim_create_user_command("NazoLspInfo", M.info, { desc = "Show the enabled language servers" })
-
-	vim.schedule(function()
-		local missing = M.missing()
-		if #missing > 0 then
-			vim.notify(
-				"LSP executables not found: " .. table.concat(missing, ", ") .. " — run inside `nix develop`",
-				vim.log.levels.WARN,
-				{ title = title }
-			)
-		end
-	end)
+	vim.api.nvim_create_user_command(
+		"NazoLspRestart",
+		M.restart,
+		{ desc = "Restart LSP clients for the current buffer" }
+	)
 end
 
 return M
