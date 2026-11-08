@@ -76,6 +76,14 @@
               zls
               vscode-langservers-extracted
               jdt-language-server
+              rust-analyzer
+              marksman
+              bash-language-server
+              yaml-language-server
+              taplo
+              emmet-language-server
+              gopls
+              pyright
 
               # DAP (nazovim/dap.lua spawns the js-debug adapter)
               vscode-js-debug

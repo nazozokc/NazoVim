@@ -22,6 +22,13 @@ local function toggle_list(title, items)
 	vim.cmd.copen()
 end
 
+---Set a titled quickfix list, closing it when the same list is already open.
+---@param title string
+---@param items table[]
+function M.set(title, items)
+	toggle_list(title, items)
+end
+
 local function diagnostic_items(buf)
 	local diagnostics = vim.diagnostic.get(buf)
 	local items = {}
