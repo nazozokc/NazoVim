@@ -86,6 +86,21 @@ let
       pkgs.tree-sitter
       pkgs.clang-tools # clangd
       pkgs.jdt-language-server # jdtls
+      # Language servers; nazovim/lsp.lua starts the ones that resolve on PATH.
+      pkgs.lua-language-server
+      pkgs.nixd
+      pkgs.typescript-language-server
+      pkgs.solargraph
+      pkgs.zls
+      pkgs.vscode-langservers-extracted # html / css / json
+      pkgs.rust-analyzer
+      pkgs.marksman
+      pkgs.bash-language-server
+      pkgs.yaml-language-server
+      pkgs.taplo
+      pkgs.emmet-language-server
+      pkgs.gopls
+      pkgs.pyright
       pkgs.vscode-js-debug # js-debug adapter for nazovim/dap.lua
       pkgs.ruby
     ];

@@ -64,6 +64,7 @@ jobs:
       - name: Test built-in editor features
         run: |
           nix develop --command nvim --headless -u NONE -l apps/nvim/tests/features_test.lua
+          nix develop --command nvim --headless -u NONE -l apps/nvim/tests/lsp_test.lua
           nix develop --command nvim --headless -u NONE -l apps/nvim/tests/builtin_test.lua
           nix develop --command nvim --headless -u NONE -l apps/nvim/tests/replacements_test.lua
           nix develop --command nvim --headless -u NONE -l apps/nvim/tests/github_test.lua

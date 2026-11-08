@@ -91,7 +91,12 @@ done
 
 | プラグイン | 用途 |
 | ---------- | ---- |
-| NazoVim 内蔵 | LSP管理（`lsp.lua`、`vim.lsp.config` / `vim.lsp.enable`、PATH上のサーバーのみ起動、`:NazoLspInfo`） |
+| NazoVim 内蔵 | LSP管理（`lsp.lua`、`vim.lsp.config` / `vim.lsp.enable`、PATH上のサーバーのみ起動、`:NazoLspInfo`）。lua_ls / clangd / html / cssls / jsonls / emmet / nixd / taplo / yamlls / marksman / bashls / gopls / pyright / jdtls / rust_analyzer / ts_ls / solargraph / zls を定義し、hover と signature help は `vim.lsp.config("*")` で丸枠に統一 |
+| NazoVim 内蔵 | LSPシンボル操作（`symbols.lua`、`grw` workspace symbol / `gD` declaration / `<leader>gr` referencesをquickfix化 / `<leader>lT` type hierarchy） |
+| NazoVim 内蔵 | LSPコール階層（`calls.lua`、`<leader>lci` / `<leader>lco`、深さ4・300ノード上限でquickfix表示） |
+| NazoVim 内蔵 | LSP表示トグル（`display.lua`、`<leader>li` inlay hints / `<leader>lS` semantic tokens / `<leader>lh` code lens） |
+| NazoVim 内蔵 | LSPライフサイクル（`lifecycle.lua`、`<leader>lr` 再起動 / `<leader>lq` 停止 / `:NazoLspStart [name]` 起動） |
+| NazoVim 内蔵 | health チェック（`health.lua`、`:checkhealth nazovim` でLSPの有効／不足とTreesitterパーサーを表示） |
 | NazoVim 内蔵 | ファイルアイコン（`icons.lua`、`get_icon` / `get_icon_by_filetype` のdevicons互換API） |
 | NazoVim 内蔵 | TypeScript / JavaScript LSP（`lsp.lua` の `ts_ls` = typescript-language-server。formatting と semantic tokens を無効化、`<leader>oi` / `<leader>ru`） |
 | NazoVim 内蔵 | 補完（`completion.lua`、`vim.lsp.completion` + snippet/buffer/path、`<C-Space>` / `<Tab>` / `<S-Tab>` / `<CR>`） |

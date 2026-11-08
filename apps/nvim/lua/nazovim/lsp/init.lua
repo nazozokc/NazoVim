@@ -31,7 +31,10 @@ local typescript_settings = {
 		includeInlayPropertyDeclarationTypeHints = false,
 		includeInlayFunctionLikeReturnTypeHints = false,
 		includeInlayEnumMemberValueHints = false,
+		-- Imports stay portable instead of hard-coding relative paths.
+		importModuleSpecifier = "non-relative",
 	},
+	updateImportsOnFileMove = { enabled = "always" },
 }
 
 ---Language servers started by NazoVim itself.
@@ -45,6 +48,9 @@ local servers = {
 		settings = {
 			Lua = {
 				diagnostics = { globals = { "vim" } },
+				-- stylua owns formatting; lua_ls only diagnoses.
+				format = { enable = false },
+				runtime = { version = "LuaJIT" },
 				workspace = {
 					checkThirdParty = false,
 					library = lua_library(),
@@ -53,19 +59,94 @@ local servers = {
 		},
 	},
 	clangd = {
-		cmd = { "clangd" },
+		cmd = { "clangd", "--background-index" },
 		filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
 		root_markers = { "compile_commands.json", "compile_flags.txt", ".clangd", ".git" },
+		settings = {
+			clangd = {
+				-- Keep diagnostics useful without a compilation database.
+				fallbackFlags = { "-std=c++20" },
+			},
+		},
 	},
 	html = {
 		cmd = { "vscode-html-language-server", "--stdio" },
 		filetypes = { "html" },
 		root_markers = { "package.json", ".git" },
 	},
+	cssls = {
+		cmd = { "vscode-css-language-server", "--stdio" },
+		filetypes = { "css", "scss", "less" },
+		root_markers = { "package.json", ".git" },
+	},
+	jsonls = {
+		cmd = { "vscode-json-language-server", "--stdio" },
+		filetypes = { "json", "jsonc" },
+		root_markers = { "package.json", ".git" },
+	},
+	emmet_language_server = {
+		cmd = { "emmet-language-server", "--stdio" },
+		filetypes = {
+			"html",
+			"css",
+			"scss",
+			"javascriptreact",
+			"typescriptreact",
+			"vue",
+			"svelte",
+		},
+		root_markers = { "package.json", ".git" },
+	},
 	nixd = {
 		cmd = { "nixd" },
 		filetypes = { "nix" },
 		root_markers = { "flake.nix", "default.nix", ".git" },
+	},
+	taplo = {
+		cmd = { "taplo", "lsp", "stdio" },
+		filetypes = { "toml" },
+		root_markers = { ".taplo.toml", "taplo.toml", ".git" },
+	},
+	yamlls = {
+		cmd = { "yaml-language-server", "--stdio" },
+		filetypes = { "yaml", "yaml.docker-compose" },
+		root_markers = { "package.json", ".git" },
+	},
+	marksman = {
+		cmd = { "marksman", "server" },
+		filetypes = { "markdown" },
+		root_markers = { ".marksman.toml", ".git" },
+	},
+	bashls = {
+		cmd = { "bash-language-server", "start" },
+		filetypes = { "sh", "bash" },
+		root_markers = { ".git" },
+		settings = {
+			bashIde = {
+				globPattern = "*@(.sh|.inc|.bash|.command)",
+			},
+		},
+	},
+	gopls = {
+		cmd = { "gopls" },
+		filetypes = { "go", "gomod", "gowork", "gotmpl" },
+		root_markers = { "go.work", "go.mod", ".git" },
+		settings = {
+			gopls = {
+				usePlaceholders = true,
+				analyses = { unusedparams = true },
+			},
+		},
+	},
+	pyright = {
+		cmd = { "pyright-langserver", "--stdio" },
+		filetypes = { "python" },
+		root_markers = { "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", ".git" },
+		settings = {
+			python = {
+				analysis = { autoSearchPaths = true, useLibraryCodeForTypes = true },
+			},
+		},
 	},
 	jdtls = {
 		-- jdtls locks its workspace, so every project root gets its own one.
@@ -120,6 +201,18 @@ local servers = {
 	},
 }
 
+---Per-server adjustments applied when a client attaches.
+---The listed server capabilities are cleared because another tool owns them.
+local overrides = {
+	ts_ls = {
+		without_capabilities = {
+			"documentFormattingProvider",
+			"documentRangeFormattingProvider",
+			"semanticTokensProvider",
+		},
+	},
+}
+
 ---Servers that were enabled because their executable exists.
 local enabled = {}
 
@@ -141,6 +234,11 @@ end
 ---Return the configured server definitions.
 function M.servers()
 	return servers
+end
+
+---Return the per-server attach overrides.
+function M.overrides()
+	return overrides
 end
 
 ---Return the servers that were enabled at startup.
@@ -166,6 +264,17 @@ local function capabilities()
 		vim.lsp.protocol.make_client_capabilities(),
 		{ textDocument = { completion = { completionItem = { snippetSupport = true } } } }
 	)
+end
+
+---Give a built-in handler default float options.
+---`vim.lsp.with()` is deprecated in 0.12, so the merge happens here.
+---@param handler function
+---@param config table
+---@return function
+local function floating(handler, config)
+	return function(err, result, ctx, opts)
+		handler(err, result, ctx, vim.tbl_deep_extend("force", opts or {}, config))
+	end
 end
 
 ---Build the shell command for a rust-analyzer runnable.
@@ -265,20 +374,47 @@ end
 ---@param client? { name: string }
 function M.attach_keymaps(buffer, client)
 	local opts = { buffer = buffer }
+	local symbols = require("nazovim.lsp.symbols")
+	local calls = require("nazovim.lsp.calls")
+	local display = require("nazovim.lsp.display")
+	local lifecycle = require("nazovim.lsp.lifecycle")
 
 	-- Hover & signature
 	vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover" }))
-	vim.keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, vim.tbl_extend("force", opts, { desc = "Signature help" }))
+	vim.keymap.set(
+		"n",
+		"<leader>ls",
+		vim.lsp.buf.signature_help,
+		vim.tbl_extend("force", opts, { desc = "Signature help" })
+	)
 
 	-- Navigation
 	vim.keymap.set("n", "<leader>ld", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Definition" }))
-	vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "References" }))
-	vim.keymap.set("n", "gri", vim.lsp.buf.implementation, vim.tbl_extend("force", opts, { desc = "Implementation" }))
+	vim.keymap.set("n", "gD", symbols.declaration, vim.tbl_extend("force", opts, { desc = "Declaration" }))
+	vim.keymap.set("n", "<leader>gr", symbols.references, vim.tbl_extend("force", opts, { desc = "References" }))
+	vim.keymap.set("n", "grw", symbols.workspace_symbols, vim.tbl_extend("force", opts, { desc = "Workspace symbols" }))
 	vim.keymap.set("n", "gO", vim.lsp.buf.document_symbol, vim.tbl_extend("force", opts, { desc = "Document symbols" }))
+	vim.keymap.set(
+		"n",
+		"<leader>lT",
+		symbols.type_hierarchy,
+		vim.tbl_extend("force", opts, { desc = "Type hierarchy" })
+	)
+	vim.keymap.set("n", "<leader>lci", function()
+		calls.run("incomingCalls")
+	end, vim.tbl_extend("force", opts, { desc = "Incoming calls" }))
+	vim.keymap.set("n", "<leader>lco", function()
+		calls.run("outgoingCalls")
+	end, vim.tbl_extend("force", opts, { desc = "Outgoing calls" }))
 
 	-- Refactor / actions
 	vim.keymap.set("n", "grn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename" }))
-	vim.keymap.set({ "n", "x" }, "gra", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
+	vim.keymap.set(
+		{ "n", "x" },
+		"gra",
+		vim.lsp.buf.code_action,
+		vim.tbl_extend("force", opts, { desc = "Code action" })
+	)
 
 	-- Formatting
 	vim.keymap.set("n", "<leader>lf", function()
@@ -312,6 +448,14 @@ end
 ---Show which servers are enabled, attached, and missing.
 function M.info()
 	local lines = { "enabled: " .. (#enabled > 0 and table.concat(enabled, ", ") or "none") }
+	local attached = {}
+	for _, client in ipairs(vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() })) do
+		local root = client.config.root_dir and vim.fs.basename(client.config.root_dir) or "no root"
+		attached[#attached + 1] = string.format("%s (%s)", client.name, root)
+	end
+	if #attached > 0 then
+		lines[#lines + 1] = "attached: " .. table.concat(attached, ", ")
+	end
 	local missing = M.missing()
 	if #missing > 0 then
 		lines[#lines + 1] = "missing: " .. table.concat(missing, ", ")
@@ -330,6 +474,18 @@ function M.info()
 	end
 
 	vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = title })
+end
+
+---Apply the per-server capability overrides when a client attaches.
+---@param client table
+function M.apply_overrides(client)
+	local override = overrides[client.name]
+	if not override then
+		return
+	end
+	for _, capability in ipairs(override.without_capabilities or {}) do
+		client.server_capabilities[capability] = false
+	end
 end
 
 ---Register the server definitions, enable the available ones and map the
@@ -357,11 +513,8 @@ function M.setup()
 		callback = function(args)
 			local client_id = args.data and args.data.client_id
 			local client = client_id and vim.lsp.get_client_by_id(client_id) or nil
-			if client and client.name == "ts_ls" then
-				-- Prettier handles formatting and the semantic tokens are noisy.
-				client.server_capabilities.documentFormattingProvider = false
-				client.server_capabilities.documentRangeFormattingProvider = false
-				client.server_capabilities.semanticTokensProvider = nil
+			if client then
+				M.apply_overrides(client)
 			end
 			M.attach_keymaps(args.buf, client)
 		end,
