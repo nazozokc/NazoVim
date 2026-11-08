@@ -2,6 +2,13 @@ local M = {}
 
 local severity_filter = nil -- nil = all, or vim.diagnostic.severity.ERROR etc.
 
+local all_severities = {
+	vim.diagnostic.severity.ERROR,
+	vim.diagnostic.severity.WARN,
+	vim.diagnostic.severity.INFO,
+	vim.diagnostic.severity.HINT,
+}
+
 local function current_severity()
 	return severity_filter
 end
@@ -58,12 +65,15 @@ function M.open_float()
 end
 
 ---Toggle between showing all diagnostics and errors only.
+---The filter applies to the signs, virtual text and `]d` / `[d` jumps alike.
 function M.toggle_errors_only()
 	if severity_filter == vim.diagnostic.severity.ERROR then
 		severity_filter = nil
+		vim.diagnostic.config({ severity = all_severities })
 		vim.notify("Diagnostics: all severities", vim.log.levels.INFO, { title = "NazoVim LSP" })
 	else
 		severity_filter = vim.diagnostic.severity.ERROR
+		vim.diagnostic.config({ severity = { vim.diagnostic.severity.ERROR } })
 		vim.notify("Diagnostics: errors only", vim.log.levels.INFO, { title = "NazoVim LSP" })
 	end
 end

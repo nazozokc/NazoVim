@@ -71,7 +71,12 @@ vim.g.nazovim_disabled_features = { "todo", "ui.scrollbar", "terminal.commands" 
 | nvim-web-devicons | `ui/icons.lua` | 拡張子・ファイル名・filetype からアイコンとハイライトを返すdevicons互換API（`get_icon` / `get_icon_by_filetype` / `get_icons` / `set_icon`）。tabline とファイルブラウザーが使用 |
 | vim-fugitive | `git/init.lua` | `git` CLI を直接呼び、statusバッファ（`s` stage / `u` unstage / `d` diff / `R` refresh / `q` close）、`<leader>ga` / `<leader>gu` / `<leader>gl`、`:Git <args>`（`%` は現在ファイルに展開）、`:NazoGitBlame` を提供 |
 | lazydev.nvim | `lsp/init.lua` | lua_ls の `workspace.library` に `$VIMRUNTIME`（Neovim API の型）と nazoplug のランタイムディレクトリ（`NazoSpec` 注釈）を登録 |
-| mason.nvim / mason-lspconfig.nvim / nvim-lspconfig / zigtools-zls | `lsp/init.lua` | 言語サーバーを `vim.lsp.config` / `vim.lsp.enable` で直接設定し、PATH上に実行ファイルがあるものだけを起動（devShellが供給）。`K` / `<leader>ls` / `<leader>ld` / `<leader>gr` をバッファマップし、`:NazoLspInfo` で有効・不足サーバーを確認 |
+| mason.nvim / mason-lspconfig.nvim / nvim-lspconfig / zigtools-zls | `lsp/init.lua` | 言語サーバーを `vim.lsp.config` / `vim.lsp.enable` で直接設定し、PATH上に実行ファイルがあるものだけを起動（devShellが供給）。lua_ls / clangd / html / cssls / jsonls / emmet / nixd / taplo / yamlls / marksman / bashls / gopls / pyright / jdtls / rust_analyzer / ts_ls / solargraph / zls を定義し、`K` / `<leader>ls` / `<leader>ld` / `<leader>lf` をバッファマップする。hover と signature help は `vim.lsp.config("*")` で丸枠に統一。`:NazoLspInfo` で有効・接続中・不足サーバーを確認 |
+| （Neovim標準） | `lsp/symbols.lua` | `grw` でワークスペースシンボルをquickfixに一覧、`<leader>gr` でカーソル下の参照をquickfix化、`gD` で宣言へジャンプ、`<leader>lT` で型階層（supertypes / subtypes）を選択 |
+| （Neovim標準） | `lsp/calls.lua` | `<leader>lci` / `<leader>lco` でカーソル下シンボルの呼び出し階層を収集しquickfixにインデント付きで表示。深さ4・300ノードで打ち切る |
+| （Neovim標準） | `lsp/display.lua` | `<leader>li` inlay hints、`<leader>lS` semantic tokens、`<leader>lh` code lens をバッファ単位でトグル |
+| （Neovim標準） | `lsp/lifecycle.lua` | `<leader>lr` 再起動 / `<leader>lq` 停止 / `:NazoLspStart [name]` 起動。再起動は `Client:_restart()` を使い、利用できない場合は `vim.lsp.enable()` で再アタッチする |
+| （Neovim標準） | `health.lua` | `:checkhealth nazovim` でLSPの有効／不足、稼働中クライアント、Treesitterパーサーを確認 |
 | nvim-cmp / cmp-nvim-lsp / cmp-buffer / cmp-path / cmp-calc | `completion/init.lua` | Neovim標準の `vim.lsp.completion` を有効化（autotrigger + `completeopt=menu,menuone,noselect,popup`）。`<C-Space>` でLSP補完、LSPが無いバッファではsnippet・バッファ内単語・パスを独自候補として表示。`<CR>`確定、`<Tab>`/`<S-Tab>` で確定とsnippetプレースホルダ移動。ファイルパスは `/` を含む入力で補完 |
 | cmp-cmdline | `cmdline/completion.lua` | Neovim標準のwildmenuとpopupでExコマンド・パス・検索入力を補完 |
 | render-markdown.nvim | `markdown/render.lua` | Markdownバッファに見出し・コードブロック・箇条書き・checkbox・引用・表・リンクの装飾を追加。`<leader>um` / `:NazoMarkdownRenderToggle` で切替 |

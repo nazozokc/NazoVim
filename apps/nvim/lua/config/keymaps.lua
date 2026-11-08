@@ -2,9 +2,8 @@ local map = vim.keymap.set
 
 -- UI / Toggle
 map("n", "<leader>h", ":nohlsearch<CR>", { desc = "Clear search highlight" })
-map("n", "<leader>e", function()
-	require("nazovim.ui.lists").diagnostics()
-end, { desc = "Workspace diagnostics" })
+-- `<leader>e` shows the diagnostic float; `lsp/diagnostics.lua` owns it and
+-- `<leader>xx` lists every workspace diagnostic.
 
 -- NazoVim picker
 map("n", "<leader><leader>", function()
