@@ -340,6 +340,35 @@ local function source_action(only)
 	vim.lsp.buf.code_action({ context = { only = only, diagnostics = {} }, apply = true })
 end
 
+---Format the current buffer if format-on-save is enabled.
+local function format_on_save(args)
+	if vim.g.nazovim_format_on_save == false then
+		return
+	end
+	local clients = vim.lsp.get_clients({ bufnr = args.buf, method = "textDocument/formatting" })
+	if #clients == 0 then
+		return
+	end
+	vim.lsp.buf.format({ bufnr = args.buf, async = false, timeout_ms = 1000 })
+end
+
+---Restart language servers attached to the current buffer.
+function M.restart()
+	local buf = vim.api.nvim_get_current_buf()
+	local clients = vim.lsp.get_clients({ bufnr = buf })
+	if #clients == 0 then
+		vim.notify("No LSP clients attached", vim.log.levels.INFO, { title = title })
+		return
+	end
+	for _, client in ipairs(clients) do
+		vim.lsp.stop_client(client.id)
+	end
+	vim.defer_fn(function()
+		vim.cmd("edit")
+		vim.notify("Restarted " .. #clients .. " LSP client(s)", vim.log.levels.INFO, { title = title })
+	end, 100)
+end
+
 ---Map the shared LSP keymaps plus the server specific actions on a buffer.
 ---@param buffer integer
 ---@param client? { name: string }
@@ -395,22 +424,10 @@ function M.attach_keymaps(buffer, client)
 		vim.lsp.buf.format({ async = true })
 	end, vim.tbl_extend("force", opts, { desc = "Format range" }))
 
-	-- Display toggles and server lifecycle
-	vim.keymap.set(
-		"n",
-		"<leader>li",
-		display.toggle_inlay_hints,
-		vim.tbl_extend("force", opts, { desc = "Inlay hints" })
-	)
-	vim.keymap.set(
-		"n",
-		"<leader>lS",
-		display.toggle_semantic_tokens,
-		vim.tbl_extend("force", opts, { desc = "Semantic tokens" })
-	)
-	vim.keymap.set("n", "<leader>lh", display.toggle_codelens, vim.tbl_extend("force", opts, { desc = "Code lens" }))
-	vim.keymap.set("n", "<leader>lr", lifecycle.restart, vim.tbl_extend("force", opts, { desc = "Restart server" }))
-	vim.keymap.set("n", "<leader>lq", lifecycle.stop, vim.tbl_extend("force", opts, { desc = "Stop server" }))
+	-- General source actions
+	vim.keymap.set("n", "<leader>la", function()
+		source_action({ "source.organizeImports", "source.fixAll" })
+	end, vim.tbl_extend("force", opts, { desc = "Organize / fix all" }))
 
 	-- Server specific
 	if client and client.name == "rust_analyzer" then
@@ -428,7 +445,7 @@ function M.attach_keymaps(buffer, client)
 	end
 end
 
----Show which servers are enabled, attached and missing.
+---Show which servers are enabled, attached, and missing.
 function M.info()
 	local lines = { "enabled: " .. (#enabled > 0 and table.concat(enabled, ", ") or "none") }
 	local attached = {}
@@ -443,6 +460,19 @@ function M.info()
 	if #missing > 0 then
 		lines[#lines + 1] = "missing: " .. table.concat(missing, ", ")
 	end
+
+	local buf = vim.api.nvim_get_current_buf()
+	local attached = vim.lsp.get_clients({ bufnr = buf })
+	if #attached > 0 then
+		lines[#lines + 1] = "attached:"
+		for _, client in ipairs(attached) do
+			local root = client.config.root_dir or "?"
+			lines[#lines + 1] = string.format("  %s (root: %s)", client.name, root)
+		end
+	else
+		lines[#lines + 1] = "attached: none"
+	end
+
 	vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = title })
 end
 
@@ -475,23 +505,10 @@ function M.setup()
 	table.sort(start)
 	enabled = start
 
-	-- Shared float styling for every server; per-server settings stay below.
-	vim.lsp.config("*", {
-		handlers = {
-			["textDocument/hover"] = floating(vim.lsp.handlers.hover, {
-				border = "rounded",
-				max_width = 100,
-				silent = true,
-			}),
-			["textDocument/signatureHelp"] = floating(vim.lsp.handlers.signature_help, {
-				border = "rounded",
-				silent = true,
-			}),
-		},
-	})
+	local group = vim.api.nvim_create_augroup("NazoLsp", { clear = true })
 
 	vim.api.nvim_create_autocmd("LspAttach", {
-		group = vim.api.nvim_create_augroup("NazoLsp", { clear = true }),
+		group = group,
 		desc = "Apply the NazoVim LSP buffer keymaps",
 		callback = function(args)
 			local client_id = args.data and args.data.client_id
@@ -503,16 +520,29 @@ function M.setup()
 		end,
 	})
 
+	vim.api.nvim_create_autocmd("BufWritePre", {
+		group = group,
+		desc = "Format on save when enabled",
+		callback = format_on_save,
+	})
+
+	vim.api.nvim_create_autocmd("LspDetach", {
+		group = group,
+		desc = "Notify when an LSP client detaches",
+		callback = function(args)
+			local client = vim.lsp.get_client_by_id(args.data.client_id)
+			if client then
+				vim.notify(client.name .. " detached", vim.log.levels.INFO, { title = title })
+			end
+		end,
+	})
+
 	if #start > 0 then
 		vim.lsp.enable(start)
 	end
 
 	vim.api.nvim_create_user_command("NazoLspInfo", M.info, { desc = "Show the enabled language servers" })
-	vim.api.nvim_create_user_command(
-		"NazoLspRestart",
-		M.restart,
-		{ desc = "Restart LSP clients for the current buffer" }
-	)
+	vim.api.nvim_create_user_command("NazoLspRestart", M.restart, { desc = "Restart LSP clients for the current buffer" })
 end
 
 return M
