@@ -1,5 +1,7 @@
 local M = {}
 
+local guard = require("nazovim.ai.lib.guard")
+
 local title = "Claude Code"
 local state = { buf = nil, win = nil }
 
@@ -146,7 +148,11 @@ function M.mention(buf)
 		vim.notify("This buffer has no file to mention", vim.log.levels.WARN, { title = title })
 		return
 	end
-	local path = vim.fn.fnamemodify(name, ":.")
+	local path, reason = guard.input_path(vim.fn.fnamemodify(name, ":."))
+	if not path then
+		vim.notify("Cannot mention this file: " .. reason, vim.log.levels.WARN, { title = title })
+		return
+	end
 	M.send("@" .. path .. " ")
 end
 

@@ -1,7 +1,14 @@
 local M = {}
 
+local guard = require("nazovim.ai.lib.guard")
+
 local function notify(message, level)
 	vim.notify(message, level, { title = "NazoVim Translate" })
+end
+
+local function clean_message(text)
+	local redacted = guard.redact(text)
+	return (redacted:gsub("[%z\1-\31\127]", " "))
 end
 
 local function show_result(lines)
@@ -46,6 +53,10 @@ function M.translate(text, target)
 		notify("There is no text to translate", vim.log.levels.WARN)
 		return
 	end
+	if #text > 64 * 1024 then
+		notify("Text is too large to translate (64 KiB maximum)", vim.log.levels.WARN)
+		return
+	end
 	target = target or vim.g.nazovim_translate_target or "ja"
 	if type(target) ~= "string" or not target:match("^[%w_%-]+$") then
 		notify("Target language must be a language code", vim.log.levels.ERROR)
@@ -65,21 +76,42 @@ function M.translate(text, target)
 		return
 	end
 	local source = vim.g.nazovim_translate_source
+	if source ~= nil and source ~= "" then
+		if type(source) ~= "string" or not source:match("^[%w_%-]+$") then
+			notify("Source language must be a language code", vim.log.levels.ERROR)
+			return
+		end
+	end
 	local language_pair = (type(source) == "string" and source ~= "" and source or "") .. ":" .. target
+	local timeout = math.max(5, math.min(300, math.floor(tonumber(vim.g.nazovim_translate_timeout) or 60)))
 	vim.system({ executable, "--translators=" .. translator, "-brief", language_pair }, {
 		stdin = text,
 		text = true,
+		timeout = timeout * 1000,
 	}, function(result)
 		vim.schedule(function()
-			if result.code ~= 0 then
-				local detail = vim.trim(result.stderr or "")
-				notify(detail ~= "" and detail or "Translation command failed", vim.log.levels.ERROR)
+			if result.code == 124 then
+				notify("Translation timed out", vim.log.levels.ERROR)
 				return
 			end
-			local output = vim.split(vim.trim(result.stdout or ""), "\n", { plain = true })
+			if result.code ~= 0 then
+				local detail = vim.trim(result.stderr or "")
+				notify(detail ~= "" and clean_message(detail) or "Translation command failed", vim.log.levels.ERROR)
+				return
+			end
+			local stdout = result.stdout or ""
+			if #stdout > 256 * 1024 then
+				stdout = stdout:sub(1, 256 * 1024)
+				notify("Translation output was truncated", vim.log.levels.WARN)
+			end
+			local output = vim.split(vim.trim(stdout), "\n", { plain = true })
 			if #output == 0 or output[1] == "" then
 				notify("Translation returned no text", vim.log.levels.WARN)
 				return
+			end
+			if #output > 2000 then
+				output = vim.list_slice(output, 1, 2000)
+				output[#output + 1] = "[truncated by NazoVim]"
 			end
 			show_result(output)
 		end)

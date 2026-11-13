@@ -252,7 +252,7 @@ run `:NazoPlug migrate` to reuse its data directory.
 | NazoVim built-in | Codex CLI integration (`codex.lua`, `:Codex` / `:CodexToggle`, `<C-q>` to close) |
 | NazoVim built-in | Claude Code CLI integration (`claudecode.lua`, `:ClaudeCode` / `:ClaudeCodeToggle` / `:ClaudeCodeFocus`, `<C-q>` to close) |
 | NazoVim built-in | opencode CLI integration (`opencode.lua`, `:OpenCode` / `:OC`, `<C-.>` to toggle) |
-| NazoVim built-in | Non-interactive AI client (`ai_ask.lua`, streams `claude -p` / `codex exec` / `opencode run` into a right split; `:NazoAI` / `<leader>aa` / `<leader>ae` / `<leader>at` / `<leader>a?`) |
+| NazoVim built-in | Non-interactive AI client (`ai_ask.lua`, streams `claude -p --tools "" --restricted --strict-mcp-config --safe-mode` / `codex exec --sandbox read-only --ephemeral --ignore-rules --ignore-user-config` / `opencode run --pure` into a right split. Refuses `.env`, private keys and credentials, redacts tokens and passwords, and caps context, prompt, output and time; `:NazoAI` / `<leader>aa` / `<leader>ae` / `<leader>at` / `<leader>a?` / `:NazoAIDiff` / `:NazoAIQuickfix` / `:NazoAIExplain` / `:NazoAIFix` / `:NazoAIReview` / `:NazoAITest` / `:NazoAIDocs`) |
 
 ### Debug / Test
 
@@ -359,14 +359,23 @@ run `:NazoPlug migrate` to reuse its data directory.
 | Key | Action |
 | ---- | ----- |
 | `<Leader>aa` | Ask NazoAI (claude / codex / opencode CLI) |
-| `<Leader>ae` | Apply the answer's code block to the buffer |
+| `<Leader>ae` | Apply the answer's code block to the buffer (asks first) |
 | `<Leader>at` | Toggle the NazoAI panel |
 | `<Leader>a?` | Select the NazoAI provider |
+| `<Leader>ad` | Attach the git diff |
+| `<Leader>aq` | Attach the quickfix list |
+| `<Leader>aE` | Explain the buffer or range |
+| `<Leader>aF` | Ask for a corrected version |
+| `<Leader>aR` | Review for correctness and security |
+| `<Leader>aT` | Ask for tests |
+| `<Leader>aD` | Ask for documentation |
 | `<Leader>Cc` | Claude Code toggle |
 | `<Leader>Cf` | Claude Code focus |
 | `<Leader>oa` | opencode ask (mentions the current buffer as `@path`) |
 | `<Leader>ox` | opencode command palette |
 | `<C-.>` | opencode toggle |
+
+NazoAI refuses `.env`, private keys and credential files, replaces tokens and passwords with `[REDACTED]`, disables Claude tools with `--restricted --strict-mcp-config --safe-mode` and sends its prompt over stdin, runs Codex with `--sandbox read-only` plus shell tools disabled and sends its prompt over stdin, runs opencode with `--pure` and an `OPENCODE_PERMISSION` that denies its built-in tools, rejects symlinks and control characters in paths, and prevents code-fence breakout. It asks before applying code (`g:nazovim_ai_apply_confirm = false` skips the prompt). Tune the limits with `g:nazovim_ai_max_context_bytes`, `g:nazovim_ai_max_prompt_bytes`, `g:nazovim_ai_max_apply_bytes`, `g:nazovim_ai_max_output_bytes`, `g:nazovim_ai_timeout` (seconds) and `g:nazovim_ai_quickfix_items`.
 
 ### DAP
 

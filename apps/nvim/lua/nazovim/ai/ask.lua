@@ -1,5 +1,7 @@
 local M = {}
 
+local guard = require("nazovim.ai.lib.guard")
+
 local title = "NazoAI"
 
 ---Providers understood by the built-in client, with their non-interactive form.
@@ -7,21 +9,53 @@ local title = "NazoAI"
 local providers = {
 	claude = {
 		binary = "claude",
-		args = function(prompt)
-			return { "-p", prompt }
+		-- Feed the prompt through stdin so it never shows up in the process
+		-- list. `--safe-mode` and `--restricted` keep project hooks, settings,
+		-- CLAUDE.md, skills and MCP servers out of a one-shot answer.
+		stdin = true,
+		args = function()
+			return { "-p", "--tools", "", "--restricted", "--strict-mcp-config", "--safe-mode" }
 		end,
 	},
 	codex = {
 		binary = "codex",
-		args = function(prompt)
-			return { "exec", "--skip-git-repo-check", "--color", "never", prompt }
+		stdin = true,
+		args = function()
+			-- `exec` is non-interactive. Read-only blocks writes and network;
+			-- disabling the shell tools keeps the model from reading local
+			-- files (or secrets) that were not attached to the prompt.
+			return {
+				"exec",
+				"--skip-git-repo-check",
+				"--sandbox",
+				"read-only",
+				"--color",
+				"never",
+				"--ephemeral",
+				"--ignore-rules",
+				"--ignore-user-config",
+				"-c",
+				"features.shell_tool=false",
+				"-c",
+				"features.unified_exec=false",
+				"-",
+			}
 		end,
 	},
 	opencode = {
 		binary = "opencode",
 		args = function(prompt)
-			return { "run", prompt }
+			-- `--pure` skips external plugins. The permission override in
+			-- `env` denies every built-in tool that could read, write,
+			-- execute or fetch, so this stays a question-answer call.
+			return { "run", "--pure", prompt }
 		end,
+		env = {
+			OPENCODE_PERMISSION = '{"bash":"deny","edit":"deny","glob":"deny","grep":"deny","list":"deny","lsp":"deny","question":"deny","read":"deny","skill":"deny","task":"deny","todowrite":"deny","webfetch":"deny","websearch":"deny","external_directory":"deny","doom_loop":"deny"}',
+			OPENCODE_DISABLE_AUTOUPDATE = "1",
+			OPENCODE_DISABLE_CLAUDE_CODE = "1",
+			OPENCODE_DISABLE_PROJECT_CONFIG = "1",
+		},
 	},
 }
 
@@ -39,6 +73,10 @@ local state = {
 	tail = nil,
 	answer = "",
 	errors = "",
+	size = 0,
+	stop_requested = false,
+	output_truncated = false,
+	request = 0,
 }
 
 local function notify_error(message)
@@ -130,16 +168,8 @@ end
 ---@param contexts? { path: string, filetype: string, body: string }[]
 ---@return string
 function M.build_prompt(question, contexts)
-	local parts = { question }
-	for _, context in ipairs(contexts or {}) do
-		parts[#parts + 1] = table.concat({
-			"### " .. context.path,
-			"```" .. (context.filetype or ""),
-			context.body,
-			"```",
-		}, "\n")
-	end
-	return table.concat(parts, "\n\n")
+	local prompt = guard.prompt(question, contexts)
+	return prompt
 end
 
 ---Return the fenced code blocks of an answer, in order.
@@ -164,6 +194,10 @@ function M.files()
 end
 
 local function attach(context)
+	local reason = guard.sensitive_path(context.path)
+	if reason then
+		return false, reason
+	end
 	for _, existing in ipairs(state.files) do
 		if existing.path == context.path then
 			existing.body = context.body
@@ -178,24 +212,92 @@ end
 ---Attach the current buffer to the next prompt.
 function M.add_current()
 	local context = M.context()
-	attach(context)
-	vim.notify("NazoAI added " .. context.path, vim.log.levels.INFO, { title = title })
+	local display = guard.display_path(context.path)
+	local _, reason = attach(context)
+	if reason then
+		vim.notify("NazoAI skipped " .. display .. " (" .. reason .. ")", vim.log.levels.WARN, { title = title })
+	else
+		vim.notify("NazoAI added " .. display, vim.log.levels.INFO, { title = title })
+	end
 	return context
 end
 
 ---Attach every loaded normal buffer to the next prompt.
 ---@return integer added
 function M.add_buffers()
-	local added = 0
+	local added, skipped = 0, 0
 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
 		if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buftype == "" then
-			if attach(M.context(buf)) then
+			local context = M.context(buf)
+			local result, reason = attach(context)
+			if reason then
+				skipped = skipped + 1
+			elseif result then
 				added = added + 1
 			end
 		end
 	end
-	vim.notify("NazoAI attached " .. added .. " buffers", vim.log.levels.INFO, { title = title })
+	vim.notify(
+		"NazoAI attached " .. added .. " buffers" .. (skipped > 0 and (" (skipped " .. skipped .. " sensitive)") or ""),
+		vim.log.levels.INFO,
+		{ title = title }
+	)
 	return added
+end
+
+---Attach the working tree diff (staged and unstaged) to the next prompt.
+function M.add_diff()
+	local ok, result = pcall(function()
+		return vim.system(
+			{ "git", "-C", vim.fn.getcwd(), "diff", "HEAD", "--no-color", "--no-ext-diff", "--no-textconv" },
+			{ text = true }
+		):wait(5000)
+	end)
+	if not ok or not result or result.code ~= 0 then
+		local detail = ok and result and vim.trim(result.stderr or "") or "git is unavailable"
+		notify_error(detail ~= "" and detail or "git diff failed")
+		return
+	end
+	local body = vim.trim(result.stdout or "")
+	if body == "" then
+		vim.notify("NazoAI found no diff to attach", vim.log.levels.INFO, { title = title })
+		return
+	end
+	attach({ path = "[git diff]", filetype = "diff", body = body })
+	vim.notify("NazoAI attached the git diff", vim.log.levels.INFO, { title = title })
+end
+
+---Attach the current quickfix list to the next prompt.
+function M.add_quickfix()
+	local items = vim.fn.getqflist()
+	if #items == 0 then
+		vim.notify("NazoAI found an empty quickfix list", vim.log.levels.WARN, { title = title })
+		return
+	end
+	local maximum = math.max(1, math.min(1000, tonumber(vim.g.nazovim_ai_quickfix_items) or 200))
+	local lines = {}
+	for index = 1, math.min(#items, maximum) do
+		local item = items[index]
+		local name = item.bufnr and item.bufnr > 0 and vim.fn.bufname(item.bufnr) or ""
+		name = name ~= "" and vim.fn.fnamemodify(name, ":~:.") or "[No Name]"
+		lines[#lines + 1] = string.format(
+			"%s%s:%d:%d: %s",
+			item.type and item.type ~= "" and ("[" .. item.type .. "] ") or "",
+			name,
+			item.lnum or 0,
+			item.col or 0,
+			item.text or ""
+		)
+	end
+	if #items > maximum then
+		lines[#lines + 1] = string.format("... %d more entries", #items - maximum)
+	end
+	attach({ path = "[quickfix]", filetype = "text", body = table.concat(lines, "\n") })
+	vim.notify(
+		"NazoAI attached " .. math.min(#items, maximum) .. " quickfix entries",
+		vim.log.levels.INFO,
+		{ title = title }
+	)
 end
 
 ---Drop every attached file.
@@ -254,10 +356,12 @@ local function start_block(header)
 	end
 	lines[#lines + 1] = ""
 	vim.api.nvim_buf_set_lines(buf, count, count, false, lines)
-	state.tail = count + #lines - 1
+	state.tail = vim.api.nvim_buf_line_count(buf)
 	state.partial = ""
 	state.answer = ""
 	state.errors = ""
+	state.size = 0
+	state.output_truncated = false
 	return buf
 end
 
@@ -271,12 +375,16 @@ local function stream(text)
 	local combined = state.partial .. text
 	local lines = vim.split(combined, "\n", { plain = true })
 	state.partial = table.remove(lines) or ""
-	local row = state.tail or (vim.api.nvim_buf_line_count(buf) - 1)
-	vim.api.nvim_buf_set_lines(buf, row, row + 1, false, lines)
-	state.tail = row + #lines - 1
+	if #lines == 0 then
+		return
+	end
+	local row = math.min(state.tail or vim.api.nvim_buf_line_count(buf), vim.api.nvim_buf_line_count(buf))
+	vim.api.nvim_buf_set_lines(buf, row, row, false, lines)
+	state.tail = row + #lines
 	-- The panel window may be showing another buffer after `:enew`.
 	if M.is_open() and vim.api.nvim_win_get_buf(state.win) == buf then
-		vim.api.nvim_win_set_cursor(state.win, { state.tail + 1, 0 })
+		local line = math.max(1, math.min(state.tail, vim.api.nvim_buf_line_count(buf)))
+		vim.api.nvim_win_set_cursor(state.win, { line, 0 })
 	end
 end
 
@@ -299,12 +407,21 @@ end
 ---Stop the running request.
 ---@return boolean stopped
 function M.stop()
+	state.stop_requested = true
 	if not state.job then
 		return false
 	end
 	pcall(state.job.kill, state.job, "sigterm")
 	state.job = nil
 	return true
+end
+
+---Stop a request that grew past the output budget.
+local function stop_for_size()
+	if not state.job then
+		return
+	end
+	pcall(state.job.kill, state.job, "sigterm")
 end
 
 ---Ask the configured CLI and stream the answer into the panel.
@@ -328,18 +445,54 @@ function M.ask(question, opts)
 		return nil
 	end
 	M.stop()
+	state.stop_requested = false
+	state.request = state.request + 1
+	local request = state.request
 
 	local contexts = {}
 	vim.list_extend(contexts, state.files)
 	if opts.context then
 		contexts[#contexts + 1] = opts.context
 	end
-	local command = M.command(provider, M.build_prompt(question, contexts))
-	start_block({ "## " .. question, "", "> " .. provider, "" })
+	local prompt, report = guard.prompt(question, contexts)
+	if report.redactions > 0 then
+		vim.notify(
+			"NazoAI redacted " .. report.redactions .. " secret(s) before sending",
+			vim.log.levels.WARN,
+			{ title = title }
+		)
+	end
+	if #report.skipped > 0 then
+		local names = {}
+		for _, skipped in ipairs(report.skipped) do
+			names[#names + 1] = skipped.path .. " (" .. skipped.reason .. ")"
+		end
+		vim.notify("NazoAI skipped: " .. table.concat(names, ", "), vim.log.levels.WARN, { title = title })
+	end
+	if report.truncated then
+		vim.notify("NazoAI truncated a large context", vim.log.levels.WARN, { title = title })
+	end
+	local command = M.command(provider, prompt)
+	local shown = guard.redact(question)
+	local output_limit = guard.limits().output
+	start_block({ "## " .. shown, "", "> " .. provider, "" })
 
 	-- Accumulate in the fast context so the exit handler sees the whole answer;
 	-- only the buffer update has to be scheduled.
 	local function collect(chunk, is_error)
+		if state.request ~= request then
+			return
+		end
+		if state.size >= output_limit then
+			state.output_truncated = true
+			stop_for_size()
+			return
+		end
+		if state.size + #chunk > output_limit then
+			chunk = chunk:sub(1, output_limit - state.size)
+			state.output_truncated = true
+		end
+		state.size = state.size + #chunk
 		if is_error then
 			state.errors = state.errors .. chunk
 		else
@@ -348,11 +501,17 @@ function M.ask(question, opts)
 		vim.schedule(function()
 			stream(chunk)
 		end)
+		if state.output_truncated then
+			stop_for_size()
+		end
 	end
 
 	state.job = vim.system(command, {
 		cwd = opts.cwd or vim.fn.getcwd(),
 		text = true,
+		env = providers[provider].env,
+		stdin = providers[provider].stdin and prompt or nil,
+		timeout = guard.timeout(),
 		stdout = function(_, data)
 			if data and data ~= "" then
 				collect(data, false)
@@ -365,14 +524,23 @@ function M.ask(question, opts)
 		end,
 	}, function(result)
 		vim.schedule(function()
+			if state.request ~= request then
+				return
+			end
 			state.job = nil
-			if result.code ~= 0 then
+			if state.output_truncated then
+				stream("\n\n_(output truncated by NazoAI)_")
+			elseif state.stop_requested then
+				stream("\n\n_(stopped)_")
+			elseif result.code == 124 then
+				stream("\n\n_(" .. provider .. " timed out)_")
+			elseif result.code ~= 0 then
 				stream("\n\n_(" .. provider .. " exited with " .. tostring(result.code) .. ")_")
 			end
 			stream("\n")
 			local answer = state.answer
-			state.history[#state.history + 1] = { question = question, answer = answer, provider = provider }
-			if opts.on_done then
+			state.history[#state.history + 1] = { question = shown, answer = answer, provider = provider }
+			if opts.on_done and not state.stop_requested and not state.output_truncated then
 				opts.on_done(answer)
 			end
 		end)
@@ -396,6 +564,15 @@ function M.apply_code(buf, first, last, code)
 	return true
 end
 
+---Ask before changing a buffer with model output.
+---@return boolean
+local function confirm_apply()
+	if vim.g.nazovim_ai_apply_confirm == false then
+		return true
+	end
+	return vim.fn.confirm("NazoAI: apply this code to the buffer?", "&Apply\n&Cancel", 2, "Question") == 1
+end
+
 ---Ask the CLI to rewrite the buffer (or the last visual range) and apply the
 ---first fenced block of the answer.
 ---@param opts? { range?: boolean }
@@ -416,13 +593,30 @@ function M.edit(opts)
 	end
 	local context = M.context(buf, first, last)
 	context.path = context.path .. " (target)"
+	local tick = vim.api.nvim_buf_get_changedtick(buf)
 	M.ask(question .. "\n\nReply with one fenced code block that replaces the target code. No prose.", {
 		context = context,
 		on_done = function(answer)
+			if not vim.api.nvim_buf_is_valid(buf) then
+				notify_error("The target buffer no longer exists")
+				return
+			end
+			if vim.api.nvim_buf_get_changedtick(buf) ~= tick then
+				notify_error("The target buffer changed while NazoAI was answering; nothing was applied")
+				return
+			end
 			local blocks = M.code_blocks(answer)
-			local code = blocks[1]
+			local code, reason = guard.code(blocks[1])
 			if not code then
-				notify_error("The answer had no fenced code block")
+				if reason == "empty answer" then
+					notify_error("The answer had no fenced code block")
+				else
+					notify_error("NazoAI will not apply the answer: " .. reason)
+				end
+				return
+			end
+			if not confirm_apply() then
+				vim.notify("NazoAI kept the buffer unchanged", vim.log.levels.INFO, { title = title })
 				return
 			end
 			if M.apply_code(buf, first, last, code) then
@@ -430,6 +624,43 @@ function M.edit(opts)
 			end
 		end,
 	})
+end
+
+---Prompt templates for the current buffer or a visual range.
+local templates = {
+	explain = "Explain this code. Cover its purpose, control flow, inputs and outputs, and any surprising assumptions. Be concise.",
+	fix = "Find bugs in this code and return only one fenced code block with the corrected version. No prose.",
+	review = "Review this code for correctness, security and maintainability. List concrete issues with line references (injection, secret handling, error handling, unsafe I/O). Do not rewrite the whole file.",
+	test = "Write focused tests for this code. Return one fenced code block with the tests and cover edge cases.",
+	docs = "Write concise documentation comments for this code. Return one fenced code block with the documented version.",
+}
+
+---Ask a built-in template about the current buffer or a visual range.
+---@param kind "explain"|"fix"|"review"|"test"|"docs"
+---@param opts? { range?: boolean, first?: integer, last?: integer }
+function M.template(kind, opts)
+	opts = opts or {}
+	local prompt = templates[kind]
+	if not prompt then
+		notify_error("Unknown NazoAI template: " .. tostring(kind))
+		return
+	end
+	local buf = vim.api.nvim_get_current_buf()
+	local first, last = 0, -1
+	if opts.range then
+		if opts.first then
+			first, last = opts.first, opts.last or -1
+		else
+			first = vim.fn.line("'<") - 1
+			last = vim.fn.line("'>")
+		end
+		if last <= first then
+			first, last = 0, -1
+		end
+	end
+	local context = M.context(buf, first, last)
+	context.path = context.path .. " (target)"
+	M.ask(prompt, { context = context })
 end
 
 ---Replay a previous exchange in the panel.
@@ -458,6 +689,16 @@ function M.history()
 end
 
 function M.setup()
+	local function template_command(kind)
+		return function(command)
+			if command.range > 0 then
+				M.template(kind, { range = true, first = command.line1 - 1, last = command.line2 })
+			else
+				M.template(kind)
+			end
+		end
+	end
+
 	vim.api.nvim_create_user_command("NazoAI", function(command)
 		M.ask(command.args ~= "" and command.args or nil)
 	end, { nargs = "*", desc = "Ask an AI CLI about the current context" })
@@ -466,6 +707,21 @@ function M.setup()
 	end, { desc = "Ask an AI CLI and apply the returned code" })
 	vim.api.nvim_create_user_command("NazoAIStop", M.stop, { desc = "Stop the running NazoAI request" })
 	vim.api.nvim_create_user_command("NazoAIToggle", M.toggle, { desc = "Toggle the NazoAI panel" })
+	vim.api.nvim_create_user_command("NazoAIDiff", M.add_diff, { desc = "Attach the git diff to NazoAI" })
+	vim.api.nvim_create_user_command("NazoAIQuickfix", M.add_quickfix, { desc = "Attach the quickfix list to NazoAI" })
+	for kind, description in pairs({
+		explain = "Explain the current buffer or range",
+		fix = "Ask for a corrected version of the buffer or range",
+		review = "Review the buffer or range for correctness and security",
+		test = "Ask for tests for the buffer or range",
+		docs = "Ask for documentation for the buffer or range",
+	}) do
+		vim.api.nvim_create_user_command(
+			"NazoAI" .. kind:sub(1, 1):upper() .. kind:sub(2),
+			template_command(kind),
+			{ range = true, desc = "NazoAI: " .. description }
+		)
+	end
 	vim.api.nvim_create_user_command("NazoAIFiles", function()
 		local files = M.files()
 		vim.notify(
@@ -493,6 +749,13 @@ function M.setup()
 	vim.keymap.set("n", "<leader>aC", M.clear_files, { desc = "AI clear files" })
 	vim.keymap.set("n", "<leader>a?", M.select_provider, { desc = "AI select provider" })
 	vim.keymap.set("n", "<leader>ah", M.history, { desc = "AI history" })
+	vim.keymap.set("n", "<leader>ad", M.add_diff, { desc = "AI attach git diff" })
+	vim.keymap.set("n", "<leader>aq", M.add_quickfix, { desc = "AI attach quickfix" })
+	for kind, key in pairs({ explain = "E", fix = "F", review = "R", test = "T", docs = "D" }) do
+		vim.keymap.set({ "n", "x" }, "<leader>a" .. key, function()
+			M.template(kind, { range = vim.fn.mode() ~= "n" })
+		end, { desc = "AI " .. kind })
+	end
 end
 
 return M

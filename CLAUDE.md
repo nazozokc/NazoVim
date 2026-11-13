@@ -194,7 +194,7 @@ done
 | プラグイン | 用途 |
 | ---------- | ---- |
 | NazoVim 内蔵 | Codex CLI統合（`codex.lua`、`:Codex` / `:CodexToggle`、`<C-q>`で閉じる） |
-| NazoVim 内蔵 | 非対話AIクライアント（`ai_ask.lua`、`claude -p` / `codex exec` / `opencode run` を右分割パネルへストリーミング。`:NazoAI` / `<leader>aa` / `<leader>ae` / `<leader>at` / `<leader>a?`） |
+| NazoVim 内蔵 | 非対話AIクライアント（`ai_ask.lua`、`claude -p --tools "" --restricted --strict-mcp-config --safe-mode` / `codex exec --sandbox read-only --ephemeral --ignore-rules --ignore-user-config` / `opencode run --pure` を右分割パネルへストリーミング。`.env`・秘密鍵・認証情報を文脈から除外し、プロンプト内のトークン/パスワードを伏字化、文脈・プロンプト・出力・時間に上限。`:NazoAI` / `<leader>aa` / `<leader>ae` / `<leader>at` / `<leader>a?` / `:NazoAIDiff` / `:NazoAIQuickfix` / `:NazoAIExplain` / `:NazoAIFix` / `:NazoAIReview` / `:NazoAITest` / `:NazoAIDocs`） |
 | NazoVim 内蔵 | Claude Code CLI統合（`claudecode.lua`、`:ClaudeCode` / `:ClaudeCodeToggle` / `:ClaudeCodeFocus`、`<C-q>`で閉じる） |
 | NazoVim 内蔵 | opencode CLI統合（`opencode.lua`、`:OpenCode` / `:OC`、`<C-.>`で開閉） |
 
@@ -314,6 +314,13 @@ done
 | `<Leader>aC` | 文脈ファイルをクリア |
 | `<Leader>a?` | プロバイダ選択（claude / codex / opencode） |
 | `<Leader>ah` | 履歴から選んで再表示 |
+| `<Leader>ad` | git diff を文脈に追加 |
+| `<Leader>aq` | quickfix を文脈に追加 |
+| `<Leader>aE` | 現在のバッファ/選択範囲を説明 |
+| `<Leader>aF` | 修正版を要求 |
+| `<Leader>aR` | セキュリティを含めてレビュー |
+| `<Leader>aT` | テストを要求 |
+| `<Leader>aD` | ドキュメントを要求 |
 
 ### AI (Claude Code)
 

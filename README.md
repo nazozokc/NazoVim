@@ -299,7 +299,7 @@ Snippetは `snippets/<filetype>.json` に追加できます。
 | NazoVim 内蔵 | Codex CLI統合（`codex.lua`、`:Codex` / `:CodexToggle`、`<C-q>`で閉じる） |
 | NazoVim 内蔵 | Claude Code CLI統合（`claudecode.lua`、`:ClaudeCode` / `:ClaudeCodeToggle` / `:ClaudeCodeFocus`、`<C-q>`で閉じる） |
 | NazoVim 内蔵 | opencode CLI統合（`opencode.lua`、`:OpenCode` / `:OC`、`<C-.>`で開閉） |
-| NazoVim 内蔵 | 非対話AIクライアント（`ai_ask.lua`、`claude -p` / `codex exec` / `opencode run` を右分割パネルへストリーミング。`:NazoAI` / `<leader>aa` / `<leader>ae` / `<leader>at` / `<leader>a?`） |
+| NazoVim 内蔵 | 非対話AIクライアント（`ai_ask.lua`、`claude -p --tools "" --restricted --strict-mcp-config --safe-mode` / `codex exec --sandbox read-only --ephemeral --ignore-rules --ignore-user-config` / `opencode run --pure` を右分割パネルへストリーミング。`.env`・秘密鍵・認証情報を文脈から除外し、プロンプト内のトークン/パスワードを伏字化、文脈・プロンプト・出力・時間に上限。`:NazoAI` / `<leader>aa` / `<leader>ae` / `<leader>at` / `<leader>a?` / `:NazoAIDiff` / `:NazoAIQuickfix` / `:NazoAIExplain` / `:NazoAIFix` / `:NazoAIReview` / `:NazoAITest` / `:NazoAIDocs`） |
 
 ### デバッグ / テスト
 
@@ -406,12 +406,21 @@ Snippetは `snippets/<filetype>.json` に追加できます。
 | `<Leader>Cc` | Claude Code toggle |
 | `<Leader>Cf` | Claude Code focus |
 | `<Leader>aa` | NazoAI に質問（claude / codex / opencode CLI） |
-| `<Leader>ae` | 回答のコードブロックをバッファへ適用 |
+| `<Leader>ae` | 回答のコードブロックをバッファへ適用（適用前に確認） |
 | `<Leader>at` | NazoAI パネル開閉 |
 | `<Leader>a?` | NazoAI プロバイダ選択 |
+| `<Leader>ad` | git diff を文脈に追加 |
+| `<Leader>aq` | quickfix を文脈に追加 |
+| `<Leader>aE` | 現在のバッファ/選択範囲を説明 |
+| `<Leader>aF` | 修正版を要求 |
+| `<Leader>aR` | セキュリティを含めてレビュー |
+| `<Leader>aT` | テストを要求 |
+| `<Leader>aD` | ドキュメントを要求 |
 | `<Leader>oa` | opencode ask（現在バッファを `@path` でメンション） |
 | `<Leader>ox` | opencode command palette |
 | `<C-.>` | opencode toggle |
+
+NazoAI は文脈を送る前に `.env`・秘密鍵・認証情報を拒否し、トークン・パスワード・URL 埋め込み資格情報を `[REDACTED]` に置換します。Claude はツールを無効化し `--restricted --strict-mcp-config --safe-mode` で settings/hooks/CLAUDE.md を遮断してプロンプトを stdin で渡し、Codex は `--sandbox read-only` に加えて shell tool を無効化して stdin で渡し、opencode は `--pure` と `OPENCODE_PERMISSION` の組み込みツール deny で実行します。シンボリックリンク・制御文字を含むパス・コードフェンス脱出も拒否または無害化します。回答の適用前には確認を挟みます（`g:nazovim_ai_apply_confirm = false` で無効化）。上限は `g:nazovim_ai_max_context_bytes` / `g:nazovim_ai_max_prompt_bytes` / `g:nazovim_ai_max_apply_bytes` / `g:nazovim_ai_max_output_bytes` / `g:nazovim_ai_timeout`（秒）/ `g:nazovim_ai_quickfix_items` で調整できます。
 
 ### DAP
 
