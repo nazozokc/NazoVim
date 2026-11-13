@@ -429,6 +429,23 @@ function M.attach_keymaps(buffer, client)
 		source_action({ "source.organizeImports", "source.fixAll" })
 	end, vim.tbl_extend("force", opts, { desc = "Organize / fix all" }))
 
+	-- Display / lifecycle toggles
+	vim.keymap.set(
+		"n",
+		"<leader>li",
+		display.toggle_inlay_hints,
+		vim.tbl_extend("force", opts, { desc = "Inlay hints" })
+	)
+	vim.keymap.set(
+		"n",
+		"<leader>lS",
+		display.toggle_semantic_tokens,
+		vim.tbl_extend("force", opts, { desc = "Semantic tokens" })
+	)
+	vim.keymap.set("n", "<leader>lh", display.toggle_codelens, vim.tbl_extend("force", opts, { desc = "Code lens" }))
+	vim.keymap.set("n", "<leader>lr", lifecycle.restart, vim.tbl_extend("force", opts, { desc = "Restart server" }))
+	vim.keymap.set("n", "<leader>lq", lifecycle.stop, vim.tbl_extend("force", opts, { desc = "Stop server" }))
+
 	-- Server specific
 	if client and client.name == "rust_analyzer" then
 		vim.keymap.set("n", "<leader>rr", function()
@@ -448,14 +465,6 @@ end
 ---Show which servers are enabled, attached, and missing.
 function M.info()
 	local lines = { "enabled: " .. (#enabled > 0 and table.concat(enabled, ", ") or "none") }
-	local attached = {}
-	for _, client in ipairs(vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() })) do
-		local root = client.config.root_dir and vim.fs.basename(client.config.root_dir) or "no root"
-		attached[#attached + 1] = string.format("%s (%s)", client.name, root)
-	end
-	if #attached > 0 then
-		lines[#lines + 1] = "attached: " .. table.concat(attached, ", ")
-	end
 	local missing = M.missing()
 	if #missing > 0 then
 		lines[#lines + 1] = "missing: " .. table.concat(missing, ", ")
@@ -492,6 +501,20 @@ end
 ---shared LSP buffer keymaps.
 function M.setup()
 	local caps = capabilities()
+	-- Shared float styling for every server; per-server settings stay below.
+	vim.lsp.config("*", {
+		handlers = {
+			["textDocument/hover"] = floating(vim.lsp.handlers.hover, {
+				border = "rounded",
+				max_width = 100,
+				silent = true,
+			}),
+			["textDocument/signatureHelp"] = floating(vim.lsp.handlers.signature_help, {
+				border = "rounded",
+				silent = true,
+			}),
+		},
+	})
 	local start = {}
 	for name, server in pairs(servers) do
 		local definition = vim.deepcopy(server)
@@ -542,7 +565,11 @@ function M.setup()
 	end
 
 	vim.api.nvim_create_user_command("NazoLspInfo", M.info, { desc = "Show the enabled language servers" })
-	vim.api.nvim_create_user_command("NazoLspRestart", M.restart, { desc = "Restart LSP clients for the current buffer" })
+	vim.api.nvim_create_user_command(
+		"NazoLspRestart",
+		M.restart,
+		{ desc = "Restart LSP clients for the current buffer" }
+	)
 end
 
 return M

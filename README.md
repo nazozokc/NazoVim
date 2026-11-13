@@ -420,7 +420,9 @@ Snippetは `snippets/<filetype>.json` に追加できます。
 | `<Leader>ox` | opencode command palette |
 | `<C-.>` | opencode toggle |
 
+<!-- markdownlint-disable MD013 -->
 NazoAI は文脈を送る前に `.env`・秘密鍵・認証情報を拒否し、トークン・パスワード・URL 埋め込み資格情報を `[REDACTED]` に置換します。Claude はツールを無効化し `--restricted --strict-mcp-config --safe-mode` で settings/hooks/CLAUDE.md を遮断してプロンプトを stdin で渡し、Codex は `--sandbox read-only` に加えて shell tool を無効化して stdin で渡し、opencode は `--pure` と `OPENCODE_PERMISSION` の組み込みツール deny で実行します。シンボリックリンク・制御文字を含むパス・コードフェンス脱出も拒否または無害化します。回答の適用前には確認を挟みます（`g:nazovim_ai_apply_confirm = false` で無効化）。上限は `g:nazovim_ai_max_context_bytes` / `g:nazovim_ai_max_prompt_bytes` / `g:nazovim_ai_max_apply_bytes` / `g:nazovim_ai_max_output_bytes` / `g:nazovim_ai_timeout`（秒）/ `g:nazovim_ai_quickfix_items` で調整できます。
+<!-- markdownlint-enable MD013 -->
 
 ### DAP
 

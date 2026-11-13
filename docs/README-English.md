@@ -375,7 +375,9 @@ run `:NazoPlug migrate` to reuse its data directory.
 | `<Leader>ox` | opencode command palette |
 | `<C-.>` | opencode toggle |
 
+<!-- markdownlint-disable MD013 -->
 NazoAI refuses `.env`, private keys and credential files, replaces tokens and passwords with `[REDACTED]`, disables Claude tools with `--restricted --strict-mcp-config --safe-mode` and sends its prompt over stdin, runs Codex with `--sandbox read-only` plus shell tools disabled and sends its prompt over stdin, runs opencode with `--pure` and an `OPENCODE_PERMISSION` that denies its built-in tools, rejects symlinks and control characters in paths, and prevents code-fence breakout. It asks before applying code (`g:nazovim_ai_apply_confirm = false` skips the prompt). Tune the limits with `g:nazovim_ai_max_context_bytes`, `g:nazovim_ai_max_prompt_bytes`, `g:nazovim_ai_max_apply_bytes`, `g:nazovim_ai_max_output_bytes`, `g:nazovim_ai_timeout` (seconds) and `g:nazovim_ai_quickfix_items`.
+<!-- markdownlint-enable MD013 -->
 
 ### DAP
 

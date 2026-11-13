@@ -160,7 +160,8 @@ function M.setup()
 		group = group,
 		desc = "Enable the built-in LSP completion for attached clients",
 		callback = function(args)
-			local client = vim.lsp.get_client_by_id(args.data.client_id)
+			local client_id = args.data and args.data.client_id
+			local client = client_id and vim.lsp.get_client_by_id(client_id) or nil
 			if not client or not client:supports_method("textDocument/completion", args.buf) then
 				return
 			end

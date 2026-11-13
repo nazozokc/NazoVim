@@ -66,10 +66,10 @@ local function has_control(text)
 end
 
 ---Return a case-insensitive Lua pattern for a single ASCII word.
----@param word string
+---@param text string
 ---@return string
-local function word(word)
-	return (word:gsub("%a", function(char)
+local function word(text)
+	return (text:gsub("%a", function(char)
 		return "[" .. char:upper() .. char:lower() .. "]"
 	end))
 end
