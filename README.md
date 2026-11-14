@@ -28,6 +28,7 @@
 **nazovim** は、CLI・TUI中心のワークフローに特化したNeovimディストリビューションです。
 
 <!-- markdownlint-disable MD013 -->
+
 [kanagawa](https://github.com/rebelot/kanagawa.nvim) カラースキームと、自作プラグインマネージャー `nazoplug` による高速な遅延ロードを基盤に、TypeScript・Lua・Nix・Rubyなどの開発に必要なすべてが揃っています。
 <!-- markdownlint-enable MD013 -->
 
@@ -38,6 +39,7 @@
 ## 🚀 Features
 
 <!-- markdownlint-disable MD013 -->
+
 - **⚡ Fast startup** — nazoplug によるアグレッシブな遅延ロード。起動を邪魔するものは VeryLazy 以降に追いやる
 - **🔧 Full LSP** — TypeScript / Lua / Ruby / Nix / C / Java / Zig など多言語対応。mason + 手動 (nixd) の両刀
 - **🎨 kanagawa** — `kanagawa-dragon` テーマ + 透明背景でターミナルと溶け込む
@@ -48,26 +50,27 @@
 - **🧪 テスト** — neotest + Jest / Vitest / Playwright アダプタ
 - **🔍 Fuzzy finding** — snacks.nvim Picker (ivy layout) をメイン、Telescope をサブとして併用
 - **📝 Treesitter textobjects** — 関数・クラス・引数単位の高精度テキストオブジェクト
+
 <!-- markdownlint-enable MD013 -->
 
 ---
 
 ## 📋 Requirements
 
-| 必須 | バージョン |
-| ---- | ---------- |
-| Neovim | 0.10+ |
-| Git | any |
+| 必須                                    | バージョン         |
+| --------------------------------------- | ------------------ |
+| Neovim                                  | 0.10+              |
+| Git                                     | any                |
 | [Nerd Font](https://www.nerdfonts.com/) | アイコン表示に必要 |
 
-| 推奨 | 用途 |
-| ---- | ---- |
+| 推奨             | 用途                                   |
+| ---------------- | -------------------------------------- |
 | Nix (flakes対応) | `nix run` / `nix develop` での隔離起動 |
-| Node.js | TypeScript LSP / prettier |
-| lazygit | LazyGit統合 |
-| yazi | ファイルマネージャー統合 |
-| ripgrep | Grep検索 |
-| fd | ファイル検索 |
+| Node.js          | TypeScript LSP / prettier              |
+| lazygit          | LazyGit統合                            |
+| yazi             | ファイルマネージャー統合               |
+| ripgrep          | Grep検索                               |
+| fd               | ファイル検索                           |
 
 ---
 
@@ -80,6 +83,7 @@ nix run github:NazoVim-org/NazoVim
 ```
 
 <!-- markdownlint-disable MD013 -->
+
 設定は `~/.config/nvim-nazozokc` に隔離して展開されるため、既存のNeovim設定を汚しません。
 <!-- markdownlint-enable MD013 -->
 
@@ -142,95 +146,95 @@ nvim
 
 ### LSP / 補完
 
-| プラグイン | 用途 |
-| ---------- | ---- |
-| nvim-lspconfig + mason | LSP管理 |
-| typescript-tools.nvim | TypeScript専用LSP（高速化設定済み） |
-| nvim-cmp | 補完エンジン |
-| LuaSnip + denippet.vim | スニペット（VSCode互換） |
-| lspsaga.nvim | LSP UI拡張 |
-| actions-preview.nvim | コードアクションプレビュー |
-| conform.nvim | フォーマッター（stylua / prettier等） |
-| nvim-lint | rubocop等の追加診断 |
-| fidget.nvim | LSPプログレス表示 |
-| tiny-inline-diagnostic.nvim | インライン診断 |
-| lazydev.nvim | Lua/Neovim API の補完・型チェック強化 |
+| プラグイン                  | 用途                                  |
+| --------------------------- | ------------------------------------- |
+| nvim-lspconfig + mason      | LSP管理                               |
+| typescript-tools.nvim       | TypeScript専用LSP（高速化設定済み）   |
+| nvim-cmp                    | 補完エンジン                          |
+| LuaSnip + denippet.vim      | スニペット（VSCode互換）              |
+| lspsaga.nvim                | LSP UI拡張                            |
+| actions-preview.nvim        | コードアクションプレビュー            |
+| conform.nvim                | フォーマッター（stylua / prettier等） |
+| nvim-lint                   | rubocop等の追加診断                   |
+| fidget.nvim                 | LSPプログレス表示                     |
+| tiny-inline-diagnostic.nvim | インライン診断                        |
+| lazydev.nvim                | Lua/Neovim API の補完・型チェック強化 |
 
 ### Fuzzy Finder / ナビゲーション
 
-| プラグイン | 用途 |
-| ---------- | ---- |
-| snacks.nvim | Picker / Dashboard / Zen / Words / Session |
-| telescope.nvim | ファジーファインダー（サブ） |
-| oil.nvim | バッファベースのファイルエクスプローラー |
-| neo-tree.nvim | ツリー形式ファイルエクスプローラー |
-| yazi.nvim | yaziファイルマネージャー統合 |
-| dropbar.nvim | Winbar / パンくずリスト |
-| flash.nvim | ジャンプ（`<CR>` でスマートジャンプ） |
-| aerial.nvim | シンボルアウトライン |
-| project.nvim | プロジェクトルート自動検出 |
+| プラグイン     | 用途                                       |
+| -------------- | ------------------------------------------ |
+| snacks.nvim    | Picker / Dashboard / Zen / Words / Session |
+| telescope.nvim | ファジーファインダー（サブ）               |
+| oil.nvim       | バッファベースのファイルエクスプローラー   |
+| neo-tree.nvim  | ツリー形式ファイルエクスプローラー         |
+| yazi.nvim      | yaziファイルマネージャー統合               |
+| dropbar.nvim   | Winbar / パンくずリスト                    |
+| flash.nvim     | ジャンプ（`<CR>` でスマートジャンプ）      |
+| aerial.nvim    | シンボルアウトライン                       |
+| project.nvim   | プロジェクトルート自動検出                 |
 
 ### UI / 見た目
 
-| プラグイン | 用途 |
-| ---------- | ---- |
-| kanagawa.nvim | カラースキーム（dragon + 透明） |
-| lualine.nvim | ステータスライン |
-| barbar.nvim | タブバー |
-| noice.nvim | コマンドラインUI / 通知 |
-| nvim-notify | 通知システム |
-| nvim-scrollbar / satellite.nvim | スクロールバー |
-| modes.nvim | モード別カーソル色変化 |
-| nvim-illuminate | カーソル下シンボルのハイライト |
-| incline.nvim | フローティングファイル名 |
-| todo-comments.nvim | TODO/FIXME等のハイライト |
-| render-markdown.nvim | Markdownのリッチレンダリング |
-| nvim-highlight-colors | カラーコードのインラインプレビュー |
+| プラグイン                      | 用途                               |
+| ------------------------------- | ---------------------------------- |
+| kanagawa.nvim                   | カラースキーム（dragon + 透明）    |
+| lualine.nvim                    | ステータスライン                   |
+| barbar.nvim                     | タブバー                           |
+| noice.nvim                      | コマンドラインUI / 通知            |
+| nvim-notify                     | 通知システム                       |
+| nvim-scrollbar / satellite.nvim | スクロールバー                     |
+| modes.nvim                      | モード別カーソル色変化             |
+| nvim-illuminate                 | カーソル下シンボルのハイライト     |
+| incline.nvim                    | フローティングファイル名           |
+| todo-comments.nvim              | TODO/FIXME等のハイライト           |
+| render-markdown.nvim            | Markdownのリッチレンダリング       |
+| nvim-highlight-colors           | カラーコードのインラインプレビュー |
 
 ### Git (Plugins)
 
-| プラグイン | 用途 |
-| ---------- | ---- |
-| gitsigns.nvim | Git差分サインカラム |
-| diffview.nvim | 差分ビュー / ファイル履歴 |
-| lazygit.nvim | LazyGit統合 |
-| vim-fugitive | Git操作 |
-| octo.nvim | GitHub Issue / PR / Notification 操作 |
+| プラグイン    | 用途                                  |
+| ------------- | ------------------------------------- |
+| gitsigns.nvim | Git差分サインカラム                   |
+| diffview.nvim | 差分ビュー / ファイル履歴             |
+| lazygit.nvim  | LazyGit統合                           |
+| vim-fugitive  | Git操作                               |
+| octo.nvim     | GitHub Issue / PR / Notification 操作 |
 
 ### エディタ機能
 
-| プラグイン | 用途 |
-| ---------- | ---- |
-| nvim-treesitter | シンタックスハイライト / インデント |
-| nvim-treesitter-textobjects | 関数・クラス・引数単位のテキストオブジェクト |
-| nvim-autopairs | 括弧自動補完 |
-| mini.ai / surround / comment | テキストオブジェクト・Surround・コメント |
-| nvim-spider | CamelCase/snake_case対応 w/e/b |
-| substitute.nvim | レジスタを使った置換 |
-| dial.nvim | `<C-a>/<C-x>` の拡張インクリメント |
-| which-key.nvim | キーマップヘルプ |
-| toggleterm.nvim | フローティングターミナル |
-| kulala.nvim | REST client (.http ファイル) |
-| persistence.nvim | セッション管理 |
+| プラグイン                   | 用途                                         |
+| ---------------------------- | -------------------------------------------- |
+| nvim-treesitter              | シンタックスハイライト / インデント          |
+| nvim-treesitter-textobjects  | 関数・クラス・引数単位のテキストオブジェクト |
+| nvim-autopairs               | 括弧自動補完                                 |
+| mini.ai / surround / comment | テキストオブジェクト・Surround・コメント     |
+| nvim-spider                  | CamelCase/snake_case対応 w/e/b               |
+| substitute.nvim              | レジスタを使った置換                         |
+| dial.nvim                    | `<C-a>/<C-x>` の拡張インクリメント           |
+| which-key.nvim               | キーマップヘルプ                             |
+| toggleterm.nvim              | フローティングターミナル                     |
+| kulala.nvim                  | REST client (.http ファイル)                 |
+| persistence.nvim             | セッション管理                               |
 
 ### AI統合
 
-| プラグイン | 用途 |
-| ---------- | ---- |
-| claudecode.nvim | Claude Code統合 |
-| opencode.nvim | opencode統合 |
+| プラグイン       | 用途                |
+| ---------------- | ------------------- |
+| claudecode.nvim  | Claude Code統合     |
+| opencode.nvim    | opencode統合        |
 | CopilotChat.nvim | GitHub Copilot Chat |
-| copilot.lua | GitHub Copilot補完 |
+| copilot.lua      | GitHub Copilot補完  |
 
 ### デバッグ / テスト
 
-| プラグイン | 用途 |
-| ---------- | ---- |
-| nvim-dap + nvim-dap-ui | デバッガー |
-| nvim-dap-vscode-js | JS/TS デバッグアダプタ |
-| neotest | テストランナー |
-| neotest-jest / vitest / playwright | テストアダプタ |
-| nvim-coverage | カバレッジ表示 |
+| プラグイン                         | 用途                   |
+| ---------------------------------- | ---------------------- |
+| nvim-dap + nvim-dap-ui             | デバッガー             |
+| nvim-dap-vscode-js                 | JS/TS デバッグアダプタ |
+| neotest                            | テストランナー         |
+| neotest-jest / vitest / playwright | テストアダプタ         |
+| nvim-coverage                      | カバレッジ表示         |
 
 ---
 
@@ -240,107 +244,107 @@ nvim
 
 ### 基本
 
-| キー | 動作 |
-| ---- | ---- |
+| キー               | 動作                         |
+| ------------------ | ---------------------------- |
 | `<Leader><Leader>` | ファイル検索 (snacks Picker) |
-| `<Leader>/` | Live Grep |
-| `<Leader>b` | バッファ一覧 |
-| `<Leader>r` | 最近使ったファイル |
-| `<Leader>h` | 検索ハイライト解除 |
-| `<Leader>z` | Zen mode |
-| `<Leader>m` | Oil ファイルエクスプローラー |
-| `<Leader>n` | Neo-tree |
-| `<Leader>t` | フローティングターミナル |
-| `<Leader>f` | フォーマット |
+| `<Leader>/`        | Live Grep                    |
+| `<Leader>b`        | バッファ一覧                 |
+| `<Leader>r`        | 最近使ったファイル           |
+| `<Leader>h`        | 検索ハイライト解除           |
+| `<Leader>z`        | Zen mode                     |
+| `<Leader>m`        | Oil ファイルエクスプローラー |
+| `<Leader>n`        | Neo-tree                     |
+| `<Leader>t`        | フローティングターミナル     |
+| `<Leader>f`        | フォーマット                 |
 
 ### LSP
 
-| キー | 動作 |
-| ---- | ---- |
-| `K` | ホバー |
-| `gd` | 定義へ移動 |
-| `ga` | コードアクション (Lspsaga) |
+| キー         | 動作                       |
+| ------------ | -------------------------- |
+| `K`          | ホバー                     |
+| `gd`         | 定義へ移動                 |
+| `ga`         | コードアクション (Lspsaga) |
 | `<Leader>ca` | コードアクション (preview) |
-| `<Leader>gd` | 定義へ移動 |
-| `<Leader>gr` | 参照一覧 |
-| `<Leader>oi` | Import整理 (TS) |
-| `<Leader>ru` | 未使用削除 (TS) |
+| `<Leader>gd` | 定義へ移動                 |
+| `<Leader>gr` | 参照一覧                   |
+| `<Leader>oi` | Import整理 (TS)            |
+| `<Leader>ru` | 未使用削除 (TS)            |
 
 ### Treesitter Textobjects
 
-| キー | 動作 |
-| ---- | ---- |
-| `af` / `if` | outer / inner 関数 |
-| `ac` / `ic` | outer / inner クラス |
-| `aa` / `ia` | outer / inner 引数 |
-| `ai` / `ii` | outer / inner 条件分岐 |
-| `al` / `il` | outer / inner ループ |
-| `ab` / `ib` | outer / inner ブロック |
-| `]f` / `[f` | 次/前の関数へジャンプ |
-| `]c` / `[c` | 次/前のクラスへジャンプ |
-| `]a` / `[a` | 次/前の引数へジャンプ |
-| `<Leader>sn` | 次の引数と swap |
-| `<Leader>sp` | 前の引数と swap |
+| キー         | 動作                    |
+| ------------ | ----------------------- |
+| `af` / `if`  | outer / inner 関数      |
+| `ac` / `ic`  | outer / inner クラス    |
+| `aa` / `ia`  | outer / inner 引数      |
+| `ai` / `ii`  | outer / inner 条件分岐  |
+| `al` / `il`  | outer / inner ループ    |
+| `ab` / `ib`  | outer / inner ブロック  |
+| `]f` / `[f`  | 次/前の関数へジャンプ   |
+| `]c` / `[c`  | 次/前のクラスへジャンプ |
+| `]a` / `[a`  | 次/前の引数へジャンプ   |
+| `<Leader>sn` | 次の引数と swap         |
+| `<Leader>sp` | 前の引数と swap         |
 
 ### Git (Keymaps)
 
-| キー | 動作 |
-| ---- | ---- |
-| `<Leader>gd` | DiffviewOpen |
-| `<Leader>gh` | ファイル履歴 |
-| `<Leader>gH` | ブランチ履歴 |
+| キー         | 動作           |
+| ------------ | -------------- |
+| `<Leader>gd` | DiffviewOpen   |
+| `<Leader>gh` | ファイル履歴   |
+| `<Leader>gH` | ブランチ履歴   |
 | `<Leader>gc` | Diffview Close |
 | `<Leader>gp` | Hunkプレビュー |
-| `<Leader>gt` | Blame toggle |
+| `<Leader>gt` | Blame toggle   |
 
 ### セッション
 
-| キー | 動作 |
-| ---- | ---- |
-| `<Leader>qs` | セッション復元 |
-| `<Leader>qS` | セッション選択 |
+| キー         | 動作                   |
+| ------------ | ---------------------- |
+| `<Leader>qs` | セッション復元         |
+| `<Leader>qS` | セッション選択         |
 | `<Leader>ql` | 最後のセッションを復元 |
-| `<Leader>qd` | セッション保存を停止 |
+| `<Leader>qd` | セッション保存を停止   |
 
 ### AI
 
-| キー | 動作 |
-| ---- | ---- |
-| `<Leader>ac` | Claude Code toggle |
-| `<Leader>af` | Claude Code focus |
-| `<Leader>ab` | 現在バッファを追加 |
-| `<C-a>` | opencode ask |
-| `<C-x>` | opencode select action |
-| `<C-.>` | opencode toggle |
+| キー         | 動作                   |
+| ------------ | ---------------------- |
+| `<Leader>ac` | Claude Code toggle     |
+| `<Leader>af` | Claude Code focus      |
+| `<Leader>ab` | 現在バッファを追加     |
+| `<C-a>`      | opencode ask           |
+| `<C-x>`      | opencode select action |
+| `<C-.>`      | opencode toggle        |
 
 ### DAP
 
-| キー | 動作 |
-| ---- | ---- |
-| `<F5>` | 実行 / 継続 |
-| `<F10>` | ステップオーバー |
-| `<F11>` | ステップイン |
-| `<F12>` | ステップアウト |
+| キー         | 動作                 |
+| ------------ | -------------------- |
+| `<F5>`       | 実行 / 継続          |
+| `<F10>`      | ステップオーバー     |
+| `<F11>`      | ステップイン         |
+| `<F12>`      | ステップアウト       |
 | `<Leader>db` | ブレークポイント切替 |
-| `<Leader>du` | DAP UI toggle |
+| `<Leader>du` | DAP UI toggle        |
 
 ### テスト
 
-| キー | 動作 |
-| ---- | ---- |
-| `<leader>tr` | 最寄りのテスト実行 |
-| `<leader>tR` | 全テスト実行 |
+| キー         | 動作                 |
+| ------------ | -------------------- |
+| `<leader>tr` | 最寄りのテスト実行   |
+| `<leader>tR` | 全テスト実行         |
 | `<leader>tf` | ファイルのテスト実行 |
-| `<leader>to` | テスト出力 toggle |
+| `<leader>to` | テスト出力 toggle    |
 
 ### ウィンドウ / バッファ
 
-| キー | 動作 |
-| ---- | ---- |
-| `<C-h/j/k/l>` | ウィンドウ移動 (tmux対応) |
-| `<C-PageDown/Up>` | バッファ切替 |
-| `<C-t>` | 新規バッファ |
-| `<C-q>` | バッファを閉じる |
+| キー              | 動作                      |
+| ----------------- | ------------------------- |
+| `<C-h/j/k/l>`     | ウィンドウ移動 (tmux対応) |
+| `<C-PageDown/Up>` | バッファ切替              |
+| `<C-t>`           | 新規バッファ              |
+| `<C-q>`           | バッファを閉じる          |
 
 ---
 
@@ -373,6 +377,7 @@ nvim
 `lua/plugins/` 以下にLuaファイルを追加するだけで自動でロードされます。
 
 <!-- markdownlint-disable MD013 -->
+
 ```lua
 -- lua/plugins/my-config.lua
 
@@ -382,6 +387,7 @@ return {
   opts = {}
 }
 ```
+
 <!-- markdownlint-enable MD013 -->
 
 既存プラグインの設定を上書きする場合も同じファイルに書けます。
@@ -421,6 +427,7 @@ nix build github:NazoVim-org/NazoVim
 
 Issue・PRはお気軽にどうぞ。
 <!-- markdownlint-disable MD013 -->
+
 質問は [GitHub Discussions](https://github.com/NazoVim-org/NazoVim/discussions) へ。
 <!-- markdownlint-enable MD013 -->
 
@@ -431,6 +438,107 @@ Issue templateが用意されています:
 - 🔌 **Plugin Proposal** — プラグイン名・URL・nazoplug の設定案を
 
 ---
+
+## Special Thanks
+
+NazoVim は多くの優れた Neovim プラグインに支えられています。以下のプロジェクトの作者・コントリビュータの皆様に感謝します。
+
+- [AckslD/nvim-neoclip.lua](https://github.com/AckslD/nvim-neoclip.lua)
+- [Bekaboo/dropbar.nvim](https://github.com/Bekaboo/dropbar.nvim)
+- [L3MON4D3/LuaSnip](https://github.com/L3MON4D3/LuaSnip)
+- [MeanderingProgrammer/render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim)
+- [MunifTanjim/eslint.nvim](https://github.com/MunifTanjim/eslint.nvim)
+- [ThePrimeagen/refactoring.nvim](https://github.com/ThePrimeagen/refactoring.nvim)
+- [alexghergh/nvim-tmux-navigation](https://github.com/alexghergh/nvim-tmux-navigation)
+- [andersevenrud/nvim_context_vt](https://github.com/andersevenrud/nvim_context_vt)
+- [andythigpen/nvim-coverage](https://github.com/andythigpen/nvim-coverage)
+- [aznhe21/actions-preview.nvim](https://github.com/aznhe21/actions-preview.nvim)
+- [chentoast/marks.nvim](https://github.com/chentoast/marks.nvim)
+- [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider)
+- [coder/claudecode.nvim](https://github.com/coder/claudecode.nvim)
+- [dmmulroy/ts-error-translator.nvim](https://github.com/dmmulroy/ts-error-translator.nvim)
+- [echasnovski/mini.ai](https://github.com/echasnovski/mini.ai)
+- [echasnovski/mini.comment](https://github.com/echasnovski/mini.comment)
+- [echasnovski/mini.icons](https://github.com/echasnovski/mini.icons)
+- [echasnovski/mini.indentscope](https://github.com/echasnovski/mini.indentscope)
+- [echasnovski/mini.jump](https://github.com/echasnovski/mini.jump)
+- [echasnovski/mini.nvim](https://github.com/echasnovski/mini.nvim)
+- [echasnovski/mini.surround](https://github.com/echasnovski/mini.surround)
+- [folke/flash.nvim](https://github.com/folke/flash.nvim)
+- [folke/noice.nvim](https://github.com/folke/noice.nvim)
+- [folke/persistence.nvim](https://github.com/folke/persistence.nvim)
+- [folke/snacks.nvim](https://github.com/folke/snacks.nvim)
+- [folke/trouble.nvim](https://github.com/folke/trouble.nvim)
+- [folke/which-key.nvim](https://github.com/folke/which-key.nvim)
+- [gbprod/substitute.nvim](https://github.com/gbprod/substitute.nvim)
+- [hrsh7th/cmp-buffer](https://github.com/hrsh7th/cmp-buffer)
+- [hrsh7th/cmp-calc](https://github.com/hrsh7th/cmp-calc)
+- [hrsh7th/cmp-cmdline](https://github.com/hrsh7th/cmp-cmdline)
+- [hrsh7th/cmp-nvim-lsp](https://github.com/hrsh7th/cmp-nvim-lsp)
+- [hrsh7th/cmp-path](https://github.com/hrsh7th/cmp-path)
+- [hrsh7th/nvim-cmp](https://github.com/hrsh7th/nvim-cmp)
+- [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)
+- [kdheepak/lazygit.nvim](https://github.com/kdheepak/lazygit.nvim)
+- [kevinhwang91/nvim-ufo](https://github.com/kevinhwang91/nvim-ufo)
+- [kevinhwang91/promise-async](https://github.com/kevinhwang91/promise-async)
+- [kkrampis/codex.nvim](https://github.com/kkrampis/codex.nvim)
+- [lambdalisue/kensaku-search.vim](https://github.com/lambdalisue/kensaku-search.vim)
+- [lambdalisue/vim-kensaku](https://github.com/lambdalisue/vim-kensaku)
+- [lewis6991/fileline.nvim](https://github.com/lewis6991/fileline.nvim)
+- [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim)
+- [lewis6991/spellsitter.nvim](https://github.com/lewis6991/spellsitter.nvim)
+- [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)
+- [m-demare/hlargs.nvim](https://github.com/m-demare/hlargs.nvim)
+- [marilari88/neotest-vitest](https://github.com/marilari88/neotest-vitest)
+- [mattn/emmet-vim](https://github.com/mattn/emmet-vim)
+- [mcauley-penney/visual-whitespace.nvim](https://github.com/mcauley-penney/visual-whitespace.nvim)
+- [mfussenegger/nvim-lint](https://github.com/mfussenegger/nvim-lint)
+- [mikavilpas/yazi.nvim](https://github.com/mikavilpas/yazi.nvim)
+- [mistweaverco/kulala.nvim](https://github.com/mistweaverco/kulala.nvim)
+- [monaqa/dial.nvim](https://github.com/monaqa/dial.nvim)
+- [nickjvandyke/opencode.nvim](https://github.com/nickjvandyke/opencode.nvim)
+- [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)
+- [nvim-neotest/neotest](https://github.com/nvim-neotest/neotest)
+- [nvim-neotest/neotest-jest](https://github.com/nvim-neotest/neotest-jest)
+- [nvim-telescope/telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
+- [nvimdev/lspsaga.nvim](https://github.com/nvimdev/lspsaga.nvim)
+- [pwntester/octo.nvim](https://github.com/pwntester/octo.nvim)
+- [rafamadriz/friendly-snippets](https://github.com/rafamadriz/friendly-snippets)
+- [rcarriga/nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui)
+- [rebelot/kanagawa.nvim](https://github.com/rebelot/kanagawa.nvim)
+- [refractalize/oil-git-status.nvim](https://github.com/refractalize/oil-git-status.nvim)
+- [romgrk/barbar.nvim](https://github.com/romgrk/barbar.nvim)
+- [roobert/tailwindcss-colorizer-cmp.nvim](https://github.com/roobert/tailwindcss-colorizer-cmp.nvim)
+- [ryoppippi/denippet-autoimport-vscode](https://github.com/ryoppippi/denippet-autoimport-vscode)
+- [ryoppippi/nvim-pnpm-catalog-lens](https://github.com/ryoppippi/nvim-pnpm-catalog-lens)
+- [ryoppippi/vim-bad-apple](https://github.com/ryoppippi/vim-bad-apple)
+- [ryoppippi/vim-svelte-inspector](https://github.com/ryoppippi/vim-svelte-inspector)
+- [saadparwaiz1/cmp_luasnip](https://github.com/saadparwaiz1/cmp_luasnip)
+- [shellRaining/hlchunk.nvim](https://github.com/shellRaining/hlchunk.nvim)
+- [sindrets/diffview.nvim](https://github.com/sindrets/diffview.nvim)
+- [stevearc/aerial.nvim](https://github.com/stevearc/aerial.nvim)
+- [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)
+- [stevearc/dressing.nvim](https://github.com/stevearc/dressing.nvim)
+- [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)
+- [stevearc/overseer.nvim](https://github.com/stevearc/overseer.nvim)
+- [theHamsta/nvim-dap-virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text)
+- [thenbe/neotest-playwright](https://github.com/thenbe/neotest-playwright)
+- [tpope/vim-repeat](https://github.com/tpope/vim-repeat)
+- [tttol/md-outline.nvim](https://github.com/tttol/md-outline.nvim)
+- [uga-rosa/ccc.nvim](https://github.com/uga-rosa/ccc.nvim)
+- [uga-rosa/cmp-denippet](https://github.com/uga-rosa/cmp-denippet)
+- [uga-rosa/denippet.vim](https://github.com/uga-rosa/denippet.vim)
+- [uga-rosa/translate.nvim](https://github.com/uga-rosa/translate.nvim)
+- [unblevable/quick-scope](https://github.com/unblevable/quick-scope)
+- [vim-denops/denops.vim](https://github.com/vim-denops/denops.vim)
+- [vinnymeller/swagger-preview.nvim](https://github.com/vinnymeller/swagger-preview.nvim)
+- [vuki656/package-info.nvim](https://github.com/vuki656/package-info.nvim)
+- [willothy/flatten.nvim](https://github.com/willothy/flatten.nvim)
+- [windwp/nvim-autopairs](https://github.com/windwp/nvim-autopairs)
+- [windwp/nvim-ts-autotag](https://github.com/windwp/nvim-ts-autotag)
+- [zeioth/garbage-day.nvim](https://github.com/zeioth/garbage-day.nvim)
+
+（リストは `apps/nvim/nazoplug-lock.json` およびプラグイン仕様から自動生成）
 
 ## 📄 License
 
