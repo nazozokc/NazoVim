@@ -70,7 +70,7 @@ spec は lazy.nvim 互換で、`tag` / `pin` / `cond` / 関数形式の `enabled
 headless テスト:
 
 ```bash
-for t in spec install loader commands init; do
+for t in spec install loader commands init lock; do
   nvim --headless -u apps/nazoplug/tests/minimal_init.lua -l apps/nazoplug/tests/${t}_test.lua
 done
 ```

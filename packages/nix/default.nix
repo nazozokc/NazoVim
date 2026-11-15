@@ -59,6 +59,8 @@ let
       if [ ! -f "$DATA_DIR/nazoplug-lock.json" ] && [ -f "$CONFIG_DIR/nazoplug-lock.json" ]; then
         cp "$CONFIG_DIR/nazoplug-lock.json" "$DATA_DIR/nazoplug-lock.json"
       fi
+      # store の読み取り専用 mode を引き継がないようにする
+      [ -f "$DATA_DIR/nazoplug-lock.json" ] && chmod u+w "$DATA_DIR/nazoplug-lock.json" || true
       exec nvim "$@"
     '';
   };
