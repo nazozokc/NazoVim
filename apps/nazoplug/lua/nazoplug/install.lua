@@ -98,7 +98,11 @@ function M.ensure(spec, opts)
 		spec._ = {}
 	end
 	local installed = G.is_repo(spec.dir)
-	local use_lock = spec.pin or opts.use_lock == true or (opts.use_lock == "missing" and not installed)
+	local prefetched = spec._ and spec._.prefetched == true
+	if spec._ then
+		spec._.prefetched = nil
+	end
+	local use_lock = spec.pin or opts.use_lock == true or (opts.use_lock == "missing" and (not installed or prefetched))
 	local locked = use_lock and opts.lock and opts.lock[spec.name] or nil
 
 	if installed and opts.update == false and not use_lock then
@@ -244,6 +248,11 @@ function M.prefetch(specs, opts)
 					if result.code ~= 0 then
 						errors[#errors + 1] =
 							string.format("%s: %s", spec.name, U.trim(result.stderr or result.stdout or "clone failed"))
+					else
+						-- Cloned at the default branch; let ensure() know it still
+						-- has to honour a locked commit for a "missing" install.
+						spec._ = spec._ or {}
+						spec._.prefetched = true
 					end
 					pump()
 				end)
@@ -251,7 +260,10 @@ function M.prefetch(specs, opts)
 			if opts.on_progress then
 				opts.on_progress(spec, "prefetch")
 			end
-			local ok, process = pcall(vim.system, G.clone_command(spec, { branch = clone_branch }), {
+			U.mkdir(U.dirname(spec.dir))
+			local command = { "git", "--no-pager" }
+			vim.list_extend(command, G.clone_command(spec, { branch = clone_branch }))
+			local ok, process = pcall(vim.system, command, {
 				text = true,
 				timeout = timeout,
 			}, finish)

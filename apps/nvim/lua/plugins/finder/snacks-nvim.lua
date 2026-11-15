@@ -25,7 +25,18 @@ return {
 					{ icon = "", desc = "New file", key = "e", action = ":enew" },
 					{ icon = "󰒲", desc = "Plugins", key = "z", action = ":NazoPlug" },
 					{ icon = "󰈙", desc = "Oil", key = ".", action = ":Oil" },
-					{ icon = "", desc = "Dotfiles", key = "d", action = ":Config" },
+					{
+						icon = "",
+						desc = "Dotfiles",
+						key = "d",
+						action = function()
+							local dir = vim.fn.expand("~/ghq/github.com/nazozokc/dotfiles")
+							if vim.fn.isdirectory(dir) == 0 then
+								dir = vim.fn.stdpath("config")
+							end
+							require("snacks").picker.files({ cwd = dir })
+						end,
+					},
 					{
 						icon = "󰈙",
 						desc = "Files",
