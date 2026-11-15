@@ -1,5 +1,5 @@
 {
-  description = "NazoVim-org's Neovim configuration";
+  description = "NazoVim's Neovim configuration";
 
   # ============================================================
   # monorepo structure:
@@ -30,7 +30,7 @@
           # version はここで管理 (release.yml が tag push 時に sed で更新)
           nixPackages = import ./packages/nix/default.nix {
             inherit pkgs;
-            version = "1.2.0";
+            version = "3.0.0";
             configSrc = ./apps/nvim;
             nazoplugSrc = ./apps/nazoplug/lua/nazoplug;
           };
