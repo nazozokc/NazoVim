@@ -131,8 +131,23 @@ function M.diff(lock, specs)
 	return missing, stale
 end
 
-function M.ensure_runtime_copy(config_path, runtime_path)
-	if U.exists(runtime_path) or not U.exists(config_path) then
+-- A runtime lock left behind as `{}` (e.g. by an older version) must not stop
+-- the config lock from seeding it; otherwise every plugin installs unpinned.
+local function is_empty_lock(path)
+	local lock, err = U.read_json(path)
+	if err or type(lock) ~= "table" then
+		return false
+	end
+	return next(lock) == nil
+end
+
+function M.ensure_runtime_copy(config_path, runtime_path, opts)
+	opts = opts or {}
+	local exists = U.exists(runtime_path)
+	if exists and not (opts.overwrite_empty and is_empty_lock(runtime_path)) then
+		return runtime_path
+	end
+	if not U.exists(config_path) then
 		return runtime_path
 	end
 	local lock, err = M.load(config_path)
@@ -166,7 +181,7 @@ function M.resolve_startup(opts)
 			config_lock = legacy_config
 		end
 	end
-	if not U.is_file(lock_path) then
+	if not U.is_file(lock_path) or is_empty_lock(lock_path) then
 		local legacy_data = U.join(data, "lazy-lock.json")
 		if not U.is_file(legacy_data) then
 			local fallback = U.join(vim.fn.fnamemodify(data, ":h"), "nvim/lazy-lock.json")
@@ -175,12 +190,12 @@ function M.resolve_startup(opts)
 			end
 		end
 		if U.is_file(legacy_data) then
-			local copied, err = M.ensure_runtime_copy(legacy_data, lock_path)
+			local copied, err = M.ensure_runtime_copy(legacy_data, lock_path, { overwrite_empty = true })
 			if not copied then
 				U.warn("failed to copy legacy lock: " .. tostring(err))
 			end
 		elseif U.is_file(config_lock) then
-			local copied, err = M.ensure_runtime_copy(config_lock, lock_path)
+			local copied, err = M.ensure_runtime_copy(config_lock, lock_path, { overwrite_empty = true })
 			if not copied then
 				U.warn("failed to copy config lock: " .. tostring(err))
 			end
