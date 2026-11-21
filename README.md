@@ -1,14 +1,8 @@
 # NazoVim
 
-```text
-█   █  ███  █████  ███  █   █ ███ █   █
-██  █ █   █     █ █   █ █   █  █  ██ ██
-█ █ █ █   █    █  █   █ █   █  █  █ █ █
-█  ██ █████   █   █   █ █   █  █  █   █
-█   █ █   █  █    █   █  █ █   █  █   █
-█   █ █   █ █     █   █  █ █   █  █   █
-█   █ █   █ █████  ███    █   ███ █   █
-```
+<p align="center">
+  <img src="assets/nazovim-dashboard.png" alt="nazovim-dashboard" width="600"/>
+</p>
 
 **A personal Neovim distribution by [NazoVim-org](https://github.com/NazoVim-org)**
 
