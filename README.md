@@ -1,5 +1,3 @@
-# NazoVim
-
 <p align="center">
   <img src="assets/nazovim-dashboard.png" alt="nazovim-dashboard" width="600"/>
 </p>
