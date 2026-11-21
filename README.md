@@ -2,7 +2,7 @@
   <img src="assets/nazovim-dashboard.png" alt="nazovim-dashboard" width="600"/>
 </p>
 
-**A personal Neovim distribution by [NazoVim-org](https://github.com/NazoVim-org)**
+**A Neovim distribution by [nazozokc](https://github.com/nazozokc)**
 
 [![CI](https://github.com/NazoVim-org/NazoVim/actions/workflows/nvim.yml/badge.svg)](https://github.com/NazoVim-org/NazoVim/actions/workflows/nvim.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
