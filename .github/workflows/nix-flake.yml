@@ -52,6 +52,13 @@ jobs:
         run: |
           nix develop --command true --print-build-logs
 
+      - name: Verify remove command
+        run: |
+          mkdir -p "$RUNNER_TEMP/xdg/nazovim"
+          touch "$RUNNER_TEMP/xdg/nazovim/init.lua"
+          XDG_CONFIG_HOME="$RUNNER_TEMP/xdg" nix run . -- remove
+          test ! -e "$RUNNER_TEMP/xdg/nazovim"
+
       - name: Upload logs on failure
         if: failure()
         uses: actions/upload-artifact@v7

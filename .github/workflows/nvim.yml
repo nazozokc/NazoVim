@@ -25,8 +25,8 @@ jobs:
         uses: actions/cache@v6
         with:
           path: |
-            ~/.local/share/nvim-nazozokc/site/pack/nazoplug
-            ~/.local/share/nvim-nazozokc/lazy
+            ~/.local/share/nazovim/site/pack/nazoplug
+            ~/.local/share/nazovim/lazy
           key: nazoplug-${{ runner.os }}-${{ hashFiles('apps/nvim/nazoplug-lock.json') }}
           restore-keys: |
             nazoplug-${{ runner.os }}-
@@ -34,7 +34,7 @@ jobs:
 
       - name: Set up Neovim config
         run: |
-          export NVIM_APPNAME="nvim-nazozokc"
+          export NVIM_APPNAME="nazovim"
           CONFIG_DIR="$HOME/.config/$NVIM_APPNAME"
           mkdir -p "$CONFIG_DIR/lua"
           cp -r apps/nvim/. "$CONFIG_DIR/"
@@ -57,7 +57,7 @@ jobs:
           NPM_CONFIG_PREFIX: /tmp/npm-global
         run: |
           nix develop --command sh -c '
-            export NVIM_APPNAME="nvim-nazozokc"
+            export NVIM_APPNAME="nazovim"
             export NPM_CONFIG_PREFIX=/tmp/npm-global
             nvim --headless "+NazoPlug sync" +q 2>&1 | tee /tmp/nazoplug-sync.log
             echo "--- nazoplug sync log ---"
@@ -70,7 +70,7 @@ jobs:
           NPM_CONFIG_PREFIX: /tmp/npm-global
         run: |
           nix develop --command sh -c '
-            export NVIM_APPNAME="nvim-nazozokc"
+            export NVIM_APPNAME="nazovim"
             export NPM_CONFIG_PREFIX=/tmp/npm-global
 
             # --startuptime でタイム計測しつつ headless 起動

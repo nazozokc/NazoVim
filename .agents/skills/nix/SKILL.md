@@ -45,7 +45,7 @@ nix develop --command true
 
 - `neovim_12` — Overlay pinning Neovim to v0.12.0
 - `nvimConfig` — Derivation copying repo to Nix store (excludes `.git`)
-- `nvim-nazozokc` — Wrapped neovim with `NVIM_APPNAME` isolation
+- `nazovim` — Wrapped neovim with `NVIM_APPNAME` isolation
 - `devShells.default` — Dev environment with LSP, formatters, runtimes
 
 ## Version Field
@@ -57,4 +57,4 @@ The `version` field in `flake.nix` is updated automatically by
 
 - Systems: `x86_64-linux`, `aarch64-linux`, `aarch64-darwin`
 - `nix run github:NazoVim-org/NazoVim` launches isolated Neovim
-- `nix develop` sets `NVIM_APPNAME=nvim-nazozokc` automatically
+- `nix develop` sets `NVIM_APPNAME=nazovim` automatically

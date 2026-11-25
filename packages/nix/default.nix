@@ -29,7 +29,7 @@ let
   # NVIM_APPNAME で完全隔離して起動する wrapped neovim
   neovim = pkgs.wrapNeovim pkgs.neovim-unwrapped { };
 
-  nvim-nazozokc = pkgs.writeShellApplication {
+  nazovim = pkgs.writeShellApplication {
     name = "nvim";
     runtimeInputs = [
       neovim
@@ -42,10 +42,22 @@ let
       pkgs.ruby
     ];
     text = ''
-      APPNAME="nvim-nazozokc"
+      APPNAME="nazovim"
       CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}/$APPNAME"
       DATA_DIR="''${XDG_DATA_HOME:-$HOME/.local/share}/$APPNAME"
       export NVIM_APPNAME="$APPNAME"
+
+      # remove: 設定ディレクトリだけを削除する (plugins は data dir に残す)
+      if [ "''${1:-}" = "remove" ]; then
+        rm -rf "$CONFIG_DIR"
+        echo "Removed $CONFIG_DIR"
+        exit 0
+      fi
+      # `--` で nvim に渡す引数と排他する
+      if [ "''${1:-}" = "--" ]; then
+        shift
+      fi
+
       # symlink なら既存チェック不要、存在すれば上書き
       if [ -L "$CONFIG_DIR" ]; then
         rm "$CONFIG_DIR"
@@ -66,5 +78,5 @@ let
   };
 in
 {
-  inherit nvimConfig nvim-nazozokc;
+  inherit nvimConfig nazovim;
 }

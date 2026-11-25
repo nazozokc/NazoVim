@@ -1,0 +1,74 @@
+name: "CI: npm Package"
+
+on:
+  pull_request:
+    paths:
+      - "package.json"
+      - "bin/**"
+      - "apps/nvim/**"
+      - "apps/nazoplug/lua/nazoplug/**"
+      - ".github/workflows/npm.yml"
+  push:
+    branches: [main]
+    paths:
+      - "package.json"
+      - "bin/**"
+      - "apps/nvim/**"
+      - "apps/nazoplug/lua/nazoplug/**"
+      - ".github/workflows/npm.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tarball:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 24]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Test launcher
+        run: npm test
+
+      - name: Pack and install tarball
+        run: |
+          tarball="$(npm pack --pack-destination "$RUNNER_TEMP" --silent)"
+          echo "TARBALL=$tarball" >> "$GITHUB_ENV"
+          npm install --prefix "$RUNNER_TEMP/prefix" "$RUNNER_TEMP/$tarball"
+          "$RUNNER_TEMP/prefix/node_modules/.bin/nazovim" --version
+
+      - name: Check bundled config
+        env:
+          FAKE_NVIM_LOG: ${{ runner.temp }}/nvim.log
+          XDG_CONFIG_HOME: ${{ runner.temp }}/config
+          XDG_DATA_HOME: ${{ runner.temp }}/data
+        run: |
+          archive="$RUNNER_TEMP/$TARBALL"
+          tar -tzf "$archive" | grep -q '^package/apps/nvim/init.lua$'
+          tar -tzf "$archive" | grep -q '^package/apps/nazoplug/lua/nazoplug/init.lua$'
+
+          mkdir -p "$RUNNER_TEMP/fake-nvim-bin"
+          # shellcheck disable=SC2016
+          printf '#!/bin/sh\nprintf "APPNAME=%%s\\nARG=%%s\\n" "$NVIM_APPNAME" "$@" > "$FAKE_NVIM_LOG"\n' > "$RUNNER_TEMP/fake-nvim-bin/nvim"
+          chmod +x "$RUNNER_TEMP/fake-nvim-bin/nvim"
+
+          PATH="$RUNNER_TEMP/fake-nvim-bin:$PATH" "$RUNNER_TEMP/prefix/node_modules/.bin/nazovim" --clean
+          test -f "$XDG_CONFIG_HOME/nazovim/lua/nazoplug/init.lua"
+          test -f "$XDG_DATA_HOME/nazovim/nazoplug-lock.json"
+          grep -q 'APPNAME=nazovim' "$FAKE_NVIM_LOG"
+          grep -q 'ARG=--clean' "$FAKE_NVIM_LOG"
+
+          "$RUNNER_TEMP/prefix/node_modules/.bin/nazovim" remove
+          test ! -e "$XDG_CONFIG_HOME/nazovim"
+          test -f "$XDG_DATA_HOME/nazovim/nazoplug-lock.json"

@@ -1,6 +1,8 @@
+<!-- markdownlint-disable MD033 MD041 -->
 <p align="center">
   <img src="assets/nazovim-dashboard.png" alt="nazovim-dashboard" width="600"/>
 </p>
+<!-- markdownlint-enable MD033 MD041 -->
 
 **A Neovim distribution by [nazozokc](https://github.com/nazozokc)**
 
@@ -24,7 +26,7 @@
 [kanagawa](https://github.com/rebelot/kanagawa.nvim) カラースキームと、自作プラグインマネージャー `nazoplug` による高速な遅延ロードを基盤に、TypeScript・Lua・Nix・Rubyなどの開発に必要なすべてが揃っています。
 <!-- markdownlint-enable MD013 -->
 
-> Nixのflakeとして配布しているため、`nix run` 一発で隔離された状態から即起動できます。
+> Nix flake と npm パッケージとして配布しているため、`nix run` または `npx nazovim` 一発で隔離された状態から即起動できます。
 
 ---
 
@@ -38,7 +40,7 @@
 - **🧠 AI統合** — Claude Code (`claudecode.nvim`) と opencode (`opencode.nvim`) を両方サポート
 - **🌊 snacks.nvim** — Dashboard・Picker・Zen mode・セッション管理をまとめて統一
 - **🐛 DAP** — JavaScript / TypeScript のデバッグ環境を最小構成で内包
-- **📦 Nix対応** — `nix run` で隔離起動 / `nix develop` でLSP完备のdevShell
+- **📦 Nix / npm対応** — `nix run` / `npx nazovim` で隔離起動 / `nix develop` でLSP完备のdevShell
 - **🧪 テスト** — neotest + Jest / Vitest / Playwright アダプタ
 - **🔍 Fuzzy finding** — snacks.nvim Picker (ivy layout) をメイン、Telescope をサブとして併用
 - **📝 Treesitter textobjects** — 関数・クラス・引数単位の高精度テキストオブジェクト
@@ -64,6 +66,8 @@
 | ripgrep          | Grep検索                               |
 | fd               | ファイル検索                           |
 
+`npx nazovim` を使う場合は Node.js 20+ が必要です。
+
 ---
 
 ## 📦 Installation
@@ -76,10 +80,26 @@ nix run github:NazoVim-org/NazoVim
 
 <!-- markdownlint-disable MD013 -->
 
-設定は `~/.config/nvim-nazozokc` に隔離して展開されるため、既存のNeovim設定を汚しません。
+設定は `~/.config/nazovim` に隔離して展開されるため、既存のNeovim設定を汚しません。
 <!-- markdownlint-enable MD013 -->
 
-### 方法2: Clone（Nix 不要）
+### 方法2: `npx nazovim`（Nix 不要・設定を汚さない）
+
+```bash
+npx nazovim
+```
+
+`nvim` が PATH に必要です（Neovim 本体はインストール済みのものを使います）。
+別の実行ファイルを使う場合は `NAZOVIM_NVIM=/path/to/nvim npx nazovim` を指定します。
+設定は `~/.config/nazovim` に展開され、既存のNeovim設定を汚しません。
+Nix 版と data ディレクトリ（`~/.local/share/nazovim`）を共有するため、プラグインは再導入不要です。
+
+```bash
+npx nazovim --version   # ランチャーのバージョン
+npx nazovim -- --version # Neovim に渡す
+```
+
+### 方法3: Clone（Nix 不要）
 
 > **注意**: 既存の Neovim 設定を上書きします。バックアップを推奨します。
 
@@ -102,6 +122,18 @@ nvim
 > monorepo 構成のため、Neovim 設定は `apps/nvim/`、マネージャーは `apps/nazoplug/` にあります。
 > 上記の sparse checkout で両方取得できます。
 
+### 設定の削除（`remove`）
+
+Nix 版・npx 版のどちらからでも `~/.config/nazovim` だけを削除できます。
+
+```bash
+nix run github:NazoVim-org/NazoVim -- remove
+npx nazovim remove
+```
+
+プラグインが入っている `~/.local/share/nazovim` は残ります。
+Nix 版が作った symlink の場合は link だけを外し、link 先は削除しません。
+
 ---
 
 ## 🗂️ Directory Structure
@@ -121,6 +153,9 @@ nvim
 │       └── tests/            # headless tests
 ├── packages/
 │   └── nix/                  # Nix modules
+├── bin/
+│   └── nazovim.mjs           # npx ランチャー
+├── package.json              # npm パッケージ定義
 ├── template/                 # ファイルテンプレート
 │   ├── js/
 │   ├── ts/
