@@ -1,6 +1,8 @@
+<!-- markdownlint-disable MD033 MD041 -->
 <p align="center">
   <img src="assets/nazovim-dashboard.png" alt="nazovim-dashboard" width="600"/>
 </p>
+<!-- markdownlint-enable MD033 MD041 -->
 
 **A Neovim distribution by [nazozokc](https://github.com/nazozokc)**
 
