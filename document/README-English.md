@@ -87,7 +87,7 @@ nix run github:NazoVim-org/NazoVim
 ```
 
 <!-- markdownlint-disable MD013 -->
-The configuration is deployed in isolation under `~/.config/nvim-nazozokc`, leaving your existing Neovim setup untouched.
+The configuration is deployed in isolation under `~/.config/nazovim`, leaving your existing Neovim setup untouched.
 <!-- markdownlint-enable MD013 -->
 
 ### Option 2: `npx nazovim` (no Nix, no config overwrite)
@@ -99,8 +99,8 @@ npx nazovim
 `nvim` must be on PATH; the launcher uses your installed Neovim binary.
 Set `NAZOVIM_NVIM=/path/to/nvim` to use a different executable.
 <!-- markdownlint-disable MD013 -->
-The configuration is deployed under `~/.config/nvim-nazozokc`, leaving your existing Neovim setup untouched.
-The data directory (`~/.local/share/nvim-nazozokc`) is shared with the Nix launch, so plugins do not need reinstalling.
+The configuration is deployed under `~/.config/nazovim`, leaving your existing Neovim setup untouched.
+The data directory (`~/.local/share/nazovim`) is shared with the Nix launch, so plugins do not need reinstalling.
 <!-- markdownlint-enable MD013 -->
 
 ```bash
@@ -133,6 +133,18 @@ run `:NazoPlug migrate` to reuse its data directory.
 
 > For development, clone the full repository instead:
 > `git clone https://github.com/NazoVim-org/NazoVim.git`
+
+### Remove the configuration
+
+Both launches can delete only `~/.config/nazovim`:
+
+```bash
+nix run github:NazoVim-org/NazoVim -- remove
+npx nazovim remove
+```
+
+Plugins under `~/.local/share/nazovim` are kept.
+If the Nix launch created a symlink, only the link is removed — not its target.
 
 ---
 

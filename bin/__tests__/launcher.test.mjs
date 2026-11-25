@@ -57,14 +57,14 @@ if (process.platform === "win32") {
     try {
       const result = run(box, ["file.txt", "--clean"]);
       assert.equal(result.status, 0, result.stderr);
-      assert.match(readFileSync(box.log, "utf8"), /APPNAME=nvim-nazozokc/);
+      assert.match(readFileSync(box.log, "utf8"), /APPNAME=nazovim/);
       assert.match(readFileSync(box.log, "utf8"), /ARG=file\.txt/);
       assert.match(readFileSync(box.log, "utf8"), /ARG=--clean/);
-      assert.ok(existsSync(join(box.config, "nvim-nazozokc/init.lua")));
-      assert.ok(existsSync(join(box.config, "nvim-nazozokc/lua/nazoplug/init.lua")));
+      assert.ok(existsSync(join(box.config, "nazovim/init.lua")));
+      assert.ok(existsSync(join(box.config, "nazovim/lua/nazoplug/init.lua")));
       assert.equal(
-        readFileSync(join(box.data, "nvim-nazozokc/nazoplug-lock.json"), "utf8"),
-        readFileSync(join(box.config, "nvim-nazozokc/nazoplug-lock.json"), "utf8"),
+        readFileSync(join(box.data, "nazovim/nazoplug-lock.json"), "utf8"),
+        readFileSync(join(box.config, "nazovim/nazoplug-lock.json"), "utf8"),
       );
     } finally {
       cleanup(box);
@@ -76,14 +76,14 @@ if (process.platform === "win32") {
     try {
       const stale = join(box.root, "stale");
       mkdirSync(stale);
-      symlinkSync(stale, join(box.config, "nvim-nazozokc"));
-      mkdirSync(join(box.data, "nvim-nazozokc"));
-      writeFileSync(join(box.data, "nvim-nazozokc/nazoplug-lock.json"), "{}");
+      symlinkSync(stale, join(box.config, "nazovim"));
+      mkdirSync(join(box.data, "nazovim"));
+      writeFileSync(join(box.data, "nazovim/nazoplug-lock.json"), "{}");
 
       const result = run(box);
       assert.equal(result.status, 0, result.stderr);
-      assert.equal(lstatSync(join(box.config, "nvim-nazozokc")).isSymbolicLink(), false);
-      assert.equal(readFileSync(join(box.data, "nvim-nazozokc/nazoplug-lock.json"), "utf8"), "{}");
+      assert.equal(lstatSync(join(box.config, "nazovim")).isSymbolicLink(), false);
+      assert.equal(readFileSync(join(box.data, "nazovim/nazoplug-lock.json"), "utf8"), "{}");
     } finally {
       cleanup(box);
     }
@@ -123,6 +123,42 @@ if (process.platform === "win32") {
       assert.equal(helpResult.status, 0, helpResult.stderr);
       assert.match(helpResult.stdout, /NAZOVIM_NVIM/);
       assert.equal(existsSync(box.log), false);
+    } finally {
+      cleanup(box);
+    }
+  });
+
+  test("remove deletes only the config dir, keeping the data dir", () => {
+    const box = sandbox();
+    try {
+      mkdirSync(join(box.config, "nazovim"), { recursive: true });
+      writeFileSync(join(box.config, "nazovim/init.lua"), "x");
+      mkdirSync(join(box.data, "nazovim"), { recursive: true });
+      writeFileSync(join(box.data, "nazovim/nazoplug-lock.json"), "{}");
+
+      const result = run(box, ["remove"]);
+      assert.equal(result.status, 0, result.stderr);
+      assert.match(result.stdout, /Removed /);
+      assert.equal(existsSync(join(box.config, "nazovim")), false);
+      assert.ok(existsSync(join(box.data, "nazovim/nazoplug-lock.json")));
+      assert.equal(existsSync(box.log), false);
+    } finally {
+      cleanup(box);
+    }
+  });
+
+  test("remove unlinks a config symlink without touching its target", () => {
+    const box = sandbox();
+    try {
+      const target = join(box.root, "nix-store-config");
+      mkdirSync(target);
+      writeFileSync(join(target, "init.lua"), "x");
+      symlinkSync(target, join(box.config, "nazovim"));
+
+      const result = run(box, ["remove"]);
+      assert.equal(result.status, 0, result.stderr);
+      assert.equal(existsSync(join(box.config, "nazovim")), false);
+      assert.ok(existsSync(join(target, "init.lua")));
     } finally {
       cleanup(box);
     }

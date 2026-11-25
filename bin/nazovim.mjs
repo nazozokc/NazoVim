@@ -16,7 +16,7 @@ import { homedir } from "node:os";
 import { delimiter, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const APPNAME = "nvim-nazozokc";
+const APPNAME = "nazovim";
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const configSource = join(packageRoot, "apps/nvim");
 const nazoplugSource = join(packageRoot, "apps/nazoplug/lua/nazoplug");
@@ -32,12 +32,23 @@ function version() {
   return JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8")).version;
 }
 
+/** Resolve the isolated config directory. */
+function configDir() {
+  return join(process.env.XDG_CONFIG_HOME ?? join(homedir(), ".config"), APPNAME);
+}
+
+/** Resolve the isolated data directory. */
+function dataDir() {
+  return join(process.env.XDG_DATA_HOME ?? join(homedir(), ".local/share"), APPNAME);
+}
+
 /** Show launcher usage. */
 function help() {
   console.log(`nazovim ${version()} — isolated Neovim configuration
 
 Usage:
   npx nazovim [nvim args...]   launch Neovim with NazoVim
+  npx nazovim remove           delete ${configDir()}
   npx nazovim --version        show launcher version
   npx nazovim --help           show this help
   npx nazovim -- --version     pass --version to Neovim
@@ -47,6 +58,13 @@ Environment:
 
 Config: $XDG_CONFIG_HOME/${APPNAME} (default ~/.config/${APPNAME})
 Data:   $XDG_DATA_HOME/${APPNAME} (default ~/.local/share/${APPNAME})`);
+}
+
+/** Remove only the isolated config directory. Plugins in the data dir stay. */
+function remove() {
+  const target = configDir();
+  rmSync(target, { recursive: true, force: true });
+  console.log(`Removed ${target}`);
 }
 
 /** Return an executable path for name, or null when it is not on PATH. */
@@ -89,18 +107,18 @@ function makeWritable(target) {
 
 /** Deploy the bundled config and seed the runtime lockfile. */
 function prepare() {
-  const configDir = join(process.env.XDG_CONFIG_HOME ?? join(homedir(), ".config"), APPNAME);
-  const dataDir = join(process.env.XDG_DATA_HOME ?? join(homedir(), ".local/share"), APPNAME);
+  const config = configDir();
+  const data = dataDir();
 
   // A symlink to an old npx cache (or Nix store) must not survive.
-  rmSync(configDir, { recursive: true, force: true });
-  cpSync(configSource, configDir, { recursive: true });
-  cpSync(nazoplugSource, join(configDir, "lua/nazoplug"), { recursive: true });
-  makeWritable(configDir);
+  rmSync(config, { recursive: true, force: true });
+  cpSync(configSource, config, { recursive: true });
+  cpSync(nazoplugSource, join(config, "lua/nazoplug"), { recursive: true });
+  makeWritable(config);
 
-  mkdirSync(dataDir, { recursive: true });
-  const configLock = join(configDir, "nazoplug-lock.json");
-  const dataLock = join(dataDir, "nazoplug-lock.json");
+  mkdirSync(data, { recursive: true });
+  const configLock = join(config, "nazoplug-lock.json");
+  const dataLock = join(data, "nazoplug-lock.json");
   if (!existsSync(dataLock) && existsSync(configLock)) {
     cpSync(configLock, dataLock);
     makeWritable(dataLock);
@@ -122,7 +140,13 @@ function launch(nvim, args) {
 }
 
 const args = process.argv.slice(2);
-if (args[0] === "--version" || args[0] === "-V") {
+if (args[0] === "remove") {
+  try {
+    remove();
+  } catch (error) {
+    fail(`failed to remove configuration: ${error.message}`);
+  }
+} else if (args[0] === "--version" || args[0] === "-V") {
   console.log(version());
 } else if (args[0] === "--help" || args[0] === "-h") {
   help();

@@ -51,6 +51,13 @@
     "avante",
     "Avante",
     "APPNAME",
+    "PATHEXT",
+    "shellcheck",
+    "EACCES",
+    "cquit",
+    "startuptime",
+    "qall",
+    "softprops",
     "Repomap"
   ],
   "flagWords": []

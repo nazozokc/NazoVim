@@ -78,7 +78,7 @@ nix run github:NazoVim-org/NazoVim
 
 <!-- markdownlint-disable MD013 -->
 
-設定は `~/.config/nvim-nazozokc` に隔離して展開されるため、既存のNeovim設定を汚しません。
+設定は `~/.config/nazovim` に隔離して展開されるため、既存のNeovim設定を汚しません。
 <!-- markdownlint-enable MD013 -->
 
 ### 方法2: `npx nazovim`（Nix 不要・設定を汚さない）
@@ -89,8 +89,8 @@ npx nazovim
 
 `nvim` が PATH に必要です（Neovim 本体はインストール済みのものを使います）。
 別の実行ファイルを使う場合は `NAZOVIM_NVIM=/path/to/nvim npx nazovim` を指定します。
-設定は `~/.config/nvim-nazozokc` に展開され、既存のNeovim設定を汚しません。
-Nix 版と data ディレクトリ（`~/.local/share/nvim-nazozokc`）を共有するため、プラグインは再導入不要です。
+設定は `~/.config/nazovim` に展開され、既存のNeovim設定を汚しません。
+Nix 版と data ディレクトリ（`~/.local/share/nazovim`）を共有するため、プラグインは再導入不要です。
 
 ```bash
 npx nazovim --version   # ランチャーのバージョン
@@ -119,6 +119,18 @@ nvim
 
 > monorepo 構成のため、Neovim 設定は `apps/nvim/`、マネージャーは `apps/nazoplug/` にあります。
 > 上記の sparse checkout で両方取得できます。
+
+### 設定の削除（`remove`）
+
+Nix 版・npx 版のどちらからでも `~/.config/nazovim` だけを削除できます。
+
+```bash
+nix run github:NazoVim-org/NazoVim -- remove
+npx nazovim remove
+```
+
+プラグインが入っている `~/.local/share/nazovim` は残ります。
+Nix 版が作った symlink の場合は link だけを外し、link 先は削除しません。
 
 ---
 

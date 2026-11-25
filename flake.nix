@@ -35,13 +35,13 @@
             nazoplugSrc = ./apps/nazoplug/lua/nazoplug;
           };
 
-          nvim-nazozokc = nixPackages.nvim-nazozokc;
+          nazovim = nixPackages.nazovim;
           nvimConfig = nixPackages.nvimConfig;
         in
         {
           packages = {
             # nix build → result/bin/nvim
-            default = nvim-nazozokc;
+            default = nazovim;
 
             # nix build .#config → 設定ファイル一式
             config = nvimConfig;
@@ -49,7 +49,7 @@
 
           apps.default = {
             type = "app";
-            program = "${nvim-nazozokc}/bin/nvim";
+            program = "${nazovim}/bin/nvim";
           };
 
           # nix develop → LSP / formatter が揃った開発シェル
@@ -77,9 +77,9 @@
             ];
 
             shellHook = ''
-              export NVIM_APPNAME="nvim-nazozokc"
+              export NVIM_APPNAME="nazovim"
 
-              CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}/nvim-nazozokc"
+              CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}/nazovim"
 
               if [ ! -d "$CONFIG_DIR" ]; then
                 echo "[nazozokc.nvim] Initializing config at $CONFIG_DIR ..."

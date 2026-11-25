@@ -58,13 +58,17 @@ jobs:
           tar -tzf "$archive" | grep -q '^package/apps/nvim/init.lua$'
           tar -tzf "$archive" | grep -q '^package/apps/nazoplug/lua/nazoplug/init.lua$'
 
-          mkdir -p "$RUNNER_TEMP/fakebin"
+          mkdir -p "$RUNNER_TEMP/fake-nvim-bin"
           # shellcheck disable=SC2016
-          printf '#!/bin/sh\nprintf "APPNAME=%%s\\nARG=%%s\\n" "$NVIM_APPNAME" "$@" > "$FAKE_NVIM_LOG"\n' > "$RUNNER_TEMP/fakebin/nvim"
-          chmod +x "$RUNNER_TEMP/fakebin/nvim"
+          printf '#!/bin/sh\nprintf "APPNAME=%%s\\nARG=%%s\\n" "$NVIM_APPNAME" "$@" > "$FAKE_NVIM_LOG"\n' > "$RUNNER_TEMP/fake-nvim-bin/nvim"
+          chmod +x "$RUNNER_TEMP/fake-nvim-bin/nvim"
 
-          PATH="$RUNNER_TEMP/fakebin:$PATH" "$RUNNER_TEMP/prefix/node_modules/.bin/nazovim" --clean
-          test -f "$XDG_CONFIG_HOME/nvim-nazozokc/lua/nazoplug/init.lua"
-          test -f "$XDG_DATA_HOME/nvim-nazozokc/nazoplug-lock.json"
-          grep -q 'APPNAME=nvim-nazozokc' "$FAKE_NVIM_LOG"
+          PATH="$RUNNER_TEMP/fake-nvim-bin:$PATH" "$RUNNER_TEMP/prefix/node_modules/.bin/nazovim" --clean
+          test -f "$XDG_CONFIG_HOME/nazovim/lua/nazoplug/init.lua"
+          test -f "$XDG_DATA_HOME/nazovim/nazoplug-lock.json"
+          grep -q 'APPNAME=nazovim' "$FAKE_NVIM_LOG"
           grep -q 'ARG=--clean' "$FAKE_NVIM_LOG"
+
+          "$RUNNER_TEMP/prefix/node_modules/.bin/nazovim" remove
+          test ! -e "$XDG_CONFIG_HOME/nazovim"
+          test -f "$XDG_DATA_HOME/nazovim/nazoplug-lock.json"
