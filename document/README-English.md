@@ -29,7 +29,7 @@
 **nazovim** is a personal Neovim distribution tailored for CLI/TUI-centric workflows.
 Built on the [kanagawa](https://github.com/rebelot/kanagawa.nvim) color scheme and aggressive lazy-loading via the in-house `nazoplug` manager, it comes with everything needed for TypeScript, Lua, Nix, Ruby, and more.
 
-> Distributed as a Nix flake — run it instantly in an isolated environment with a single `nix run` command.
+> Distributed as a Nix flake and an npm package — run it instantly in an isolated environment with `nix run` or `npx nazovim`.
 <!-- markdownlint-enable MD013 -->
 
 ---
@@ -49,7 +49,7 @@ Built on the [kanagawa](https://github.com/rebelot/kanagawa.nvim) color scheme a
 - **🧠 AI integration** — Supports both Claude Code (`claudecode.nvim`) and opencode (`opencode.nvim`)
 - **🌊 snacks.nvim** — Dashboard, Picker, Zen mode, and session management all unified in one plugin
 - **🐛 DAP** — Minimal debug environment for JavaScript / TypeScript
-- **📦 Nix-ready** — Isolated launch via `nix run` / LSP-equipped devShell via `nix develop`
+- **📦 Nix / npm-ready** — Isolated launch via `nix run` / `npx nazovim`, LSP-equipped devShell via `nix develop`
 - **🧪 Testing** — neotest with Jest / Vitest / Playwright adapters
 - **🔍 Fuzzy finding** — snacks.nvim Picker (ivy layout) as primary, Telescope as secondary
 - **📝 Treesitter textobjects** — High-precision text objects at function / class / argument granularity
@@ -74,6 +74,8 @@ Built on the [kanagawa](https://github.com/rebelot/kanagawa.nvim) color scheme a
 | ripgrep | Grep search |
 | fd | File search |
 
+`npx nazovim` requires Node.js 20+.
+
 ---
 
 ## 📦 Installation
@@ -88,7 +90,25 @@ nix run github:NazoVim-org/NazoVim
 The configuration is deployed in isolation under `~/.config/nvim-nazozokc`, leaving your existing Neovim setup untouched.
 <!-- markdownlint-enable MD013 -->
 
-### Option 2: Clone (no Nix required)
+### Option 2: `npx nazovim` (no Nix, no config overwrite)
+
+```bash
+npx nazovim
+```
+
+`nvim` must be on PATH; the launcher uses your installed Neovim binary.
+Set `NAZOVIM_NVIM=/path/to/nvim` to use a different executable.
+<!-- markdownlint-disable MD013 -->
+The configuration is deployed under `~/.config/nvim-nazozokc`, leaving your existing Neovim setup untouched.
+The data directory (`~/.local/share/nvim-nazozokc`) is shared with the Nix launch, so plugins do not need reinstalling.
+<!-- markdownlint-enable MD013 -->
+
+```bash
+npx nazovim --version    # launcher version
+npx nazovim -- --version # pass --version to Neovim
+```
+
+### Option 3: Clone (no Nix required)
 
 <!-- markdownlint-disable MD013 -->
 > **Warning**: This will overwrite your existing Neovim configuration. A backup is recommended.
@@ -133,6 +153,9 @@ run `:NazoPlug migrate` to reuse its data directory.
 │       └── tests/            # headless tests
 ├── packages/
 │   └── nix/                  # Nix modules
+├── bin/
+│   └── nazovim.mjs           # npx launcher
+├── package.json              # npm package definition
 ├── template/                 # File templates
 │   ├── js/
 │   ├── ts/
@@ -399,7 +422,7 @@ return {
 }
 ```
 
-> **Note**: Only applies when installed via the Clone method (Option 2).
+> **Note**: Only applies when installed via the Clone method (Option 3).
 
 ---
 

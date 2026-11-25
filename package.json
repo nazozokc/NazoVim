@@ -1,0 +1,34 @@
+{
+  "name": "nazovim",
+  "version": "3.0.0",
+  "description": "Fast, self-contained Neovim distribution — launch with npx nazovim",
+  "type": "module",
+  "bin": {
+    "nazovim": "bin/nazovim.mjs"
+  },
+  "files": [
+    "bin/nazovim.mjs",
+    "apps/nvim",
+    "apps/nazoplug/lua/nazoplug"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "pack:check": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "neovim",
+    "nvim",
+    "nazovim",
+    "dotfiles"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NazoVim-org/NazoVim.git"
+  },
+  "homepage": "https://github.com/NazoVim-org/NazoVim#readme",
+  "bugs": "https://github.com/NazoVim-org/NazoVim/issues"
+}
