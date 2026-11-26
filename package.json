@@ -1,6 +1,6 @@
 {
   "name": "nazovim",
-  "version": "3.0.0",
+  "version": "3.0.3",
   "description": "Fast, self-contained Neovim distribution — launch with npx nazovim",
   "type": "module",
   "bin": {
