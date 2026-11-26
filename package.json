@@ -27,8 +27,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NazoVim-org/NazoVim.git"
+    "url": "git+https://github.com/nazozokc/NazoVim.git"
   },
-  "homepage": "https://github.com/NazoVim-org/NazoVim#readme",
-  "bugs": "https://github.com/NazoVim-org/NazoVim/issues"
+  "homepage": "https://github.com/nazozokc/NazoVim#readme",
+  "bugs": "https://github.com/nazozokc/NazoVim/issues"
 }
