@@ -71,6 +71,47 @@ if (process.platform === "win32") {
     }
   });
 
+  test("migrates plugins from the legacy data dir on first launch", () => {
+    const box = sandbox();
+    try {
+      const legacyPlugin = join(box.data, "nvim-nazozokc/site/pack/nazoplug/opt/flash.nvim/lua/flash");
+      mkdirSync(legacyPlugin, { recursive: true });
+      writeFileSync(join(legacyPlugin, "init.lua"), "-- legacy flash");
+
+      const result = run(box);
+      assert.equal(result.status, 0, result.stderr);
+      assert.equal(
+        readFileSync(join(box.data, "nazovim/site/pack/nazoplug/opt/flash.nvim/lua/flash/init.lua"), "utf8"),
+        "-- legacy flash",
+      );
+      assert.ok(existsSync(join(legacyPlugin, "init.lua")));
+      assert.equal(
+        readFileSync(join(box.data, "nazovim/nazoplug-lock.json"), "utf8"),
+        readFileSync(join(box.config, "nazovim/nazoplug-lock.json"), "utf8"),
+      );
+    } finally {
+      cleanup(box);
+    }
+  });
+
+  test("keeps an existing plugin dir instead of copying the legacy one", () => {
+    const box = sandbox();
+    try {
+      const current = join(box.data, "nazovim/site/pack/nazoplug/opt/flash.nvim");
+      const legacy = join(box.data, "nvim-nazozokc/site/pack/nazoplug/opt/flash.nvim");
+      mkdirSync(current, { recursive: true });
+      writeFileSync(join(current, "marker"), "current");
+      mkdirSync(legacy, { recursive: true });
+      writeFileSync(join(legacy, "marker"), "legacy");
+
+      const result = run(box);
+      assert.equal(result.status, 0, result.stderr);
+      assert.equal(readFileSync(join(current, "marker"), "utf8"), "current");
+    } finally {
+      cleanup(box);
+    }
+  });
+
   test("replaces a stale config symlink and keeps an existing lockfile", () => {
     const box = sandbox();
     try {
