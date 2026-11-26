@@ -2,25 +2,11 @@
 // npm launcher for NazoVim. Mirrors packages/nix/default.nix: deploy the
 // config into an isolated NVIM_APPNAME and exec nvim with the same argv.
 import { spawn } from "node:child_process";
-import {
-  chmodSync,
-  cpSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  rmSync,
-  statSync,
-} from "node:fs";
-import { homedir } from "node:os";
-import { delimiter, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
-const APPNAME = "nazovim";
-const LEGACY_APPNAME = "nvim-nazozokc";
-const packageRoot = fileURLToPath(new URL("..", import.meta.url));
-const configSource = join(packageRoot, "apps/nvim");
-const nazoplugSource = join(packageRoot, "apps/nazoplug/lua/nazoplug");
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { packageRoot, prepare, remove } from "./lib/deploy.mjs";
+import { configDir, dataDir, nvimEnvironment } from "./lib/paths.mjs";
+import { findExecutable, forwardableSignals, needsShell } from "./lib/platform.mjs";
 
 /** Print a message to stderr and stop with an error exit code. */
 function fail(message) {
@@ -31,21 +17,6 @@ function fail(message) {
 /** Read the package version from package.json. */
 function version() {
   return JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8")).version;
-}
-
-/** Resolve the isolated config directory. */
-function configDir() {
-  return join(process.env.XDG_CONFIG_HOME ?? join(homedir(), ".config"), APPNAME);
-}
-
-/** Resolve the isolated data directory. */
-function dataDir() {
-  return join(process.env.XDG_DATA_HOME ?? join(homedir(), ".local/share"), APPNAME);
-}
-
-/** Resolve the data directory used by older NazoVim releases. */
-function legacyDataDir() {
-  return join(process.env.XDG_DATA_HOME ?? join(homedir(), ".local/share"), LEGACY_APPNAME);
 }
 
 /** Show launcher usage. */
@@ -61,93 +32,22 @@ Usage:
 
 Environment:
   NAZOVIM_NVIM                 nvim executable (default: nvim on PATH)
+  XDG_CONFIG_HOME              config base (default ~/.config)
+  XDG_DATA_HOME                data base (default ~/.local/share)
 
-Config: $XDG_CONFIG_HOME/${APPNAME} (default ~/.config/${APPNAME})
-Data:   $XDG_DATA_HOME/${APPNAME} (default ~/.local/share/${APPNAME})`);
-}
-
-/** Remove only the isolated config directory. Plugins in the data dir stay. */
-function remove() {
-  const target = configDir();
-  rmSync(target, { recursive: true, force: true });
-  console.log(`Removed ${target}`);
-}
-
-/** Return an executable path for name, or null when it is not on PATH. */
-function findExecutable(name) {
-  if (name.includes("/") || name.includes("\\")) {
-    try {
-      return statSync(name).isFile() ? name : null;
-    } catch {
-      return null;
-    }
-  }
-  const extensions = process.platform === "win32" ? (process.env.PATHEXT ?? ".EXE;.CMD;.BAT").split(";") : [""];
-  for (const dir of (process.env.PATH ?? "").split(delimiter)) {
-    for (const extension of extensions) {
-      const candidate = join(dir, `${name}${extension}`);
-      try {
-        const stat = statSync(candidate);
-        if (stat.isFile() && (stat.mode & 0o111) !== 0) return candidate;
-      } catch {
-        // Not present in this PATH entry — keep looking.
-      }
-    }
-  }
-  return null;
-}
-
-/** Restore owner-write bits lost from archived files. */
-function makeWritable(target) {
-  let stat;
-  try {
-    stat = statSync(target);
-  } catch {
-    return;
-  }
-  chmodSync(target, stat.mode | 0o200);
-  if (stat.isDirectory()) {
-    for (const entry of readdirSync(target)) makeWritable(join(target, entry));
-  }
-}
-
-/** Deploy the bundled config and seed the runtime lockfile. */
-function prepare() {
-  const config = configDir();
-  const data = dataDir();
-
-  // A symlink to an old npx cache (or Nix store) must not survive.
-  rmSync(config, { recursive: true, force: true });
-  cpSync(configSource, config, { recursive: true });
-  cpSync(nazoplugSource, join(config, "lua/nazoplug"), { recursive: true });
-  makeWritable(config);
-
-  mkdirSync(data, { recursive: true });
-
-  // Older releases used a different NVIM_APPNAME; carry their plugins over
-  // so a version upgrade does not turn every require() into "module not found".
-  const site = join(data, "site");
-  const legacySite = join(legacyDataDir(), "site");
-  if (!existsSync(site) && existsSync(legacySite)) {
-    cpSync(legacySite, site, { recursive: true });
-  }
-
-  const configLock = join(config, "nazoplug-lock.json");
-  const dataLock = join(data, "nazoplug-lock.json");
-  if (!existsSync(dataLock) && existsSync(configLock)) {
-    cpSync(configLock, dataLock);
-    makeWritable(dataLock);
-  }
+Config: ${configDir()}
+Data:   ${dataDir()}`);
 }
 
 /** Run nvim with the prepared environment and forward its exit status. */
 function launch(nvim, args) {
   const child = spawn(nvim, args, {
     stdio: "inherit",
-    env: { ...process.env, NVIM_APPNAME: APPNAME },
+    env: nvimEnvironment(),
+    shell: needsShell(nvim),
   });
 
-  for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
+  for (const signal of forwardableSignals()) {
     process.on(signal, () => child.kill(signal));
   }
   child.on("error", (error) => fail(`failed to start ${nvim}: ${error.message}`));
@@ -157,7 +57,8 @@ function launch(nvim, args) {
 const args = process.argv.slice(2);
 if (args[0] === "remove") {
   try {
-    remove();
+    const target = remove();
+    console.log(`Removed ${target}`);
   } catch (error) {
     fail(`failed to remove configuration: ${error.message}`);
   }

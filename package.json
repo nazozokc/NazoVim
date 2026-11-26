@@ -8,6 +8,7 @@
   },
   "files": [
     "bin/nazovim.mjs",
+    "bin/lib",
     "apps/nvim",
     "apps/nazoplug/lua/nazoplug"
   ],
