@@ -45,6 +45,7 @@ let
       APPNAME="nazovim"
       CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}/$APPNAME"
       DATA_DIR="''${XDG_DATA_HOME:-$HOME/.local/share}/$APPNAME"
+      LEGACY_DATA_DIR="''${XDG_DATA_HOME:-$HOME/.local/share}/nvim-nazozokc"
       export NVIM_APPNAME="$APPNAME"
 
       # remove: 設定ディレクトリだけを削除する (plugins は data dir に残す)
@@ -67,6 +68,10 @@ let
       ln -s ${nvimConfig} "$CONFIG_DIR"
       # プラグインのデータディレクトリを事前に作成
       mkdir -p "$DATA_DIR"
+      # 旧 APPNAME (nvim-nazozokc) のプラグインを初回起動時に引き継ぐ
+      if [ ! -d "$DATA_DIR/site" ] && [ -d "$LEGACY_DATA_DIR/site" ]; then
+        cp -a "$LEGACY_DATA_DIR/site" "$DATA_DIR/site"
+      fi
       # 初回起動時に Nix store の lockfile を data dir にコピー
       if [ ! -f "$DATA_DIR/nazoplug-lock.json" ] && [ -f "$CONFIG_DIR/nazoplug-lock.json" ]; then
         cp "$CONFIG_DIR/nazoplug-lock.json" "$DATA_DIR/nazoplug-lock.json"

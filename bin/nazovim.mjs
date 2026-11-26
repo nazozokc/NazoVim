@@ -17,6 +17,7 @@ import { delimiter, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const APPNAME = "nazovim";
+const LEGACY_APPNAME = "nvim-nazozokc";
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const configSource = join(packageRoot, "apps/nvim");
 const nazoplugSource = join(packageRoot, "apps/nazoplug/lua/nazoplug");
@@ -40,6 +41,11 @@ function configDir() {
 /** Resolve the isolated data directory. */
 function dataDir() {
   return join(process.env.XDG_DATA_HOME ?? join(homedir(), ".local/share"), APPNAME);
+}
+
+/** Resolve the data directory used by older NazoVim releases. */
+function legacyDataDir() {
+  return join(process.env.XDG_DATA_HOME ?? join(homedir(), ".local/share"), LEGACY_APPNAME);
 }
 
 /** Show launcher usage. */
@@ -117,6 +123,15 @@ function prepare() {
   makeWritable(config);
 
   mkdirSync(data, { recursive: true });
+
+  // Older releases used a different NVIM_APPNAME; carry their plugins over
+  // so a version upgrade does not turn every require() into "module not found".
+  const site = join(data, "site");
+  const legacySite = join(legacyDataDir(), "site");
+  if (!existsSync(site) && existsSync(legacySite)) {
+    cpSync(legacySite, site, { recursive: true });
+  }
+
   const configLock = join(config, "nazoplug-lock.json");
   const dataLock = join(data, "nazoplug-lock.json");
   if (!existsSync(dataLock) && existsSync(configLock)) {
