@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -21,23 +23,38 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
 
-      - name: Verify version matches the release tag
+      - name: Sync package.json version with release tag
+        id: version
         env:
           TAG: ${{ github.event.release.tag_name }}
         run: |
           version="${TAG#v}"
-          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([-.+][0-9A-Za-z.-]+)?$'; then
+          if ! printf '%s' "$version" | grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'; then
             echo "::error::release tag '$TAG' is not a valid semver tag"
             exit 1
           fi
+          npm version "$version" --no-git-tag-version --allow-same-version --ignore-scripts
           package_version="$(node -p "require('./package.json').version")"
-          if [ "$version" != "$package_version" ]; then
-            echo "::error::package.json version '$package_version' does not match tag '$version'"
+          if [ "$package_version" != "$version" ]; then
+            echo "::error::package.json version '$package_version' was not updated to '$version'"
             exit 1
           fi
+          echo "VERSION=$version" >> "$GITHUB_OUTPUT"
 
       - name: Test launcher
         run: npm test
+
+      - name: Verify tarball version
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          tarball="$(npm pack --pack-destination "$RUNNER_TEMP" --silent)"
+          npm install --prefix "$RUNNER_TEMP/prefix" "$RUNNER_TEMP/$tarball"
+          actual="$("$RUNNER_TEMP/prefix/node_modules/.bin/nazovim" --version)"
+          if [ "$actual" != "$VERSION" ]; then
+            echo "::error::tarball reports version '$actual', expected '$VERSION'"
+            exit 1
+          fi
 
       - name: Update npm for OIDC trusted publishing
         run: npm install -g npm@latest
