@@ -5,7 +5,7 @@ import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { packageRoot, prepare, remove } from "./lib/deploy.mjs";
-import { configDir, dataDir, nvimEnvironment } from "./lib/paths.mjs";
+import { binDir, configDir, dataDir, nvimEnvironment } from "./lib/paths.mjs";
 import { findExecutable, forwardableSignals, needsShell } from "./lib/platform.mjs";
 
 /** Print a message to stderr and stop with an error exit code. */
@@ -25,7 +25,7 @@ function help() {
 
 Usage:
   npx nazovim [nvim args...]   launch Neovim with NazoVim
-  npx nazovim remove           delete ${configDir()}
+  npx nazovim remove           delete all NazoVim config, data and bin shims
   npx nazovim --version        show launcher version
   npx nazovim --help           show this help
   npx nazovim -- --version     pass --version to Neovim
@@ -34,9 +34,12 @@ Environment:
   NAZOVIM_NVIM                 nvim executable (default: nvim on PATH)
   XDG_CONFIG_HOME              config base (default ~/.config)
   XDG_DATA_HOME                data base (default ~/.local/share)
+  XDG_STATE_HOME               state base (default ~/.local/state)
+  XDG_BIN_HOME                 shim base (default ~/.local/bin)
 
 Config: ${configDir()}
-Data:   ${dataDir()}`);
+Data:   ${dataDir()}
+Bin:    ${binDir()}`);
 }
 
 /** Run nvim with the prepared environment and forward its exit status. */
@@ -57,8 +60,8 @@ function launch(nvim, args) {
 const args = process.argv.slice(2);
 if (args[0] === "remove") {
   try {
-    const target = remove();
-    console.log(`Removed ${target}`);
+    const removed = remove();
+    console.log(`Removed ${removed.length} NazoVim path(s):\n${removed.map((path) => `  ${path}`).join("\n")}`);
   } catch (error) {
     fail(`failed to remove configuration: ${error.message}`);
   }

@@ -3,14 +3,25 @@ import {
   chmodSync,
   cpSync,
   existsSync,
+  lstatSync,
   mkdirSync,
   readdirSync,
+  readlinkSync,
   rmSync,
   statSync,
 } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { configDir, dataDir, legacyDataDir } from "./paths.mjs";
+import {
+  APPNAME,
+  binDir,
+  configDir,
+  dataDir,
+  legacyConfigDir,
+  legacyDataDir,
+  legacyStateDir,
+  stateDir,
+} from "./paths.mjs";
 
 export const packageRoot = fileURLToPath(new URL("../..", import.meta.url));
 const configSource = join(packageRoot, "apps", "nvim");
@@ -35,11 +46,47 @@ function makeWritable(target) {
   }
 }
 
-/** Remove only the isolated config directory. Plugins in the data dir stay. */
+function isSymlink(path) {
+  try {
+    return lstatSync(path).isSymbolicLink();
+  } catch {
+    return false;
+  }
+}
+
+/** A `nvim` shim only belongs to us when its link target names NazoVim. */
+function isNazovimLink(path) {
+  if (!isSymlink(path)) return false;
+  return /nazovim|nvim-nazozokc/i.test(readlinkSync(path));
+}
+
+/** Remove every NazoVim-owned path: config, plugins, state and bin shims. */
 export function remove() {
-  const target = configDir();
-  rmSync(target, { recursive: true, force: true });
-  return target;
+  const removed = [];
+  for (const target of [
+    configDir(),
+    dataDir(),
+    stateDir(),
+    legacyConfigDir(),
+    legacyDataDir(),
+    legacyStateDir(),
+  ]) {
+    rmSync(target, { recursive: true, force: true });
+    removed.push(target);
+  }
+
+  const bin = binDir();
+  const own = join(bin, APPNAME);
+  if (existsSync(own) || isSymlink(own)) {
+    rmSync(own, { force: true });
+    removed.push(own);
+  }
+  const nvim = join(bin, "nvim");
+  if (isNazovimLink(nvim)) {
+    rmSync(nvim, { force: true });
+    removed.push(nvim);
+  }
+  return removed;
 }
 
 /** Deploy the bundled config and seed the runtime lockfile. */
