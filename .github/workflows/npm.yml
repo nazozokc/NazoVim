@@ -53,6 +53,8 @@ jobs:
           FAKE_NVIM_LOG: ${{ runner.temp }}/nvim.log
           XDG_CONFIG_HOME: ${{ runner.temp }}/config
           XDG_DATA_HOME: ${{ runner.temp }}/data
+          XDG_STATE_HOME: ${{ runner.temp }}/state
+          XDG_BIN_HOME: ${{ runner.temp }}/bin
         run: |
           archive="$RUNNER_TEMP/$TARBALL"
           tar -tzf "$archive" | grep -q '^package/apps/nvim/init.lua$'
@@ -71,4 +73,5 @@ jobs:
 
           "$RUNNER_TEMP/prefix/node_modules/.bin/nazovim" remove
           test ! -e "$XDG_CONFIG_HOME/nazovim"
-          test -f "$XDG_DATA_HOME/nazovim/nazoplug-lock.json"
+          test ! -e "$XDG_DATA_HOME/nazovim"
+          test ! -e "$XDG_STATE_HOME/nazovim"
