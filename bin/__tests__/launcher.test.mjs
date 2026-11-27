@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { delimiter, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { APPNAME, dataName } from "../lib/paths.mjs";
+import { APPNAME, LEGACY_APPNAME, dataName } from "../lib/paths.mjs";
 import { isWindows } from "../lib/platform.mjs";
 
 const launcher = fileURLToPath(new URL("../nazovim.mjs", import.meta.url));
@@ -25,11 +25,15 @@ function sandbox() {
   const bin = join(root, "bin");
   const config = join(root, "config");
   const data = join(root, "data");
+  const state = join(root, "state");
+  const shims = join(root, "shims");
   const log = join(root, "nvim.log");
   const nvim = join(bin, isWindows ? "nvim.cmd" : "nvim");
   mkdirSync(bin);
   mkdirSync(config);
   mkdirSync(data);
+  mkdirSync(state);
+  mkdirSync(shims);
 
   if (isWindows) {
     writeFileSync(
@@ -39,6 +43,7 @@ function sandbox() {
         `echo APPNAME=%NVIM_APPNAME%>> "%FAKE_NVIM_LOG%"`,
         `echo CONFIG=%XDG_CONFIG_HOME%>> "%FAKE_NVIM_LOG%"`,
         `echo DATA=%XDG_DATA_HOME%>> "%FAKE_NVIM_LOG%"`,
+        `echo AUTO=%NAZOVIM_AUTO_INSTALL%>> "%FAKE_NVIM_LOG%"`,
         `for %%A in (%*) do echo ARG=%%~A>> "%FAKE_NVIM_LOG%"`,
         "",
       ].join("\r\n"),
@@ -46,13 +51,13 @@ function sandbox() {
   } else {
     writeFileSync(
       nvim,
-      `#!/bin/sh\n{ printf 'APPNAME=%s\\n' "$NVIM_APPNAME"; printf 'CONFIG=%s\\n' "$XDG_CONFIG_HOME"; printf 'DATA=%s\\n' "$XDG_DATA_HOME"; printf 'ARG=%s\\n' "$@"; } > "$FAKE_NVIM_LOG"\n`,
+      `#!/bin/sh\n{ printf 'APPNAME=%s\\n' "$NVIM_APPNAME"; printf 'CONFIG=%s\\n' "$XDG_CONFIG_HOME"; printf 'DATA=%s\\n' "$XDG_DATA_HOME"; printf 'AUTO=%s\\n' "$NAZOVIM_AUTO_INSTALL"; printf 'ARG=%s\\n' "$@"; } > "$FAKE_NVIM_LOG"\n`,
       { mode: 0o755 },
     );
     chmodSync(nvim, 0o755);
   }
 
-  return { root, bin, config, data, log, nvim };
+  return { root, bin, config, data, state, shims, log, nvim };
 }
 
 /** Run the launcher with the sandbox environment. */
@@ -65,6 +70,8 @@ function run(box, args = [], overrides = {}) {
       USERPROFILE: box.root,
       XDG_CONFIG_HOME: box.config,
       XDG_DATA_HOME: box.data,
+      XDG_STATE_HOME: box.state,
+      XDG_BIN_HOME: box.shims,
       PATH: `${box.bin}${delimiter}${process.env.PATH}`,
       PATHEXT: ".COM;.EXE;.BAT;.CMD",
       FAKE_NVIM_LOG: box.log,
@@ -87,6 +94,7 @@ test("deploys config, seeds lockfile and passes argv to nvim", () => {
     assert.match(log, /APPNAME=nazovim/);
     assert.ok(log.includes(`CONFIG=${box.config}`), log);
     assert.ok(log.includes(`DATA=${box.data}`), log);
+    assert.match(log, /AUTO=1/);
     assert.match(log, /ARG=file\.txt/);
     assert.match(log, /ARG=--clean/);
     assert.ok(existsSync(join(box.config, APPNAME, "init.lua")));
@@ -199,20 +207,54 @@ test("prints launcher version and help without launching nvim", () => {
   }
 });
 
-test("remove deletes only the config dir, keeping the data dir", () => {
+test("remove deletes config, data, state and legacy dirs", () => {
   const box = sandbox();
   try {
-    mkdirSync(join(box.config, APPNAME), { recursive: true });
-    writeFileSync(join(box.config, APPNAME, "init.lua"), "x");
-    mkdirSync(join(box.data, DATA_NAME), { recursive: true });
-    writeFileSync(join(box.data, DATA_NAME, "nazoplug-lock.json"), "{}");
+    const dirs = [
+      join(box.config, APPNAME),
+      join(box.data, DATA_NAME),
+      join(box.state, DATA_NAME),
+      join(box.config, LEGACY_APPNAME),
+      join(box.data, LEGACY_DATA_NAME),
+      join(box.state, LEGACY_DATA_NAME),
+    ];
+    for (const dir of dirs) {
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(join(dir, "marker"), "x");
+    }
 
     const result = run(box, ["remove"]);
     assert.equal(result.status, 0, result.stderr);
-    assert.match(result.stdout, /Removed /);
-    assert.equal(existsSync(join(box.config, APPNAME)), false);
-    assert.ok(existsSync(join(box.data, DATA_NAME, "nazoplug-lock.json")));
+    assert.match(result.stdout, /Removed 6 NazoVim path/);
+    for (const dir of dirs) {
+      assert.equal(existsSync(dir), false, dir);
+    }
     assert.equal(existsSync(box.log), false);
+  } finally {
+    cleanup(box);
+  }
+});
+
+test("remove deletes NazoVim bin shims but keeps unrelated executables", () => {
+  const box = sandbox();
+  try {
+    const own = join(box.shims, "nazovim");
+    writeFileSync(own, "#!/bin/sh\n");
+    const nvimLink = join(box.shims, "nvim");
+    const nvimTarget = join(box.root, "store-nazovim");
+    mkdirSync(nvimTarget);
+    link(nvimTarget, nvimLink);
+    const other = join(box.shims, "vim");
+    writeFileSync(other, "#!/bin/sh\n");
+    const foreign = join(box.shims, "other-nvim");
+    link(join(box.root, "real-nvim"), foreign);
+
+    const result = run(box, ["remove"]);
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(existsSync(own), false);
+    assert.equal(lstatSync(nvimLink, { throwIfNoEntry: false }), undefined);
+    assert.ok(existsSync(other));
+    assert.ok(lstatSync(foreign).isSymbolicLink());
   } finally {
     cleanup(box);
   }

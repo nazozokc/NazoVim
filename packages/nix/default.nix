@@ -43,15 +43,30 @@ let
     ];
     text = ''
       APPNAME="nazovim"
+      LEGACY_APPNAME="nvim-nazozokc"
       CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}/$APPNAME"
       DATA_DIR="''${XDG_DATA_HOME:-$HOME/.local/share}/$APPNAME"
-      LEGACY_DATA_DIR="''${XDG_DATA_HOME:-$HOME/.local/share}/nvim-nazozokc"
+      STATE_DIR="''${XDG_STATE_HOME:-$HOME/.local/state}/$APPNAME"
+      BIN_DIR="''${XDG_BIN_HOME:-$HOME/.local/bin}"
+      LEGACY_CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}/$LEGACY_APPNAME"
+      LEGACY_DATA_DIR="''${XDG_DATA_HOME:-$HOME/.local/share}/$LEGACY_APPNAME"
+      LEGACY_STATE_DIR="''${XDG_STATE_HOME:-$HOME/.local/state}/$LEGACY_APPNAME"
       export NVIM_APPNAME="$APPNAME"
+      # 未導入のプラグインを起動時に自動インストールする
+      export NAZOVIM_AUTO_INSTALL=1
 
-      # remove: 設定ディレクトリだけを削除する (plugins は data dir に残す)
+      # remove: NazoVim が作った config / data / state / bin shim をすべて削除する
       if [ "''${1:-}" = "remove" ]; then
-        rm -rf "$CONFIG_DIR"
-        echo "Removed $CONFIG_DIR"
+        rm -rf "$CONFIG_DIR" "$DATA_DIR" "$STATE_DIR" \
+          "$LEGACY_CONFIG_DIR" "$LEGACY_DATA_DIR" "$LEGACY_STATE_DIR"
+        rm -f "$BIN_DIR/nazovim"
+        # nvim は NazoVim を指す symlink のときだけ消す (他ツールの nvim は残す)
+        if [ -L "$BIN_DIR/nvim" ]; then
+          case "$(readlink "$BIN_DIR/nvim")" in
+            *nazovim*|*NazoVim*|*nvim-nazozokc*) rm -f "$BIN_DIR/nvim" ;;
+          esac
+        fi
+        echo "Removed NazoVim config, data, state and bin shims"
         exit 0
       fi
       # `--` で nvim に渡す引数と排他する

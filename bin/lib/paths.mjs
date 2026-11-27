@@ -31,8 +31,26 @@ export function dataDir() {
   return join(dataBase(), dataName());
 }
 
+/** Directory Neovim uses for state (shada, undo, etc.). */
+export function stateDir(appname = APPNAME) {
+  return join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local", "state"), dataName(appname));
+}
+
+export function legacyConfigDir() {
+  return join(configBase(), LEGACY_APPNAME);
+}
+
 export function legacyDataDir() {
   return join(dataBase(), dataName(LEGACY_APPNAME));
+}
+
+export function legacyStateDir() {
+  return stateDir(LEGACY_APPNAME);
+}
+
+/** Where users commonly symlink the launcher executable. */
+export function binDir() {
+  return process.env.XDG_BIN_HOME ?? join(homedir(), ".local", "bin");
 }
 
 /** Pass the exact bases the launcher deployed into. Without this, Windows
@@ -41,6 +59,7 @@ export function nvimEnvironment() {
   return {
     ...process.env,
     NVIM_APPNAME: APPNAME,
+    NAZOVIM_AUTO_INSTALL: "1",
     XDG_CONFIG_HOME: configBase(),
     XDG_DATA_HOME: dataBase(),
   };
