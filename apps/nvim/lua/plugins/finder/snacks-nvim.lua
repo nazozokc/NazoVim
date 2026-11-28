@@ -24,7 +24,7 @@ return {
 				keys = {
 					{ icon = "", desc = "New file", key = "e", action = ":enew" },
 					{ icon = "󰒲", desc = "Plugins", key = "z", action = ":NazoPlug" },
-					{ icon = "󰈙", desc = "Oil", key = ".", action = ":Oil" },
+					{ icon = "󰙅", desc = "Explorer", key = ".", action = ":Neotree filesystem reveal right" },
 					{
 						icon = "",
 						desc = "Dotfiles",

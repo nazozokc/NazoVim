@@ -215,7 +215,6 @@ Nix store is kept. Other tools' `nvim` executables are left alone.
 | ------ | ------ |
 | snacks.nvim | Picker / Dashboard / Zen / Words / Session |
 | telescope.nvim | Fuzzy finder (secondary) |
-| oil.nvim | Buffer-based file explorer |
 | neo-tree.nvim | Tree-style file explorer |
 | yazi.nvim | yazi file manager integration |
 | dropbar.nvim | Winbar / breadcrumbs |
@@ -301,8 +300,7 @@ Nix store is kept. Other tools' `nvim` executables are left alone.
 | `<Leader>r` | Recent files |
 | `<Leader>h` | Clear search highlight |
 | `<Leader>z` | Zen mode |
-| `<Leader>m` | Oil file explorer |
-| `<Leader>n` | Neo-tree |
+| `<Leader>n` | Neo-tree file explorer |
 | `<Leader>t` | Floating terminal |
 | `<Leader>f` | Format |
 
