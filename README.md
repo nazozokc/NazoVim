@@ -279,17 +279,17 @@ Nix 版が作った config symlink は link だけを外し、link 先（Nix sto
 
 ### 基本
 
-| キー               | 動作                         |
+| キー | 動作 |
 | ------------------ | ---------------------------- |
 | `<Leader><Leader>` | ファイル検索 (snacks Picker) |
-| `<Leader>/`        | Live Grep                    |
-| `<Leader>b`        | バッファ一覧                 |
-| `<Leader>r`        | 最近使ったファイル           |
-| `<Leader>h`        | 検索ハイライト解除           |
-| `<Leader>z`        | Zen mode                     |
-| `<Leader>n`        | Neo-tree ファイルエクスプローラー |
-| `<Leader>t`        | フローティングターミナル     |
-| `<Leader>f`        | フォーマット                 |
+| `<Leader>/` | Live Grep |
+| `<Leader>b` | バッファ一覧 |
+| `<Leader>r` | 最近使ったファイル |
+| `<Leader>h` | 検索ハイライト解除 |
+| `<Leader>z` | Zen mode |
+| `<Leader>n` | Neo-tree ファイルエクスプローラー |
+| `<Leader>t` | フローティングターミナル |
+| `<Leader>f` | フォーマット |
 
 ### LSP
 
