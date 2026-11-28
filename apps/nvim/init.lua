@@ -39,7 +39,8 @@ if not ok then
 	error("nazoplug not found: " .. tostring(nazoplug))
 end
 
-local initialized = nazoplug.setup("plugins", {
+local initialized = nazoplug.setup({
+	spec = "plugins",
 	defaults = {
 		lazy = true,
 	},

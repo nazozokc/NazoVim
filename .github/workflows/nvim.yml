@@ -51,6 +51,12 @@ jobs:
           npm config set prefix /tmp/npm-global
           echo "/tmp/npm-global/bin" >> "$GITHUB_PATH"
 
+      - name: Check nvim init setup wiring
+        run: |
+          nix develop --command nvim --headless \
+            -u apps/nazoplug/tests/minimal_init.lua \
+            -l apps/nazoplug/tests/nvim_init_test.lua
+
       - name: Install nazoplug plugins
         timeout-minutes: 30
         env:
