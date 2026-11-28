@@ -202,7 +202,6 @@ Nix 版が作った config symlink は link だけを外し、link 先（Nix sto
 | -------------- | ------------------------------------------ |
 | snacks.nvim    | Picker / Dashboard / Zen / Words / Session |
 | telescope.nvim | ファジーファインダー（サブ）               |
-| oil.nvim       | バッファベースのファイルエクスプローラー   |
 | neo-tree.nvim  | ツリー形式ファイルエクスプローラー         |
 | yazi.nvim      | yaziファイルマネージャー統合               |
 | dropbar.nvim   | Winbar / パンくずリスト                    |
@@ -280,18 +279,17 @@ Nix 版が作った config symlink は link だけを外し、link 先（Nix sto
 
 ### 基本
 
-| キー               | 動作                         |
+| キー | 動作 |
 | ------------------ | ---------------------------- |
 | `<Leader><Leader>` | ファイル検索 (snacks Picker) |
-| `<Leader>/`        | Live Grep                    |
-| `<Leader>b`        | バッファ一覧                 |
-| `<Leader>r`        | 最近使ったファイル           |
-| `<Leader>h`        | 検索ハイライト解除           |
-| `<Leader>z`        | Zen mode                     |
-| `<Leader>m`        | Oil ファイルエクスプローラー |
-| `<Leader>n`        | Neo-tree                     |
-| `<Leader>t`        | フローティングターミナル     |
-| `<Leader>f`        | フォーマット                 |
+| `<Leader>/` | Live Grep |
+| `<Leader>b` | バッファ一覧 |
+| `<Leader>r` | 最近使ったファイル |
+| `<Leader>h` | 検索ハイライト解除 |
+| `<Leader>z` | Zen mode |
+| `<Leader>n` | Neo-tree ファイルエクスプローラー |
+| `<Leader>t` | フローティングターミナル |
+| `<Leader>f` | フォーマット |
 
 ### LSP
 
@@ -542,7 +540,6 @@ NazoVim は多くの優れた Neovim プラグインに支えられています�
 - [rafamadriz/friendly-snippets](https://github.com/rafamadriz/friendly-snippets)
 - [rcarriga/nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui)
 - [rebelot/kanagawa.nvim](https://github.com/rebelot/kanagawa.nvim)
-- [refractalize/oil-git-status.nvim](https://github.com/refractalize/oil-git-status.nvim)
 - [romgrk/barbar.nvim](https://github.com/romgrk/barbar.nvim)
 - [roobert/tailwindcss-colorizer-cmp.nvim](https://github.com/roobert/tailwindcss-colorizer-cmp.nvim)
 - [ryoppippi/denippet-autoimport-vscode](https://github.com/ryoppippi/denippet-autoimport-vscode)
@@ -555,7 +552,6 @@ NazoVim は多くの優れた Neovim プラグインに支えられています�
 - [stevearc/aerial.nvim](https://github.com/stevearc/aerial.nvim)
 - [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)
 - [stevearc/dressing.nvim](https://github.com/stevearc/dressing.nvim)
-- [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)
 - [stevearc/overseer.nvim](https://github.com/stevearc/overseer.nvim)
 - [theHamsta/nvim-dap-virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text)
 - [thenbe/neotest-playwright](https://github.com/thenbe/neotest-playwright)

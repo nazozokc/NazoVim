@@ -101,7 +101,6 @@ done
 | ---------- | ---- |
 | snacks.nvim | Picker / Dashboard / Zen / Words / Session |
 | telescope.nvim | ファジーファインダー（サブ） |
-| oil.nvim | バッファベースのファイルエクスプローラー |
 | neo-tree.nvim | ツリー形式ファイルエクスプローラー |
 | yazi.nvim | yaziファイルマネージャー統合 |
 | dropbar.nvim | Winbar / パンくずリスト |
@@ -189,8 +188,7 @@ done
 | `<Leader>r` | 最近使ったファイル |
 | `<Leader>h` | 検索ハイライト解除 |
 | `<Leader>z` | Zen mode |
-| `<Leader>m` | Oil ファイルエクスプローラー |
-| `<Leader>n` | Neo-tree |
+| `<Leader>n` | Neo-tree ファイルエクスプローラー |
 | `<Leader>t` | フローティングターミナル |
 | `<Leader>f` | フォーマット |
 

@@ -395,14 +395,6 @@
     "branch": "master",
     "commit": "5ae580df72589f25b775ff2bdacfd7f7be8d63bd"
   },
-  "oil-git-status.nvim": {
-    "branch": "main",
-    "commit": "a3e2ccb00cb8822115e28a9a1791eda051d940c9"
-  },
-  "oil.nvim": {
-    "branch": "master",
-    "commit": "0fcc83805ad11cf714a949c98c605ed717e0b83e"
-  },
   "open-browser.vim": {
     "branch": "master",
     "commit": "7d4c1d8198e889d513a030b5a83faa07606bac27"
